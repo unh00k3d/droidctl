@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- `permission` scenario: a runtime permission that shows the system dialog -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- `notification` scenario on API 33+ -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:label="droidctl test app"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.TestApp">
+
+        <!-- One activity hosts every scenario. singleTask + onNewIntent: an
+             `am start` with a new scenario while the app is open swaps the scenario in
+             place instead of stacking activities. configChanges is NOT set, so
+             rotation really recreates the activity (the `recreate` scenario). -->
+        <activity
+            android:name=".Main"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="droidctl-test" android:host="s" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".NotificationActionReceiver" android:exported="false" />
+    </application>
+</manifest>

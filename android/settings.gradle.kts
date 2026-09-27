@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "droidctl-android"
 include(":agent")
+include(":testapp")
