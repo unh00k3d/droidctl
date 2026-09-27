@@ -262,6 +262,8 @@ class Session:
         self.subs = set()
         self.sub_client = None
         self.sub_alive = False
+        self.side_lock = threading.Lock()    # the cache's gen checks: never behind an action
+        self.side_client = None
         self.stats = collections.Counter()
         self.last_call_end = time.monotonic()
         self.last_used = time.monotonic()
@@ -320,7 +322,8 @@ class Session:
         self.entry = None
         sc, self.sub_client = self.sub_client, None
         self.sub_alive = False
-        for c in (sc, self.client):
+        side, self.side_client = self.side_client, None
+        for c in (sc, side, self.client):
             if c is not None:
                 with contextlib.suppress(Exception):
                     c.close()
@@ -351,6 +354,25 @@ class Session:
                 if not self.alive:
                     self.open()
             return self._raw(method, params, timeout)
+
+    def _side(self, method, params=None, timeout=5.0):
+        """A cheap read on a second, persistent connection. The main one is held for
+        the whole of an action (a settle can take seconds), and a cache check that
+        queued behind it would make a cached snapshot wait for the action."""
+        from droidctl import device as dev
+        from droidctl.core import UserError
+        with self.side_lock:
+            for attempt in (0, 1):
+                if self.side_client is None:
+                    self.side_client = dev.AgentClient(self.port, timeout=timeout)
+                try:
+                    return self.side_client.call(method, params or {}, timeout=timeout)
+                except UserError as e:
+                    with contextlib.suppress(Exception):
+                        self.side_client.close()
+                    self.side_client = None
+                    if e.kind != "connection" or attempt:
+                        raise
 
     def call(self, method, params=None, timeout=10.0):
         from droidctl import device as dev
@@ -395,7 +417,7 @@ class Session:
                 self.stats["hits"] += 1
                 return e.tree
             t_send = time.monotonic()
-            g = (self._read("gen", None, 5.0) or {}).get("gen")
+            g = (self._side("gen") or {}).get("gen")
             self.stats["gen_checks"] += 1
             if g == e.gen and self.entry is e:
                 # nothing changed between the dump and this check; if they are far
@@ -476,6 +498,14 @@ class PooledClient:
         if method == "unsubscribe":
             self.close()
             return {"unsubscribed": True}
+        if method == "events" and self._sess.sub_alive:
+            # served from the permanent subscription's ring: no device round trip, so a
+            # cached snapshot never waits behind a running action. `age_ms` is host-side.
+            since = (params or {}).get("since") or 0
+            now = time.monotonic()
+            evs = [dict(ev, age_ms=int((now - t) * 1000)) for t, ev in list(self._sess.ring)
+                   if (ev.get("seq") or 0) > since]
+            return {"events": evs, "next": max(self._sess.last_seq, since)}
         return self._sess.call(method, params, timeout)
 
     def notifications(self, timeout=1.0):

@@ -155,6 +155,17 @@ def test_not_performed_falls_back_once(home, monkeypatch):
     assert s._client.count("gesture") == 1
 
 
+def test_no_fallback_when_the_click_took_the_screen_away(home, monkeypatch):
+    """performed:false after the app crashed: the old coordinates now belong to
+    another screen (measured: the launcher), so no positional tap."""
+    s = session(monkeypatch, tree("cart_inc-a"))
+    other = json.loads((FIX.parent / "trees" / "real-launcher-home.json").read_text())["tree"]
+    s._client.act_replies = [{"performed": False, "available": [], "tree": other}]
+    out = act.cmd_tap(args(target=str(plus_ref())))
+    assert out["method"] == "action" and "not tapping by position" in out["warning"]
+    assert s._client.count("gesture") == 0
+
+
 def test_method_action_never_falls_back(home, monkeypatch):
     s = session(monkeypatch, tree("cart_inc-a"))
     s._client.act_replies = [{"performed": True, "clicked_event": False, "tree": tree("cart_inc-a")}]
@@ -359,3 +370,38 @@ def test_run_collects_step_results_and_stops_on_failure(home, monkeypatch):
                                          keep_going=False, device=None, json=True, no_auto_setup=True))
     assert out["ran"] == 2 and out["failed"] == 1 and out["ok"] is False
     assert out["results"][1]["error"]["kind"] in ("bad-args", "no-device")
+
+
+def test_an_empty_clipboard_is_cleared_again_after_the_paste(home, monkeypatch):
+    t0 = tree("under_keyboard-a")
+    s = session(monkeypatch, t0)
+    s._client.clip = None                              # nothing on the clipboard before
+    s._client.act_replies = [{"performed": True, "tree": t0}] + [{"performed": True}] * 5
+    with pytest.raises(UserError):
+        act.cmd_type(type_args(id="message", content="hello"))
+    clips = [c[1] for c in s._client.calls if c[0] == "clipboard"]
+    assert clips[0] == "hello" and clips[-1] == ""    # our text never stays on the clipboard
+
+
+def test_a_password_never_goes_through_the_clipboard(home, monkeypatch):
+    t0 = json.loads((FIX.parent / "trees" / "testapp-password.json").read_text())["tree"]
+    s = session(monkeypatch, t0)
+    s._client.act_replies = [{"performed": False, "tree": t0}] + [{"performed": True}] * 5
+    with pytest.raises(UserError) as e:
+        act.cmd_type(type_args(id="password", content="hunter22"))
+    assert s._client.count("clipboard") == 0
+    steps = e.value.data["steps"]
+    assert any(x.get("skipped") for x in steps if x["method"] == "paste")
+
+
+def test_digits_after_a_locator_are_the_text_not_a_ref(home, monkeypatch):
+    """`type --id otp1 123456`: an all-digit text must not be read as ref 123456."""
+    t0 = tree("under_keyboard-a")
+    s = session(monkeypatch, t0)
+    s._client.act_replies = [{"performed": True, "tree": t0}]
+    a = type_args(id="message", target="123456", content=None)
+    with pytest.raises(UserError):          # the fake field never changes: no-change, not bad-args
+        act.cmd_type(a)
+    assert a.content == "123456" and a.target is None
+    sets = [c for c in s._client.calls if c[0] == "act" and c[3] == "set_text"]
+    assert sets and sets[0][4]["text"] == "123456"

@@ -152,7 +152,10 @@ TESTAPP `huge_tree`, every v2 dump returned the previous scenario's tree).
 `type_<n>` for OEM types: Samsung's Edge panel is `type_-1`), `layer`, `bounds`,
 `title` (if any), `pkg` (the root's package), `active` / `focused` (only when true),
 `root` (a node; absent if the window had no root), `no_root` (`true` for an
-application window whose root could not be read in time: see Degraded dumps).
+application window whose root could not be read in time: see Degraded dumps),
+`unlisted` (`true` when the window came from `rootInActiveWindow` because
+`getWindows()` listed no application window: right after the service is re-bound,
+Android 9 lists only windows that changed since; such a window has no `bounds`/`layer`).
 
 **Node object.** Fields that are null, empty, `false` or default are **omitted**:
 
@@ -347,3 +350,4 @@ typing; the host restores `previous` afterwards.
   max_nodes}`; node `size` (unclipped) when clipped; settle re-checks transitional trees
   (`redumps`). Bumped because a host that trusted a v2 degraded tree's handles would
   act on the wrong screen.
+  Agent 0.3.1 (versionCode 4, still protocol 3): the additive `unlisted` window.

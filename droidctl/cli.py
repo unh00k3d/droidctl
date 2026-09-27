@@ -59,6 +59,23 @@ def _wait_for_agent(port, timeout=8.0):
             time.sleep(0.2)
 
 
+def _wait_for_windows(port, timeout=3.0):
+    """A freshly bound service answers ping before it can see the app's windows
+    (measured on the SM-N950F: the first command after a re-enable found nothing).
+    Wait until the tree has an application window with a root; never fail setup."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            with dev.AgentClient(port, timeout=3.0) as c:
+                tree = c.call("tree", {}, timeout=3.0)
+            if any(w.get("type") == "application" and w.get("root") for w in tree.get("windows", ())):
+                return True
+        except UserError:
+            pass
+        time.sleep(0.2)
+    return False
+
+
 def cmd_setup(a):
     if not os.path.exists(dev.APK_PATH):
         raise UserError(f"the agent APK is not bundled ({dev.APK_PATH})", "missing-dep",
@@ -101,6 +118,8 @@ def cmd_setup(a):
     # 4. forward and ping
     port = dev.ensure_forward(serial)
     info = _wait_for_agent(port)
+    if installed or added:
+        _wait_for_windows(port)
     dev.update_device_state(serial, port=port, version_code=info.get("versionCode"))
     return {"ok": True, "serial": serial, "installed": installed, "previous_version": before_version,
             "service_added": added, "services_before": before, "services_after": dev.get_services(d),
@@ -388,6 +407,24 @@ def _snap_opts(a):
                          bounds=a.bounds, max=a.max, find=a.find, within=a.within)
 
 
+def _recent_toast(client, prev_state):
+    """(toast text or None, event seq now) for the snapshot header: toasts since the
+    previous snapshot or action, else ones fired in the last few seconds. Never fails
+    the snapshot: an agent without events just gets no toast."""
+    from droidctl import snapshot as snap_mod
+    prev_seq = (prev_state or {}).get("evseq")
+    try:
+        r = client.call("events", {"since": prev_seq or 0}, timeout=5)
+        evs = r.get("events") or []
+        now = None
+        if prev_seq is None and any(e.get("type") == "toast" for e in evs) \
+                and not all("age_ms" in e for e in evs):
+            now = client.call("ping", {}, timeout=5).get("uptime_ms")   # only to age a toast
+    except UserError:
+        return None, prev_seq
+    return snap_mod.pick_toast(r.get("events"), prev_seq, now), r.get("next", prev_seq)
+
+
 def cmd_snapshot(a):
     import json
     from droidctl import snapshot as snap_mod
@@ -403,14 +440,19 @@ def cmd_snapshot(a):
         activity = (doc.get("meta") or {}).get("activity")
     else:
         serial = dev.resolve_serial(a.device)
+        prev_state = snap_mod.load_state(serial)
         client, _info = dev.connect(serial)
         try:
             tree = client.call("tree", {}, timeout=15)
+            if not a.raw:
+                toast, evseq = _recent_toast(client, prev_state)
         finally:
             client.close()
     if a.raw:
         return {"ok": True, "raw": tree}
     snap = snap_mod.build(tree, activity=activity, system=a.system)
+    if serial:
+        snap.toast, snap.evseq = toast, evseq
     if a.within is not None and not any(e.ref == a.within for e in snap.elements):
         raise UserError(f"no element [{a.within}] on this screen", "not-found", hint="run: droidctl snapshot")
     prev = snap_mod.load_state(serial) if serial else None
@@ -439,7 +481,7 @@ def cmd_snapshot(a):
                    "dump": snap.dump, "gen": snap.gen},
         "unchanged": unchanged, "diff": changes,
         "elements": [snap_mod.element_json(e) for e in shown],
-        "total": len(snap.elements), "warnings": snap.warnings,
+        "total": len(snap.elements), "warnings": snap.warnings, "toast": snap.toast,
         "text": text, "tokens_est": snap_mod.est_tokens(text),
     }
 

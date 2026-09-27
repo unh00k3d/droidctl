@@ -56,8 +56,9 @@ screen dev.droidctl.testapp/.Main  sig=9b86  keyboard=hidden  dialog=no  1080x22
   (custom actions), `list 8/25 more↓` (scrollable, with position), `covered` (behind the
   keyboard or another window), `#id`. `share?` marks a label *inferred* from a resource id.
 - The header: package/activity, a screen signature `sig=` (changes when the screen's
-  structure does), `keyboard=`, `dialog=` and the screen size. Toasts are reported on action
-  results (`toast`) and between calls (`between_calls`), not in the header.
+  structure does), `keyboard=`, `dialog=`, the screen size, and `toast="…"` for a toast
+  that fired since your last snapshot or action (also `toast` in `--json`). Action results
+  carry their own `toast`, and the daemon reports events between calls (`between_calls`).
 - Options: `--diff` (only what changed since the last snapshot; `unchanged` if nothing),
   `--find TEXT`, `--in REF` (one subtree), `--bounds`, `--geo` (`@x,y wxh` as screen %),
   `--map` (ASCII wireframe), `--layout flat` (one element per line), `--system` (include the
@@ -111,8 +112,13 @@ changed" into the `no-change` error; `--settle MS` sets the quiet window (defaul
 - `--method action|gesture` forces one path.
 
 **Typing** tries `ACTION_SET_TEXT` (Unicode, no tap), then a clipboard paste (the clipboard is
-restored), then `adb input text` (ASCII only), and reads the value back (`value` in the
-result). `--enter` presses the keyboard's action key.
+restored, or cleared if it was empty), then `adb input text` (ASCII only), and reads the value
+back (`value` in the result). Password fields never go through the clipboard, and their value is
+never printed: `verified` compares the length only. `--enter` presses the keyboard's action key.
+Digits after a locator are text: `type --id otp1 123456`.
+
+**Swipes** drag 0.4 of the box up/down and 0.7 left/right: pages and swipe-to-dismiss rows need
+more than half the width, because accessibility gestures don't register as flings.
 
 ## Wait and observe
 

@@ -183,6 +183,7 @@ class Tree(private val svc: AccessibilityService) {
             if (root == null && walk.timeLeft() > 100) { SystemClock.sleep(50); root = svc.rootInActiveWindow }
             if (root == null) return 1
             val jw = JSONObject().put("id", root.windowId).put("type", "application").put("active", true)
+                .put("unlisted", true)
             root.packageName?.let { jw.put("pkg", it.toString()) }
             jw.put("root", walk.root(root))
             out.put(jw)
@@ -206,6 +207,20 @@ class Tree(private val svc: AccessibilityService) {
             if (root != null) jw.put("root", walk.root(root))
             else if (w.type == AccessibilityWindowInfo.TYPE_APPLICATION) { jw.put("no_root", true); missing += 1 }
             out.put(jw)
+        }
+        // Right after the service is (re)bound, Android 9 lists only the windows that
+        // changed since (measured on the SM-N950F: just the edge panel, while the app in
+        // front was missing until its next window change). The active window is still
+        // reachable directly, so add it when no application window was listed.
+        if (list.none { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }) {
+            val root = svc.rootInActiveWindow
+            if (root != null && list.none { it.id == root.windowId }) {
+                val jw = JSONObject().put("id", root.windowId).put("type", "application")
+                    .put("active", true).put("focused", true).put("unlisted", true)
+                root.packageName?.let { jw.put("pkg", it.toString()) }
+                jw.put("root", walk.root(root))
+                out.put(jw)
+            }
         }
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT < 33) for (w in list) try { w.recycle() } catch (_: Exception) {}

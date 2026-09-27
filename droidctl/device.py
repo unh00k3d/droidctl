@@ -23,7 +23,7 @@ PROTOCOL = 3
 # The versionCode of the APK bundled in droidctl/assets. It has to match the
 # agent's build.gradle.kts (a unit test checks); setup compares it with what
 # the phone reports so an unchanged agent is not reinstalled.
-AGENT_VERSION_CODE = 3
+AGENT_VERSION_CODE = 4
 APK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "droidctl-agent.apk")
 DEVICE_TMP_APK = "/data/local/tmp/droidctl-agent.apk"
 
@@ -473,10 +473,39 @@ def screenshot(client, serial, scale=0.5, quality=70, crop=None):
     return screencap_jpeg(serial, scale, quality, crop)
 
 
+def secure_windows(dumpsys_text):
+    """Names of on-screen FLAG_SECURE windows in `dumpsys window windows` output.
+
+    The API < 30 screenshot path is `screencap`, which renders a secure window
+    black instead of failing; this is how we refuse to pass that off as a real
+    screenshot. Pure (tested on real captures)."""
+    import re
+    out = []
+    for block in re.split(r"\n(?=  Window #\d+ )", dumpsys_text):
+        m = re.match(r"\s*Window #\d+ Window\{\S+ \S+ ([^}]*)\}", block)
+        if not m:
+            continue
+        flags = re.search(r"\bfl=([^\n]*)", block)
+        if (flags and re.search(r"\bSECURE\b", flags.group(1))
+                and "isVisible=true" in block and "mHasSurface=true" in block):
+            out.append(m.group(1))
+    return out
+
+
 def screencap_jpeg(serial, scale=0.5, quality=70, crop=None):
     import base64
     import io
     import subprocess
+    try:
+        dump = subprocess.run([adb_path(), "-s", serial, "shell", "dumpsys", "window", "windows"],
+                              capture_output=True, text=True, timeout=15).stdout
+    except (subprocess.SubprocessError, OSError):
+        dump = ""
+    secure = secure_windows(dump)
+    if secure:
+        raise UserError(f"a FLAG_SECURE window is on screen ({secure[0]}); screencap would return "
+                        "a black image, not the screen", "secure-window",
+                        hint="snapshot still works on secure windows")
     try:
         png = subprocess.run([adb_path(), "-s", serial, "exec-out", "screencap", "-p"],
                              capture_output=True, timeout=15, check=True).stdout

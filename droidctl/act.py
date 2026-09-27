@@ -298,6 +298,10 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     """Build the post-action snapshot, diff it against `pre`, save it, shape the result."""
     tree = (reply or {}).get("tree") or sess.tree()
     post = S.build(tree)
+    events = (reply or {}).get("events") or []
+    seqs = [e["seq"] for e in events if isinstance(e.get("seq"), int)]
+    # the toasts this result reports must not come back in the next snapshot's header
+    post.evseq = max(seqs) if seqs else pre.get("evseq")
     changes = S.diff(pre, post) if pre.get("lines") else []
     new_screen = bool(pre.get("sig")) and pre.get("sig") != post.sig
     changed = bool(changes) or new_screen
@@ -310,7 +314,6 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
         more = len(changes) - len(lines)
         text = "\n".join([S.header(post, opts)] + (lines or ["unchanged"])
                          + ([f"… {more} more changed lines (snapshot --diff shows them all)"] if more > 0 else []))
-    events = (reply or {}).get("events") or []
     out = {
         "ok": True, "changed": changed, "method": method,
         "new_screen": new_screen,
@@ -419,11 +422,32 @@ def cmd_tap(a):
     why = "ACTION_CLICK was not performed"
     if t.tap is None:
         return finish(sess, a, "action", r, pre, t, warning=why + "; no tap point for a fallback")
+    moved = _screen_moved(sess, r, pre)
+    if moved:
+        return finish(sess, a, "action", r, pre, t, warning=f"{why}, and {moved}; not tapping by position")
     if t.res is not None and t.occluded:
         R.check_occlusion(t.res, "gesture")
     g = _gesture(sess, "tap", [t.tap], settle)
     return finish(sess, a, "gesture-fallback", g, pre, t,
                   warning=f"{why}; tapped once at {t.tap[0]},{t.tap[1]}")
+
+
+def _screen_moved(sess, r, pre):
+    """Why a positional fallback would hit something else, or None if it is safe.
+
+    performed:false can also mean the click did run and took the screen with it
+    (the app crashed, a dialog closed, the activity finished). A tap at the old
+    coordinates would then land on whatever is there now (measured: TESTAPP
+    `crash` -> the launcher), so the fallback only fires on the same screen."""
+    tree = (r or {}).get("tree") or sess.tree()
+    if r is not None:
+        r["tree"] = tree                  # finish() reuses it: no second dump
+    post = S.build(tree)
+    if pre.get("pkg") and post.pkg != pre.get("pkg"):
+        return f"the screen is now {post.pkg}"
+    if pre.get("sig") and post.sig != pre["sig"]:
+        return "the screen changed"
+    return None
 
 
 def _gesture_tap(sess, a, t, pre, settle, typ, warning=None):
@@ -450,6 +474,10 @@ def cmd_long_press(a):
         return finish(sess, a, "action", r, pre, t)
     if t.tap is None:
         return finish(sess, a, "action", r, pre, t, warning="ACTION_LONG_CLICK was not performed")
+    moved = _screen_moved(sess, r, pre)
+    if moved:
+        return finish(sess, a, "action", r, pre, t,
+                      warning=f"ACTION_LONG_CLICK was not performed, and {moved}; not pressing by position")
     g = _gesture(sess, "long", [t.tap], settle)
     return finish(sess, a, "gesture-fallback", g, pre, t,
                   warning="ACTION_LONG_CLICK was not performed; long-pressed at the element's centre")
@@ -572,9 +600,10 @@ def _swipe_points(direction, box, frac=0.4):
         return [[cx, top + 0.7 * h], [cx, top + (0.7 - frac) * h]]
     if direction == "up":
         return [[cx, top + 0.3 * h], [cx, top + (0.3 + frac) * h]]
+    hfrac = max(frac, 0.6)          # horizontal drags must pass half the width (see cmd_swipe)
     if direction == "right":
-        return [[l + 0.8 * w, cy], [l + (0.8 - frac) * w, cy]]
-    return [[l + 0.2 * w, cy], [l + (0.2 + frac) * w, cy]]
+        return [[l + 0.8 * w, cy], [l + (0.8 - hfrac) * w, cy]]
+    return [[l + 0.2 * w, cy], [l + (0.2 + hfrac) * w, cy]]
 
 
 def _screen_box(sess):
@@ -610,6 +639,12 @@ def cmd_swipe(a):
     l, top, r, b = box
     w, h = r - l, b - top
     d = a.distance
+    if d is None:
+        # Horizontal swipes (ViewPager pages, swipe-to-dismiss rows) must drag past
+        # half the width: accessibility-dispatched gestures register no fling on the
+        # SM-N950F (even a 150 ms swipe snapped back), and 0.4 did nothing on TESTAPP
+        # tabs_pager and swipe_only_delete. Vertical scrolls don't need a fling.
+        d = 0.7 if a.direction in ("left", "right") else 0.4
     if a.direction in ("up", "down"):
         x = l + 0.6 * w if t is None else l + 0.5 * w
         y0, y1 = (0.7, 0.7 - d) if a.direction == "up" else (0.3, 0.3 + d)
@@ -786,7 +821,11 @@ def _type(sess, a, t):
     before = current
 
     def ok(val):
-        return want["password"] or val == target
+        if want["password"]:
+            # the platform exposes a password as bullets of the same length (measured on
+            # API 28: "••••••••"); the length is all we may compare, and all we report
+            return val is not None and len(val) == len(target)
+        return val == target
 
     # 1. ACTION_SET_TEXT (no tap, Unicode-safe)
     r = _act(sess, t, action="set_text", args={"text": target}, force=force,
@@ -796,12 +835,17 @@ def _type(sess, a, t):
     val, node, snap = _readback(sess, want, (r or {}).get("tree"))
     method, reply = "set_text", r
     ignored = not (r and r.get("performed")) or (val == before and target != before)
-    # 2. focus + clipboard paste (the field refused set_text)
-    if ignored and not ok(val) and node is not None:
+    # 2. focus + clipboard paste (the field refused set_text). Never for a password:
+    #    the clipboard is readable by other apps and Samsung keeps a clipboard history.
+    if ignored and not ok(val) and node is not None and want["password"]:
+        steps.append({"method": "paste", "skipped": "password field: never via the clipboard"})
+    elif ignored and not ok(val) and node is not None:
         prev = None
+        touched = False
         try:
             sess.call("act", snap.dump, node.raw["handle"], action="focus", force=force, retry=False)
             clip = sess.call("clipboard", set=text if a.append else target)
+            touched = True
             prev = clip.get("previous")
             cur = _field_value(node) or ""
             if not a.append and cur:
@@ -819,9 +863,10 @@ def _type(sess, a, t):
         except UserError as e:
             steps.append({"method": "paste", "error": e.kind})
         finally:
-            if prev is not None:
+            if touched:
+                # restore; an empty clipboard before means clear it, not leave our text
                 try:
-                    sess.call("clipboard", set=prev)
+                    sess.call("clipboard", set=prev if prev is not None else "")
                 except UserError:
                     pass
     # 3. adb input text (ASCII only), into the focused field
@@ -836,7 +881,13 @@ def _type(sess, a, t):
         except UserError as e:
             steps.append({"method": "input", "error": e.kind})
     warning = None
-    if not want["password"] and val != target:
+    if want["password"] and not ok(val):
+        n_now, n_want = len(val or ""), len(target)
+        if (val or "") == (before or "") and target != (before or ""):
+            raise UserError(f"the password field did not take the text ({n_now} characters, not {n_want})",
+                            "no-change", data={"steps": steps, "len": n_now})
+        warning = f"the password field holds {n_now} characters, not {n_want} (a length limit?)"
+    elif not want["password"] and val != target:
         if val == before and target != before:
             raise UserError(f"the field did not take the text (it still shows {val!r})", "no-change",
                             data={"steps": steps, "value": val})
@@ -845,7 +896,7 @@ def _type(sess, a, t):
         _enter(sess, node, snap)
         steps.append({"method": "enter"})
         reply = None
-    extra = {"value": None if want["password"] else val, "verified": want["password"] or val == target,
+    extra = {"value": None if want["password"] else val, "verified": ok(val),
              "steps": steps}
     if want["password"]:
         extra["value_hidden"] = True
@@ -867,9 +918,11 @@ def _enter(sess, node, snap):
 
 def cmd_type(a):
     sess = session_for(a)
-    # `type "hello"`: one positional that is not a ref is the text, into the focused input
-    if (a.content is None and a.target is not None and not re.fullmatch(r"\[?\d+\]?", a.target.strip())
-            and not (a.stdin or a.file)):
+    # `type "hello"`: one positional that is not a ref is the text, into the focused input.
+    # With a locator (`type --id otp1 123456`) a lone positional is always the text,
+    # even when it is all digits: the locator already names the element.
+    if (a.content is None and a.target is not None and not (a.stdin or a.file)
+            and (not re.fullmatch(r"\[?\d+\]?", a.target.strip()) or _locator(a) or a.ref is not None)):
         a.content, a.target = a.target, None
     if (a.target is None and a.ref is None and not _locator(a) and not a.point):
         # no target: the focused input

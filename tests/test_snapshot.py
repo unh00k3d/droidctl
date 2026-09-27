@@ -44,7 +44,9 @@ def test_every_real_screen_is_small_and_sane(path):
     snap = S.build(d["tree"], activity=d["meta"].get("activity"))
     out = S.render(snap, S.Opts())
     assert S.est_tokens(out) < 2000, "PLAN: under 2k tokens per screen (estimate)"
-    assert S.est_tokens(out) < S.est_tokens(json.dumps(d["tree"])) / 10
+    raw = S.est_tokens(json.dumps(d["tree"]))
+    if raw > 1000:                     # the ratio means little on a five-node tree
+        assert S.est_tokens(out) < raw / 10
     w, h = snap.screen[2], snap.screen[3]
     assert [e.ref for e in snap.elements] == list(range(1, len(snap.elements) + 1))
     for e in snap.elements:
@@ -307,6 +309,8 @@ def test_cli_live_path_saves_state_diffs_and_where(monkeypatch, tmp_path, capsys
 
     class FakeClient:
         def call(self, method, params=None, timeout=None):
+            if method == "events":                  # the toast header's read: none here
+                return {"events": [], "next": 0}
             assert method == "tree"
             return copy.deepcopy(trees[-1])
 
@@ -638,3 +642,19 @@ def _nodes(tree):
             n = stack.pop()
             yield n
             stack.extend(n.get("children", ()))
+
+
+def test_an_open_drawer_is_its_own_region():
+    """DrawerLayout hides the main content from a11y when the drawer opens, so the
+    drawer is the only (index 0) child; the region must still be `drawer`."""
+    s = S.build(load("testapp-fab_sheet_drawer-drawer")["tree"])
+    assert {e.region for e in s.elements} == {"drawer"}
+
+
+def test_a_window_without_bounds_after_a_rebind_is_the_main_screen():
+    """Right after the service is re-bound, Android 9 lists no application window;
+    the agent falls back to rootInActiveWindow (no bounds, no title). That window is
+    the screen, not a dialog, and its elements are listed."""
+    s = S.build(load("testapp-buttons-rebound")["tree"])
+    assert not s.dialog
+    assert [e.label_full for e in s.elements][:2] == ["Buttons", "Save"]

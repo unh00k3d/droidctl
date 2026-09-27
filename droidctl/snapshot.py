@@ -78,6 +78,10 @@ class Win:
         self.title = raw.get("title") or ""
         self.pkg = raw.get("pkg") or (raw.get("root") or {}).get("pkg") or ""
         self.rect = sp.inter(sp.rect(raw.get("bounds")), screen)
+        if raw.get("bounds") is None and raw.get("root"):
+            # a window from rootInActiveWindow (right after a re-bind, or when
+            # getWindows() is empty) has no window bounds: its root node's box is it
+            self.rect = sp.inter(sp.rect(raw["root"].get("bounds")), screen)
         # Android 9 reports a dialog's/popup's window bounds shifted by its shadow
         # insets (-84,-84 on the SM-N950F: a PopupMenu window at [-42,461,..]
         # whose root node is at [42,545,..]); clipping nodes to that cuts rows
@@ -265,6 +269,8 @@ class Snap:
         self.dump = self.gen = None
         self.windows = []
         self.roots = []               # the Node tree of every kept window (the resolver searches it)
+        self.toast = None             # a toast since the previous snapshot (set by the caller)
+        self.evseq = None             # the agent's event-ring position this snapshot has seen
 
 
 def build(tree, activity=None, system=False):
@@ -344,7 +350,9 @@ def _classify(wins, snap, system):
     def floating(w):
         # Android 9 titles activity windows (the activity label) but not dialogs,
         # and a modal dialog is often the only window it lists at all
-        return popup(w) or not w.title or sp.area(w.rect) < 0.7 * area_scr
+        # a window from rootInActiveWindow (`unlisted`, no bounds) has no title to go by
+        untitled = not w.title and not w.raw.get("unlisted") and w.raw.get("bounds") is not None
+        return popup(w) or untitled or sp.area(w.rect) < 0.7 * area_scr
 
     main = max((w for w in apps if not floating(w)), key=lambda w: (sp.area(w.rect), -w.layer), default=None)
     for w in apps:
@@ -782,8 +790,10 @@ def _regions(elems, wins, W, H):
                 continue
             n, r = e.node, e.rect
             bar = next((k for k, b in w.bars.items() if b is n or b.is_ancestor_of(n)), None)
+            # the drawer is the DrawerLayout child narrower than the screen. Not "index > 0":
+            # an open drawer hides the main content from a11y, leaving the drawer at index 0
             drawer = next((a for a in n.ancestors() if a.parent is not None and a.parent.cls == "DrawerLayout"
-                           and a.index > 0 and a.rect and sp.width(a.rect) < 0.95 * W), None)
+                           and a.rect and sp.width(a.rect) < 0.95 * W), None)
             sheet = _in_sheet(n)
             if sheet:                      # a sheet docked at the bottom is not a bar
                 e.region = "sheet"
@@ -1033,6 +1043,8 @@ def header(snap, opts=None):
         parts.append(f"{snap.screen[2]}x{snap.screen[3]}")
     if snap.degraded:
         parts.append(f"degraded={snap.degraded}")
+    if snap.toast:
+        parts.append(f'toast="{_q(snap.toast[:80])}"')
     return "  ".join(parts)
 
 
@@ -1371,14 +1383,39 @@ def to_state(snap, serial=None):
              "role", "label", "text", "desc", "hint",   # the fingerprint
              "id", "uid", "vid", "class", "path": [anchor_id, [child indices]],
              "ctx": [labels around it],                 # see context()
-             "bounds", "tap", "region", "parent"}}}
+             "bounds", "tap", "region", "parent"}},
+         "evseq": last agent event seq already reported (toast header), or null}
     """
     refs = {str(e.ref): ref_record(e, snap) for e in snap.elements}
     return {"version": 1, "serial": serial, "created": round(time.time(), 3), "dump": snap.dump,
             "gen": snap.gen, "sig": snap.sig, "pkg": snap.pkg, "activity": snap.activity,
             "title": snap.title, "screen": list(snap.screen),
             "keyboard": list(snap.keyboard) if snap.keyboard else None,
-            "lines": flat_lines(snap), "refs": refs}
+            "lines": flat_lines(snap), "refs": refs, "evseq": snap.evseq}
+
+
+TOAST_FRESH_MS = 3500   # Toast.LENGTH_LONG: a toast this recent may still be on screen
+
+
+def pick_toast(events, prev_seq=None, now_ms=None):
+    """The newest toast text among agent `events` that the caller hasn't reported yet:
+    seq > prev_seq when a previous position is known, else fired within the last
+    TOAST_FRESH_MS (device uptime `now_ms`). Pure."""
+    best = None
+    for e in events or ():
+        if e.get("type") != "toast" or not e.get("text"):
+            continue
+        if prev_seq is not None:
+            if (e.get("seq") or 0) <= prev_seq:
+                continue
+        elif "age_ms" in e:                      # the daemon's ring knows each event's age
+            if e["age_ms"] > TOAST_FRESH_MS:
+                continue
+        elif now_ms is None or now_ms - (e.get("t") or 0) > TOAST_FRESH_MS:
+            continue
+        if best is None or (e.get("seq") or 0) > (best.get("seq") or 0):
+            best = e
+    return best["text"] if best else None
 
 
 def snap_path(serial):

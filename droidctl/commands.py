@@ -102,7 +102,8 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("direction", choices=("up", "down", "left", "right"), help="finger direction")
     sp.add_argument("target", nargs="?", metavar="REF", help="swipe inside this element")
     _locators(sp, positional=False)
-    sp.add_argument("--distance", type=float, default=0.4, metavar="F", help="fraction of the box (0.4)")
+    sp.add_argument("--distance", type=float, default=None, metavar="F",
+                    help="fraction of the box to drag (0.4 up/down, 0.7 left/right: pages need > half)")
     sp.add_argument("--ms", type=int, default=400, metavar="MS", help="swipe duration (400)")
     _act_opts(sp, method=False)
 

@@ -49,7 +49,10 @@ def test_fixture_is_a_well_formed_raw_tree(path):
 
     for w in tree["windows"]:
         assert w["type"] in WINDOW_TYPES or w["type"].startswith("type_")
-        assert len(w["bounds"]) == 4
+        if w.get("unlisted"):          # from rootInActiveWindow: no window bounds (PROTOCOL.md)
+            assert "bounds" not in w and w.get("root")
+        else:
+            assert len(w["bounds"]) == 4
     apps = [w for w in tree["windows"] if w["type"] == "application" and "root" in w]
     if "no root" in meta.get("note", "") or any(w.get("no_root") for w in tree["windows"]):
         # a real capture of the agent returning an app window without its tree

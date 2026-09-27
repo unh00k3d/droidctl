@@ -212,7 +212,9 @@ valid.
   passed without a change, any later change starts a new burst, and that burst *is*
   pushed. So pushes are only trusted after a verified quiet gap.
 - **A `gen` check** (one ~8 ms round trip on the dev phone) serves the tree whenever it
-  isn't quiet yet, the TTL expired, or the subscription is down.
+  isn't quiet yet, the TTL expired, or the subscription is down. It runs on a second,
+  persistent device connection, so a cached snapshot never queues behind an action
+  holding the main one (a settle can take seconds).
 - **Anything else is a miss:** a fresh `tree`.
 
 **Invalidation:**

@@ -1,0 +1,170 @@
+{
+ "meta": {
+  "name": "testapp-buttons-rebound",
+  "captured": "2026-09-27T12:27:41+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.3.1",
+   "versionCode": 4
+  },
+  "package": "dev.droidctl.testapp",
+  "activity": "dev.droidctl.testapp/dev.droidctl.testapp.Main",
+  "not_important": false,
+  "settled": true,
+  "dump_ms": 20,
+  "nodes": 5,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 0,
+  "dump": 2,
+  "degraded": false,
+  "ms": 20,
+  "nodes": 5,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 3475,
+    "type": "application",
+    "active": true,
+    "unlisted": true,
+    "pkg": "dev.droidctl.testapp",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "dev.droidctl.testapp",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.TextView",
+       "text": "Buttons",
+       "bounds": [
+        42,
+        105,
+        1038,
+        211
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled",
+        "heading"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 3,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/save",
+       "text": "Save",
+       "bounds": [
+        42,
+        211,
+        1038,
+        337
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 4,
+       "class": "android.widget.ImageButton",
+       "id": "dev.droidctl.testapp:id/settings",
+       "desc": "Settings",
+       "tooltip": "Settings",
+       "bounds": [
+        42,
+        337,
+        1038,
+        471
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 5,
+       "class": "android.widget.ImageButton",
+       "id": "dev.droidctl.testapp:id/mystery",
+       "bounds": [
+        42,
+        471,
+        1038,
+        605
+       ],
+       "drawingOrder": 3,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}
