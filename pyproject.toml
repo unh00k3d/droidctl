@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "droidctl"
+version = "0.1.0.dev0"
+description = "An agent-first Android automation CLI: compact UI snapshots with refs and element-based actions."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Enes Bayram" }]
+dependencies = [
+    "adbutils>=2.8",
+    "rich>=13",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+droidctl = "droidctl.cli:main"
+
+[tool.setuptools]
+packages = ["droidctl"]
+
+[tool.setuptools.package-data]
+droidctl = ["assets/*.apk"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# device tests skip unless DROIDCTL_SERIAL is set, so a bare `pytest` is always safe
+addopts = "-q"
