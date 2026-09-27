@@ -21,10 +21,13 @@ from tests.fakes import FakeAdb, FakeAgent
 PY = sys.executable
 
 
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def _env(home, **extra):
     env = {k: v for k, v in os.environ.items()
            if not k.startswith("DROIDCTL_") and k not in ("ANDROID_SERIAL", "ANDROID_ADB_SERVER_PORT")}
     env.update(DROIDCTL_HOME=str(home), DROIDCTL_IDLE="120s")
+    env["PYTHONPATH"] = REPO   # subprocesses run this checkout, not whatever is pip-installed
     env.update({k: str(v) for k, v in extra.items()})
     return env
 

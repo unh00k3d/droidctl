@@ -107,6 +107,7 @@ def test_stdio_session_against_fake_phones(tmp_path):
     adb = FakeAdb({"AAA": agent})
     env = {k: v for k, v in os.environ.items() if not k.startswith("DROIDCTL_") and k != "ANDROID_SERIAL"}
     env.update(DROIDCTL_HOME=str(tmp_path), ANDROID_ADB_SERVER_PORT=str(adb.port), DROIDCTL_IDLE="60s")
+    env["PYTHONPATH"] = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     async def session():
         params = StdioServerParameters(command=sys.executable, args=["-m", "droidctl", "mcp"], env=env)
