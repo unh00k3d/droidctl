@@ -126,6 +126,8 @@ Legend for the expected behaviour: **R** = ref resolution, **S** = snapshot, **A
 | TalkBack/other a11y services enabled before `setup` | still enabled after `setup` and after `teardown` |
 | APK older than the host | auto-upgrade with `install -r`, then continue |
 | two devices attached, no `-d` | E `bad-args` listing serials |
+| display resolution override (`wm size` ≠ physical; the dev phone runs 1080x2220 over 1440x2960) | a11y bounds, gesture taps, `screencap` and `--marks` boxes line up; `--geo` percentages are correct; a tap at a node's centre hits it (DTA) |
+| API < 30 device (dev phone is API 28) | `shot` via `screencap` fallback, `--enter` via keyevent, resolver works without `uid`; features needing newer APIs report a clear `unsupported` note rather than failing silently |
 | first command with no daemon running | daemon auto-starts detached; the stderr notice (or the `--json` `daemon.started`) appears exactly once; the next call reports `mode:"daemon"` |
 | `DROIDCTL_NO_DAEMON=1` | the command works in-process, `mode:"inprocess"`; no droidctl process remains afterwards (`pgrep`) |
 | `DROIDCTL_AUTOSTART=0` with no daemon | E `no-daemon` with a hint |

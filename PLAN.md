@@ -492,7 +492,7 @@ Every command takes `--json`, `-d SERIAL|NAME` (falls back to `ANDROID_SERIAL`, 
 Any coordinates we print are always in device pixels.
 
 ## Milestones
-0. **Toolchain: done 2026-09-27.** JDK 21, Go, Android SDK at `~/Android/Sdk` (platform 35, build-tools 35.0.0, platform-tools/adb 37; `ANDROID_HOME` in `~/.zshrc`). Still to do at the start of M1: create the `.venv` with `adbutils`, and connect and authorize the phone (`adb devices`).
+0. **Toolchain: done 2026-09-27.** Dev phone: Galaxy Note 8 SM-N950F, Android 9 (API 28), stock plus Magisk (details in CLAUDE.md). Add an API 35 emulator as a second target for API 30+ paths. JDK 21, Go, Android SDK at `~/Android/Sdk` (platform 35, build-tools 35.0.0, platform-tools/adb 37; `ANDROID_HOME` in `~/.zshrc`). Still to do at the start of M1: create the `.venv` with `adbutils`, and connect and authorize the phone (`adb devices`).
 1. **Walking skeleton, measured:**
    - Gradle project;
    - a service with a socket, `ping` and the peer-UID check;
@@ -520,7 +520,8 @@ Any coordinates we print are always in device pixels.
 | question | decided by | when |
 |---|---|---|
 | Does peer-UID auth work (adbd = uid 2000) on the user's phone? Else use an adb-broadcast token | on-device test | M1 |
-| Can adb enable our service on Android 13+ despite restricted settings? | on-device test | M1 |
+| Can adb enable our service on Android 13+ despite restricted settings? | on-device test (**not possible on the Android 9 dev phone**; use the API 35 emulator or another device) | M1 |
+| Do a11y bounds, gesture coordinates, `screencap` and `--marks` agree under a display-resolution override (dev phone: 1080x2220 over 1440x2960)? | on-device test | M1/M7 |
 | Do the M1 on-device checks hold on a **stock, unrooted** phone? (dev starts on a rooted phone, where custom ROMs and Magisk/LSPosed can change settings, SELinux and a11y behaviour) | re-run the M1 checks on a stock device | before v1.0 |
 | Real socket RTT (USB and wireless), tree-dump time, settle time → settle defaults | `bench` | M1, M5 |
 | Port the thin client to Go? | client boot share of per-step time; distribution needs | M6 / v1.0 |
