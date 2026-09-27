@@ -16,13 +16,18 @@ An agent-first Android automation CLI: a compact UI snapshot with refs, element-
 - JDK 21 (`javac`), Go, Python 3.13 (Debian system Python is externally managed, so **use a venv**: `python3 -m venv .venv`).
 - Android SDK at `~/Android/Sdk` (`ANDROID_HOME`, set in `~/.zshrc`): `platforms;android-35`, `build-tools;35.0.0`, `platform-tools` (adb 37, first on PATH; Debian's `/usr/bin/adb` 34 also exists, so don't mix the two servers). The SDK's `sdkmanager` now prints a deprecation notice pointing at the new `android` CLI; it still works.
 - Physical Android phone over USB (check with `adb devices`). Ask the user for the model and Android version if it isn't recorded here yet.
+- **The dev phone is rooted.**
+  - droidctl must **never depend on root**: no `su` in features or tests.
+  - Don't use `adb root` for normal development; keep adbd as shell (uid 2000) so we exercise the real path. Peer-UID auth also accepts uid 0 for rooted/custom-ROM setups.
+  - Results from the M1 on-device checks (restricted settings, peer UID, a11y behaviour) must be re-verified on a stock phone before v1.0.
+  - Minimum Android 8 (API 26); `takeScreenshot` needs 11+, stable node `uid` needs 13+.
 
 ## Non-negotiables
 - **Measure, don't assume.** Latency, settle defaults, the spatial-layer defaults and the Go-client question are all decided by measurements and benchmarks (see "Open questions and decision gates" in PLAN.md). Label estimates as estimates.
 - **Fixtures come from real devices.** Never hand-write UI trees for tests; capture them with `dump-fixture` / `make fixtures`. Hand-written fixtures hid real bugs in Artemis and mobile-use.
 - **Never break the user's phone.** Append to `enabled_accessibility_services`, never overwrite it. Never switch or leave behind an IME. Never uninstall other tools. `teardown` restores everything.
 - **Never guess by position.** Refs resolve uniquely or fail with a typed error (`stale-ref`, `ambiguous`, `occluded`, `offscreen`). No coordinate taps unless explicit (`--point`) or through the event-gated single fallback.
-- **The APK stays tiny:** Kotlin, no AndroidX or other dependencies, **no INTERNET permission**, auth by peer UID (shell = 2000).
+- **The APK stays tiny:** Kotlin, no AndroidX or other dependencies, **no INTERNET permission**, auth by peer UID (shell 2000, or root 0).
 - **Test ground truth comes from the test app's `DTA` logcat events,** never from droidctl's own output.
 - **Licensing:** Artemis, mobile-use and mobile-mcp are Apache-2.0 (port with NOTICE attribution). uiautomator2 is MIT. **droidrun/mobilerun Portal is AGPL-3 and mobilecli's license is unclear: ideas only, never copy their code.** Our license is MIT.
 - **Follow chromectl conventions:** `--json` on every command, one `ERROR_KINDS` registry, docs generated from the parser, and drift tests.

@@ -50,7 +50,7 @@ droidctl daemon (Python, host)                  droidctl-agent.apk (Kotlin, phon
 
 ### Transport and security
 - **Socket:** `LocalServerSocket("droidctl")` (abstract unix socket), reached with `adb forward tcp:N localabstract:droidctl`, carrying newline-delimited JSON-RPC 2.0 (requests plus server-pushed notifications). The daemon keeps one persistent connection per device. In `--no-daemon` mode each CLI call opens its own connection, and `run` keeps one open for all steps.
-- **Auth is by peer UID.** Accept only `getPeerCredentials().uid == 2000` (shell). adbd runs as shell on production builds, so only adb-forwarded connections get through and other apps on the phone are rejected. No token needed. **Verify on the user's phone in M1**; fall back to an adb-broadcast token (Artemis scheme) if needed.
+- **Auth is by peer UID.** Accept only `getPeerCredentials().uid` ∈ {2000 (shell), 0 (root: adbd after `adb root` or on rooted/custom-ROM devices; anything already running as root on the phone is unrestricted anyway)}. adbd runs as shell on production builds, so only adb-forwarded connections get through and other apps on the phone are rejected. No token needed. **Verify on the user's phone in M1**; fall back to an adb-broadcast token (Artemis scheme) if needed.
 - **The APK declares no `INTERNET` permission**, so it provably can't send data anywhere. We say so in the README.
 - **Versioning:** the host bundles the APK and compares `versionCode` from `ping`. If they differ, it auto-upgrades with `install -r` (same committed debug key).
 
@@ -521,6 +521,7 @@ Any coordinates we print are always in device pixels.
 |---|---|---|
 | Does peer-UID auth work (adbd = uid 2000) on the user's phone? Else use an adb-broadcast token | on-device test | M1 |
 | Can adb enable our service on Android 13+ despite restricted settings? | on-device test | M1 |
+| Do the M1 on-device checks hold on a **stock, unrooted** phone? (dev starts on a rooted phone, where custom ROMs and Magisk/LSPosed can change settings, SELinux and a11y behaviour) | re-run the M1 checks on a stock device | before v1.0 |
 | Real socket RTT (USB and wireless), tree-dump time, settle time → settle defaults | `bench` | M1, M5 |
 | Port the thin client to Go? | client boot share of per-step time; distribution needs | M6 / v1.0 |
 | Which spatial layers are on by default? `--map` useful at all? | spatial A/B | M8 |
