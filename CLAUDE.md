@@ -8,8 +8,9 @@ An agent-first Android automation CLI: a compact UI snapshot with refs, element-
 - `research/`: prior-art reports (Artemis, droidrun/mobilerun, mobile-use, mobile-mcp, uiautomator2, android_world, Maestro, agent-device, …) with file:line references. Consult them before re-inventing a heuristic.
 
 ## Status
-- Planning is complete; **no code yet.**
-- Next up: **Milestone 1, the walking skeleton**: the agent APK with socket, `ping` and the peer-UID check; the chromectl core port; `setup`/`teardown`/`doctor`/`ping`; the round-trip measurement; `android/agent/PROTOCOL.md`.
+- **M1 (walking skeleton) done 2026-09-27**; numbers in PLAN.md. Next: M2 (raw tree, test app, fixtures).
+- Build the APK with `make apk` (Gradle 9.8 wrapper, AGP 9.4.1; build-tools 36.0.0 was auto-installed by AGP). Python: `.venv/bin/pytest`; on-device e2e with `DROIDCTL_SERIAL=<serial>`.
+- The Bash tool's shell does not source `~/.zshrc`: put `~/Android/Sdk/platform-tools` first on PATH yourself, or you get Debian's adb 34.
 - Work milestone by milestone. When a milestone is done, update PLAN.md with measured numbers and resolved open questions.
 
 ## Environment (set up 2026-09-27)

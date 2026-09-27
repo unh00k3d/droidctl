@@ -51,7 +51,7 @@ droidctl daemon (Python, host)                  droidctl-agent.apk (Kotlin, phon
 ### Transport and security
 - **Socket:** `LocalServerSocket("droidctl")` (abstract unix socket), reached with `adb forward tcp:N localabstract:droidctl`, carrying newline-delimited JSON-RPC 2.0 (requests plus server-pushed notifications). The daemon keeps one persistent connection per device. In `--no-daemon` mode each CLI call opens its own connection, and `run` keeps one open for all steps.
 - **Auth is by peer UID.** Accept only `getPeerCredentials().uid` ∈ {2000 (shell), 0 (root: adbd after `adb root` or on rooted/custom-ROM devices; anything already running as root on the phone is unrestricted anyway)}. adbd runs as shell on production builds, so only adb-forwarded connections get through and other apps on the phone are rejected. No token needed. **Verify on the user's phone in M1**; fall back to an adb-broadcast token (Artemis scheme) if needed.
-- **The APK declares no `INTERNET` permission**, so it provably can't send data anywhere. We say so in the README.
+- **The APK declares no `INTERNET` permission** (in fact no `<uses-permission>` at all), so it provably can't send data anywhere. Its power comes from being *enabled as an accessibility service* (which `setup` does and `teardown` undoes), not from a manifest permission; `BIND_ACCESSIBILITY_SERVICE` only restricts who may bind to it (the system). The README must say exactly this, not "no permissions".
 - **Versioning:** the host bundles the APK and compares `versionCode` from `ping`. If they differ, it auto-upgrades with `install -r` (same committed debug key).
 
 ### Service config (`res/xml/accessibility_service.xml`)
@@ -493,7 +493,8 @@ Any coordinates we print are always in device pixels.
 
 ## Milestones
 0. **Toolchain: done 2026-09-27.** Dev phone: Galaxy Note 8 SM-N950F, Android 9 (API 28), stock plus Magisk (details in CLAUDE.md). Add an API 35 emulator as a second target for API 30+ paths. JDK 21, Go, Android SDK at `~/Android/Sdk` (platform 35, build-tools 35.0.0, platform-tools/adb 37; `ANDROID_HOME` in `~/.zshrc`). Still to do at the start of M1: create the `.venv` with `adbutils`, and connect and authorize the phone (`adb devices`).
-1. **Walking skeleton, measured:**
+1. **Walking skeleton, measured: done 2026-09-27.** Results (SM-N950F, API 28, USB passthrough into a KVM VM; `bench/results/m1-rtt.json`): socket `echo` median 8.3 ms / p95 11.0 (equal to a raw adb-forward echo through toybox `nc`, so this is the transport floor here; it jitters 4–8 ms between runs); `ping` 15.4 / 18.8 ms; a fresh connection plus echo 13.5 ms; a 64 KB echo 48 ms; service bind (settings put → first answer) ~194 ms. Cold `droidctl ping --json` 76 ms end to end (≈48 ms host overhead, an estimate); `python -c pass` 27 ms; `import droidctl.cli` 7 ms cumulative (no adbutils/rich). **Found and fixed:** `LocalSocket` `flush()` polls the send queue with ~10 ms sleeps, adding 10.6 ms to every reply; the agent no longer flushes. APK: 12.7 KB, no `<uses-permission>` at all. Peer UID over `adb forward` = 2000; setup preserves other services; teardown restores the secure settings byte-for-byte. Not measured: wireless adb (needs `adb tcpip` on the user's network). Not yet verified: that a non-shell app uid is rejected (M2, via the debuggable test app's `run-as`).
+   Original scope:
    - Gradle project;
    - a service with a socket, `ping` and the peer-UID check;
    - Python: chromectl core port, `device.py`, `setup`/`teardown`/`doctor`/`ping`.
@@ -519,7 +520,7 @@ Any coordinates we print are always in device pixels.
 ## Open questions and decision gates
 | question | decided by | when |
 |---|---|---|
-| Does peer-UID auth work (adbd = uid 2000) on the user's phone? Else use an adb-broadcast token | on-device test | M1 |
+| ~~Does peer-UID auth work (adbd = uid 2000) on the user's phone?~~ **Yes** (peer_uid 2000 on the SM-N950F, 2026-09-27); rejection of an app uid still to be shown in M2 | on-device test | M1 |
 | Can adb enable our service on Android 13+ despite restricted settings? | on-device test (**not possible on the Android 9 dev phone**; use the API 35 emulator or another device) | M1 |
 | Do a11y bounds, gesture coordinates, `screencap` and `--marks` agree under a display-resolution override (dev phone: 1080x2220 over 1440x2960)? | on-device test | M1/M7 |
 | Do the M1 on-device checks hold on a **stock, unrooted** phone? (dev starts on a rooted phone, where custom ROMs and Magisk/LSPosed can change settings, SELinux and a11y behaviour) | re-run the M1 checks on a stock device | before v1.0 |

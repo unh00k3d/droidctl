@@ -18,16 +18,23 @@ class Rpc(private val ctx: Context) {
 
     fun call(method: String, params: JSONObject, c: Ctx): JSONObject = when (method) {
         "ping" -> ping(c)
+        "echo" -> params  // transport-only round trip: no device work (benchmarks, health)
         else -> throw RpcError(Codes.METHOD_NOT_FOUND, "method not found: $method")
     }
 
+    // Both are fixed for the life of the process (an APK upgrade restarts it), and
+    // looking them up costs binder calls: measured ~3 ms and ~5 ms per ping.
+    private val pkg by lazy { ctx.packageManager.getPackageInfo(ctx.packageName, 0) }
+    private val display: Display by lazy {
+        ctx.getSystemService(DisplayManager::class.java).getDisplay(Display.DEFAULT_DISPLAY)
+    }
+
     private fun ping(c: Ctx): JSONObject {
-        val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
         @Suppress("DEPRECATION")
-        val versionCode = if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else pi.versionCode.toLong()
+        val versionCode = if (Build.VERSION.SDK_INT >= 28) pkg.longVersionCode else pkg.versionCode.toLong()
         return JSONObject()
             .put("protocol", PROTOCOL)
-            .put("version", pi.versionName)
+            .put("version", pkg.versionName)
             .put("versionCode", versionCode)
             .put("sdk", Build.VERSION.SDK_INT)
             .put("release", Build.VERSION.RELEASE)
@@ -43,8 +50,6 @@ class Rpc(private val ctx: Context) {
 
     /** Real (logical) display size in px: reflects `wm size`/`wm density` overrides. */
     private fun screen(): JSONObject {
-        val dm = ctx.getSystemService(DisplayManager::class.java)
-        val display = dm.getDisplay(Display.DEFAULT_DISPLAY)
         val m = DisplayMetrics()
         @Suppress("DEPRECATION")
         display.getRealMetrics(m)

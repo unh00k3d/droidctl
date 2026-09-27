@@ -152,9 +152,11 @@ class Server(private val rpc: Rpc) {
 
     private fun write(out: OutputStream, obj: JSONObject) {
         val bytes = (obj.toString() + "\n").toByteArray(Charsets.UTF_8)
+        // No flush(): LocalSocket's stream is unbuffered, and its flush() polls the
+        // socket's send queue (SIOCOUTQ) with ~10 ms sleeps until adbd drains it.
+        // Measured on the SM-N950F: +10.6 ms per reply (bench/results/m1-rtt.json).
         synchronized(out) {
             out.write(bytes)
-            out.flush()
         }
     }
 

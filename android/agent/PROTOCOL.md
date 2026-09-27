@@ -73,6 +73,15 @@ Example (illustrative values):
 ← {"jsonrpc":"2.0","id":1,"result":{"protocol":1,"version":"0.1.0","versionCode":1,"sdk":28,"release":"9","manufacturer":"samsung","model":"SM-N950F","device":"greatlte","screen":{"w":1080,"h":2220,"density":420,"rotation":0},"service":{"connected":true},"gen":0,"peer_uid":2000,"uptime_ms":123456789}}
 ```
 
+### `echo`
+Params: any object. Result: the same object, verbatim. It does no device work, so it
+measures the transport and framing cost alone (`bench/rtt.py` compares it with `ping`).
+
+```
+→ {"jsonrpc":"2.0","id":2,"method":"echo","params":{"x":1}}
+← {"jsonrpc":"2.0","id":2,"result":{"x":1}}
+```
+
 ## Versioning
 - Additive changes (new methods, new result fields) keep `protocol` unchanged; clients
   must ignore unknown fields.

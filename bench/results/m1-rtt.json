@@ -1,0 +1,99 @@
+{
+  "date": "2026-09-27",
+  "device": {
+    "manufacturer": "samsung",
+    "model": "SM-N950F",
+    "device": "greatlte",
+    "sdk": 28,
+    "release": "9",
+    "screen": {
+      "w": 1080,
+      "h": 2220,
+      "density": 420,
+      "rotation": 0
+    }
+  },
+  "agent": {
+    "version": "0.1.0",
+    "versionCode": 1
+  },
+  "host": {
+    "python": "3.13.5",
+    "machine": "x86_64",
+    "kernel": "6.12.95+deb13-amd64"
+  },
+  "transport": "usb-passthrough-vm",
+  "units": "ms",
+  "results": {
+    "echo": {
+      "n": 300,
+      "min": 2.687,
+      "median": 8.335,
+      "p95": 10.992,
+      "max": 16.6
+    },
+    "ping": {
+      "n": 300,
+      "min": 6.128,
+      "median": 15.418,
+      "p95": 18.826,
+      "max": 22.499
+    },
+    "echo_64k": {
+      "n": 30,
+      "min": 34.749,
+      "median": 48.117,
+      "p95": 59.075,
+      "max": 70.146
+    },
+    "fresh_connection": {
+      "n": 30,
+      "min": 8.124,
+      "median": 13.539,
+      "p95": 14.863,
+      "max": 20.599
+    },
+    "raw_adb_echo": {
+      "n": 300,
+      "min": 4.383,
+      "median": 8.043,
+      "p95": 11.059,
+      "max": 16.668
+    },
+    "cold_python_pass": {
+      "n": 25,
+      "min": 26.155,
+      "median": 27.108,
+      "p95": 30.72,
+      "max": 38.453
+    },
+    "cold_import_cli": {
+      "n": 25,
+      "min": 33.69,
+      "median": 35.164,
+      "p95": 43.837,
+      "max": 45.732
+    },
+    "cold_cli_version": {
+      "n": 25,
+      "min": 40.095,
+      "median": 41.524,
+      "p95": 47.706,
+      "max": 53.79
+    },
+    "cold_cli_ping": {
+      "n": 25,
+      "min": 68.758,
+      "median": 76.27,
+      "p95": 85.113,
+      "max": 90.631
+    },
+    "service_bind": {
+      "n": 5,
+      "min": 178.823,
+      "median": 193.631,
+      "p95": 223.666,
+      "max": 223.666
+    }
+  }
+}
