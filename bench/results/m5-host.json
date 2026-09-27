@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-27",
+  "device": "SM-N950F API 28 (USB passthrough into a KVM VM)",
+  "host": "Linux x86_64 python 3.13.5",
+  "target": "testapp counter: tap Increment (static screen, one line changes)",
+  "in_process_tap_settle_ms": {
+    "n": 10,
+    "min": 267.5,
+    "median": 301.5,
+    "p95": 313.6,
+    "max": 313.6
+  },
+  "device_settle_ms": {
+    "n": 10,
+    "min": 219,
+    "median": 226.0,
+    "p95": 233,
+    "max": 233
+  },
+  "fast_path_tiers": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "cold_cli_tap_ms": {
+    "n": 10,
+    "min": 395.6,
+    "median": 413.5,
+    "p95": 460.5,
+    "max": 460.5
+  },
+  "budget": {
+    "tap+settle (static target)": "<500 ms"
+  }
+}

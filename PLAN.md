@@ -447,8 +447,8 @@ screen com.shop/.CartActivity  sig=c09e  1080x2400
 - **tap:**
   1. Resolve the ref. If the node isn't clickable, walk up to its clickable ancestor.
   2. `act ACTION_CLICK`.
-  3. **Fallback policy (clicks that report success but do nothing):** if the device reports `performed:true` *and* a `TYPE_VIEW_CLICKED` event for that node arrives, the click was handled, so there's no fallback. If `performed:false`, or there's no clicked event and the tree is unchanged within 300 ms, do **one** `gesture tap` at the center of the largest uncovered area (droidrun geometry) and report `method:"gesture-fallback"`.
-  - The event check is what makes the fallback safe: we never double-tap something that already handled the click, which would undo a toggle.
+  3. **Fallback policy (decided in M5 by measurement):** only if the device reports `performed:false` do **one** `gesture tap` at the center of the largest uncovered area (droidrun geometry) and report `method:"gesture-fallback"`. If `performed:true` arrives with no clicked event and no change, return `method:"action"` with a warning and **do not tap again**.
+  - Why: a view that handles the click silently (TESTAPP `click_no_event`) ran its handler **twice** under the originally planned event-gated fallback, and `performed:true` is also reported for touch-only views (`touch_only`), so the two cases can't be told apart from outside. A missed tap is recoverable (`changed:false` + warning → `--method gesture`); a double trigger (a "Pay" whose spinner appears after the settle window) is not.
   - `--method auto|action|gesture` overrides the policy.
 - **Other node actions:**
   - `long-press`, `tap --double`;
@@ -528,7 +528,7 @@ Any coordinates we print are always in device pixels.
 | Port the thin client to Go? | client boot share of per-step time; distribution needs | M6 / v1.0 |
 | Which spatial layers are on by default? `--map` useful at all? | spatial A/B | M8 |
 | Incremental tree mirror worth it? | cache-miss cost after changes | after M8 |
-| `click_no_event` views: acceptable double-trigger risk of the fallback? | TESTAPP `click_no_event` results | M5 |
+| ~~`click_no_event` views: acceptable double-trigger risk of the fallback?~~ **No**: measured n=2 on the SM-N950F, so auto never falls back after `performed:true` (see Actions → tap) | TESTAPP `click_no_event` results | M5 |
 | Accessibility-tool flag vs Play policy (only matters if we ever publish to Play) | policy check | before any Play release |
 
 ## Future work (out of scope for v1)

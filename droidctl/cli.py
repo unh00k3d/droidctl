@@ -620,20 +620,30 @@ def build_parser():
                         help="an element's box, region and neighbours (from the last snapshot)")
     sp.add_argument("ref", type=int, help="the element's ref")
     sp.set_defaults(fn=cmd_where, render=render_where)
+
+    # act / observe / apps / run (implemented in act.py, registered in commands.py)
+    from droidctl import commands
+    commands.add_parsers(sub, jsonopt, devopt)
+
+    # daemon / serve / mcp (implemented in daemon.py and mcp.py)
+    from droidctl import daemon
+    daemon.add_parsers(sub, jsonopt)
     return p
 
 
-def dispatch(args):
+def dispatch(args, mode="inprocess"):
     """Run one parsed command with the shared error mapping, then emit its payload.
 
-    Separate from main() so a future daemon or `run` can go through the exact
-    same path and error vocabulary. Errors funnel through die(), which prints
-    per --json and raises SystemExit.
+    The daemon runs the same parser and command functions (daemon.execute) but
+    emits per request itself. Errors funnel through die(), which prints per
+    --json and raises SystemExit. Every --json result says where it ran.
     """
     try:
         payload = args.fn(args)
     except UserError as e:
-        die(args, e.kind, e, e.hint, getattr(e, "data", None))
+        die(args, e.kind, e, e.hint, getattr(e, "data", None), mode=mode)
+    if isinstance(payload, dict):
+        payload.setdefault("mode", mode)
     emit(args, payload, getattr(args, "render", None))
     # a payload that reports ok=false (doctor with a failed check) still printed
     # in full, but the exit code has to tell a script something is wrong
@@ -642,10 +652,14 @@ def dispatch(args):
     return payload
 
 
-def main(argv=None):
+def main(argv=None, mode="inprocess"):
+    """The in-process CLI (`python -m droidctl`, --no-daemon, and the thin
+    client's fallback). The `droidctl` script is droidctl.client:main."""
+    argv = list(sys.argv[1:] if argv is None else argv)
+    argv = [t for t in argv if t != "--no-daemon"]
     args = build_parser().parse_args(argv)
     try:
-        dispatch(args)
+        dispatch(args, mode)
     except KeyboardInterrupt:
         sys.exit(130)
 

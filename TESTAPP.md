@@ -54,8 +54,8 @@ Legend for the expected behaviour: **R** = ref resolution, **S** = snapshot, **A
 | `toggle` | switch, checkbox, radio group | exactly-once: DTA n==1 per tap; S shows the state; the diff shows `off→on` |
 | `counter` | increments on every click | 10 taps → n==10 (no double-taps from the fallback) |
 | `row_nested` | clickable list row containing a clickable star icon | S: the row merges its text but the star stays a separate ref; tap star ≠ tap row (DTA) |
-| `touch_only` | custom view with only `onTouchListener` (ACTION_CLICK is a no-op) | A: no TYPE_VIEW_CLICKED → one gesture fallback; `method:"gesture-fallback"`; n==1 |
-| `click_no_event` | view that handles performClick but suppresses the a11y click event | no-change + no event → fallback may fire; documents the double-trigger risk; must still be n≤2 and flagged |
+| `touch_only` | custom view with only `onTouchListener` (ACTION_CLICK is a no-op) | auto: ACTION_CLICK is still reported performed, so no fallback: `method:"action"` + warning, n==0; then `--method gesture` → n==1 (decided in M5, see PLAN open questions) |
+| `click_no_event` | view that handles performClick but suppresses the a11y click event | no-change + no event, but performed → **no fallback**: n==1, `method:"action"` + warning (a fallback here measured n==2, the double trigger) |
 | `long_press` | long-press only (context menu) | `long-press` opens the menu; plain `tap` doesn't |
 | `double_tap` | double-tap to like | `tap --double` (gesture) works |
 | `custom_actions` | row with Archive/Delete a11y custom actions | S `actions=[Archive, Delete]`; `action --ref N Delete` works with no gesture |

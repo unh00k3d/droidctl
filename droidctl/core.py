@@ -88,7 +88,7 @@ def emit(a, payload, render=None):
     return payload
 
 
-def die(args, kind, message, hint="", data=None):
+def die(args, kind, message, hint="", data=None, mode=None):
     """Report a fatal error the way the caller asked for it, then exit 1.
 
     With --json the error is a JSON object on stdout, so an agent parsing stdout
@@ -100,7 +100,7 @@ def die(args, kind, message, hint="", data=None):
             error["hint"] = hint
         if data:
             error["data"] = data
-        out_json({"ok": False, "error": error})
+        out_json({"ok": False, "error": error, **({"mode": mode} if mode else {})})
     else:
         err.print(f"{kind}: {message}" + (f"\n{hint}" if hint else ""), markup=False)
     sys.exit(1)

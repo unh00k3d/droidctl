@@ -281,11 +281,28 @@ class AgentClient:
         except OSError as e:
             raise UserError(f"nothing listening on tcp:{port}: {e}", "connection")
         self._sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self._r = self._sock.makefile("rb")
+        # our own line buffer, not makefile(): a buffered file is unusable after
+        # one read timeout ("cannot read from timed out object"), and bounded
+        # waits for pushed events time out by design
+        self._buf = bytearray()
+
+    def _readline(self):
+        while True:
+            i = self._buf.find(b"\n")
+            if i >= 0:
+                line = bytes(self._buf[:i + 1])
+                del self._buf[:i + 1]
+                return line
+            chunk = self._sock.recv(65536)      # socket.timeout leaves _buf intact
+            if not chunk:
+                line = bytes(self._buf)
+                self._buf.clear()
+                return line
+            self._buf += chunk
 
     def _read(self, method, timeout):
         self._sock.settimeout(timeout)
-        line = self._r.readline()
+        line = self._readline()
         if not line:
             # adb accepts the forwarded connect even when nothing listens
             # on the device, then closes it: EOF here means no agent
@@ -399,7 +416,6 @@ class AgentClient:
 
     def close(self):
         try:
-            self._r.close()
             self._sock.close()
         except OSError:
             pass
@@ -499,12 +515,25 @@ def diagnose(serial):
                     "connection", hint="run: droidctl doctor")
 
 
+# Set by the daemon: connect() then hands out the device's warm, shared session
+# (same AgentClient API, a tree cache behind `tree`) instead of a new socket.
+_connect_hook = None
+
+
 def connect(serial, timeout=5.0):
     """Open an AgentClient and ping it: -> (client, ping_result).
 
     Uses the existing forward; on failure re-creates the forward once, then
     diagnoses (not installed / not enabled / not bound) with a typed error.
+    Inside the daemon the client is the device's pooled session; closing it is
+    cheap either way, so callers always close.
     """
+    if _connect_hook is not None:
+        return _connect_hook(serial, timeout)
+    return _connect(serial, timeout)
+
+
+def _connect(serial, timeout=5.0):
     for attempt in (0, 1):
         port = find_forward(serial) if attempt == 0 else None
         if port is None:

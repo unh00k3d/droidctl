@@ -18,9 +18,11 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
+# `droidctl mcp`: the official MCP SDK (a resident process, so its import cost is paid once)
+mcp = ["mcp>=2.2"]
 
 [project.scripts]
-droidctl = "droidctl.cli:main"
+droidctl = "droidctl.client:entry"
 
 [tool.setuptools]
 packages = ["droidctl"]

@@ -1,0 +1,83 @@
+{
+  "date": "2026-09-27",
+  "host": "claudesrv",
+  "python": "3.13.5",
+  "device": "fake agent (host overhead only)",
+  "n": 30,
+  "python_bare": {
+    "n": 30,
+    "min": 26.39,
+    "median": 27.43,
+    "p95": 34.26,
+    "max": 36.1
+  },
+  "inprocess_version": {
+    "n": 30,
+    "min": 60.15,
+    "median": 61.81,
+    "p95": 68.42,
+    "max": 70.63
+  },
+  "client_version": {
+    "n": 30,
+    "min": 33.15,
+    "median": 34.34,
+    "p95": 37.97,
+    "max": 39.4
+  },
+  "inprocess_snapshot_fixture": {
+    "n": 30,
+    "min": 67.7,
+    "median": 69.34,
+    "p95": 75.2,
+    "max": 85.17
+  },
+  "client_snapshot_fixture": {
+    "n": 30,
+    "min": 34.35,
+    "median": 35.35,
+    "p95": 41.27,
+    "max": 41.37
+  },
+  "client_snapshot_cache_hit": {
+    "n": 30,
+    "min": 35.67,
+    "median": 38.51,
+    "p95": 44.77,
+    "max": 50.92
+  },
+  "inprocess_snapshot_device": {
+    "n": 30,
+    "min": 72.35,
+    "median": 74.68,
+    "p95": 80.36,
+    "max": 81.6
+  },
+  "resident_version": {
+    "n": 100,
+    "min": 0.23,
+    "median": 0.33,
+    "p95": 0.86,
+    "max": 1.15
+  },
+  "resident_snapshot_cache_hit": {
+    "n": 100,
+    "min": 2.97,
+    "median": 3.48,
+    "p95": 5.0,
+    "max": 7.39
+  },
+  "daemon_cache": {
+    "hits": 132,
+    "misses": 1,
+    "gen_checks": 1,
+    "primed": 0,
+    "hit_rate": 0.992
+  },
+  "budgets_ms": {
+    "cli_to_daemon_overhead": 35,
+    "daemon_overhead_resident": 3,
+    "snapshot_cache_hit": "5 + client boot"
+  },
+  "cli_to_daemon_overhead_est_ms": 6.91
+}
