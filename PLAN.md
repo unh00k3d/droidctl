@@ -29,7 +29,7 @@ Core ideas:
 
 No existing tool clicks by element; all of them end in coordinate taps. Owning the device side is what makes the core ideas possible.
 
-Alternative considered: a scrcpy-style `app_process` jar using UiAutomation. It needs no install or settings change, but it conflicts with Appium/u2, dies on reboot, and has no persistent event stream. Rejected, but still possible later as a fallback backend.
+Alternative considered: a scrcpy-style `app_process` jar using UiAutomation. It needs no install or settings change, but it conflicts with Appium/u2, dies on reboot, and has no persistent event stream. Rejected as the *default*, but retained as a designed **fallback backend** (see "Device backends") — it reaches apps that hide from an enabled a11y service, and devices where one can't be enabled, over the same ADB trust boundary.
 
 ## Architecture: thin device, smart host
 ```
@@ -93,6 +93,30 @@ This fills every gap the research found in uiautomator2's XML: scroll hints come
 - Each tree read has a 2 s budget. If exceeded, it returns the last good tree with `degraded:true` (Portal idea).
 - A null root is retried once.
 - Every call on the device is wrapped so the service never crashes.
+
+## Device backends (pluggable) — design, not built
+The host (snapshot, resolve, act, daemon) is already pure and speaks only to a device that implements the JSON-RPC methods above (`PROTOCOL.md`). That contract is the seam: anything that answers `ping`/`tree`/`act`/`gesture`/`global`/`events`/`wait_*`/`current`/`screenshot` is a **backend**, and the host doesn't care which. v1 ships one backend; a second is designed here and gated on demand.
+
+**Backend A — a11y service (v1, default).** Our APK's `AccessibilityService` over the abstract socket. Persistent, pushes events, no ADB session held open, survives reboot (rebinds). Its power comes from being *enabled*, which is exactly the signal some apps defend against (below).
+
+**Backend B — UiAutomation over ADB (fallback, designed).** A tiny droidctl dex/jar launched with `app_process` as shell (uid 2000), holding a `UiAutomation` (scrcpy/uiautomator-style). **It implements the same `PROTOCOL.md` wire contract**, so snapshot/resolve/act/the daemon are unchanged — the only new host code is backend selection in `device.py` and a launcher (push dex, `CLASSPATH=… app_process /system/bin <Main>`, forward its socket). No APK install, **no accessibility service enabled, no setting changed.**
+
+**Why B is a legitimate second mechanism, not evasion.** `UiAutomation` is obtainable only as the shell uid via ADB; a normal installed app cannot get one that inspects other apps. So Backend B requires USB debugging + an authorized host key + physical access — the same trust boundary droidctl already lives behind, and **not a malware-reusable path** (a remote trojan has no ADB). This is the opposite of the a11y vector, which malware *can* abuse. Backends must never *hide* an enabled service, hook a detection check, or spoof the environment — that would be defeating an anti-fraud control, and is out of scope for droidctl.
+
+**Capability parity (both read the same `AccessibilityNodeInfo`):** tree of all windows, node actions (click/set_text/scroll/custom), collection/range/uid — all equal. **Differences that matter:**
+| aspect | A: a11y service | B: UiAutomation/app_process |
+|---|---|---|
+| install / setup | install APK, enable service (writes a setting) | push dex, run `app_process`; nothing enabled |
+| persistence | permanent; rebinds after reboot | dies on reboot / when the detached process is killed |
+| event stream | native push (subscribe) | `setOnAccessibilityEventListener` only while the process lives; the daemon's dirty-flag cache falls back to polling or a detached long-lived process |
+| conflicts | Appium/u2 suppress it (`suppressed`) | **it** conflicts with Appium/u2 (one UiAutomation at a time) |
+| gestures | `dispatchGesture` | `injectInputEvent` |
+| screenshot | `takeScreenshot` (30+); FLAG_SECURE → `secure-window` | privileged capture (verify FLAG_SECURE behaviour on-device; do **not** assume it bypasses it) |
+| mutually exclusive? | — | **on a hardened app the a11y service must be OFF for B to see the UI** — the two backends don't run together there |
+
+**Measured 2026-09-27 (SM-N950F, a production banking app, welcome screen):** with our a11y service **enabled**, both droidctl and a plain `uiautomator dump` saw an empty app window (7 container nodes, `null root` on the login screen). With the service **disabled**, `uiautomator dump` saw the full tree (38 nodes: "Login", "Exchange Rates", …), reproduced twice. So the app hides its UI from *all* accessibility clients when an unknown service is enabled; it does not defend against the ADB/UiAutomation harness (out of its threat model). Its QA build has no such check. Implication: Backend B would drive such apps only with Backend A off, and **automating a production banking app should still be cleared with its owner** — the QA build is the sanctioned target.
+
+**Open design questions (before building):** how the daemon keeps a warm Backend B alive (detached `app_process` like scrcpy, vs per-call); event-cache strategy without native push; `doctor`/`setup` UX for choosing a backend; whether B is a separate dex module or shares code with the APK; licensing of any uiautomator-derived helpers (MIT `android-uiautomator-server` is a reference, Apache Appium u2 ideas only). Decision gate below.
 
 ## Host (Python) layout
 ```
@@ -539,13 +563,14 @@ Any coordinates we print are always in device pixels.
 | Incremental tree mirror worth it? | cache-miss cost after changes | after M8 |
 | ~~`click_no_event` views: acceptable double-trigger risk of the fallback?~~ **No**: measured n=2 on the SM-N950F, so auto never falls back after `performed:true` (see Actions → tap) | TESTAPP `click_no_event` results | M5 |
 | Accessibility-tool flag vs Play policy (only matters if we ever publish to Play) | policy check | before any Play release |
+| Build the UiAutomation/`app_process` fallback backend? Which shape (own dex vs Appium u2), and how the daemon keeps it warm without native event push? | demand + the design in "Device backends"; measured need on apps that hide from an enabled a11y service (a production banking app, 2026-09-27) | post-v1, design agreed first |
 
 ## Future work (out of scope for v1)
 - **iOS** behind the same host contracts: simulators via `idb`/`simctl`, devices via WebDriverAgent.
 - **WebView → chromectl handoff:** forward `webview_devtools_remote_<pid>` and drive debuggable WebViews with chromectl's CDP commands.
 - **Incremental tree mirror** and a **frame stream** (scrcpy-style) for instant `shot` and a live browser viewer (the only place WebSocket makes sense).
 - **`layout-check`** QA audits (overlap, clipping, offscreen, touch target < 48dp).
-- **Fallback backend:** a scrcpy-style `app_process` + UiAutomation jar for devices where the a11y service can't be enabled.
+- **Fallback backend (designed, see "Device backends"):** a scrcpy-style `app_process` + UiAutomation dex that speaks the same `PROTOCOL.md`, for devices where the a11y service can't be enabled and for apps that hide their UI while an unknown a11y service is on (measured on a production banking app). Same ADB trust boundary; never hides/hooks/spoofs to defeat a detection.
 - **Single-binary distribution** (Go, APK embedded) if the gate says so.
 
 ## Licensing
