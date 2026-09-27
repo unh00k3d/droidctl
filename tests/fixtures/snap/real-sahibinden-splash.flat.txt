@@ -1,2 +1,3 @@
 screen com.sahibinden/.app.main.ui.MainActivity  sig=8294  keyboard=hidden  dialog=no
 (no elements: nothing on screen is labelled or actionable)
+! opaque view: nothing here is labelled or actionable (still loading, or a canvas/game/map?): try wait, shot --marks, or tap --point X,Y

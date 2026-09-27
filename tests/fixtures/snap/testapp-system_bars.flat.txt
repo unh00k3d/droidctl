@@ -1,0 +1,18 @@
+screen dev.droidctl.testapp/.Main  sig=76ca  keyboard=hidden  dialog=no
+[1] scroll  more↓
+  [2] button  "Edge row 1"
+  [3] button  "Edge row 2"
+  [4] button  "Edge row 3"
+  [5] button  "Edge row 4"
+  [6] button  "Edge row 5"
+  [7] button  "Edge row 6"
+  [8] button  "Edge row 7"
+  [9] button  "Edge row 8"
+  [10] button  "Edge row 9"
+  [11] button  "Edge row 10"
+  [12] button  "Edge row 11"
+  [13] button  "Edge row 12"
+  [14] button  "Edge row 13"
+  [15] button  "Edge row 14"
+  [16] button  "Edge row 15"
+  [17] button  "Edge row 16"

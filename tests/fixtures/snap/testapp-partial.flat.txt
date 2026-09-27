@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=9f51  keyboard=hidden  dialog=no
+[1] heading  "Partial visibility"
+[2] scroll  more↑↓
+  [3] button  "Full"
+  [4] button  "Thirty"

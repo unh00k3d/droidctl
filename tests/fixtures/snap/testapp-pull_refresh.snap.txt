@@ -1,0 +1,19 @@
+screen dev.droidctl.testapp/.Main  sig=cfc7  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] heading "Pull to refresh"
+-- content
+[2] list 14/30 more↓
+  [3] button "Entry 1"
+  [4] button "Entry 2"
+  [5] button "Entry 3"
+  [6] button "Entry 4"
+  [7] button "Entry 5"
+  [8] button "Entry 6"
+  [9] button "Entry 7"
+  [10] button "Entry 8"
+  [11] button "Entry 9"
+  [12] button "Entry 10"
+  [13] button "Entry 11"
+  [14] button "Entry 12"
+  [15] button "Entry 13"
+  [16] button "Entry 14"

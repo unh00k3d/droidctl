@@ -1,0 +1,8 @@
+screen dev.droidctl.testapp/.Main  sig=9189  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Toggles"
+[2] text "Wi-Fi"   [3] toggle wifi? (unlabeled, right of "Wi-Fi") #wifi off
+[4] checkbox remember? (unlabeled, left of "Remember me") #remember unchecked   [5] text "Remember me"
+[6] button "Small"
+[7] button "Medium"
+[8] button "Large"

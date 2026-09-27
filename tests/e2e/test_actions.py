@@ -74,7 +74,8 @@ def test_a_button_under_the_keyboard_is_clicked_by_action(scenario):
         time.sleep(0.2)
     s = sc.snap()
     assert s["screen"]["keyboard"], "the keyboard never showed"
-    assert not any(e["label"] == "Submit" for e in s["elements"])   # under the keyboard: not listed
+    sub = [e for e in s["elements"] if e["label"] == "Submit"]      # TESTAPP: listed, flagged covered
+    assert len(sub) == 1 and "covered" in sub[0]["annotations"]
     r = dc("tap", "--text", "Submit")
     assert r["method"] == "action"
     assert len(sc.dta("click", "submit")) == 1

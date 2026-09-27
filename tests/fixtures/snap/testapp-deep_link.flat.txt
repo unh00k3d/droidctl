@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=1602  keyboard=hidden  dialog=no
+[1] heading  "Deep link"
+[2] text  "This screen answers droidctl-test://s/<scenario>."
+[3] button  "Open form"

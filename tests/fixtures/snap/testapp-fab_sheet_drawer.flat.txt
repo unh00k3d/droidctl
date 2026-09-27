@@ -1,0 +1,20 @@
+screen dev.droidctl.testapp/.Main  sig=f3ac  keyboard=hidden  dialog=no
+[1] button  "Open navigation drawer"
+[2] heading  "Contacts"
+[3] list  12/25 more↓
+  [4] button  "Contact 1"
+  [5] button  "Contact 2"
+  [6] button  "Contact 3"
+  [7] button  "Contact 4"
+  [8] button  "Contact 5"
+  [9] button  "Contact 6"
+  [10] button  "Contact 7"
+  [11] button  "Contact 8"
+  [12] button  "Contact 9"
+  [13] button  "Contact 10"
+  [14] button  "Contact 11"
+  [15] button  "Contact 12"
+[16] button  "Add"
+[17] heading  "Filters"
+[18] button  "Favorites only"
+! overlap [15] [16]

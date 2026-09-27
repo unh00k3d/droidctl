@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=c665  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Working"
+[2] progress #progress
+[3] button "Do it"

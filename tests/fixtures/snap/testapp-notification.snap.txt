@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=10db  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Notification"
+[2] button "Notify"

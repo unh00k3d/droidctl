@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=fbbd  keyboard=hidden  dialog=yes  1080x2220
+-- dialog
+[1] heading "Full screen dialog"
+[2] text "Edit your profile"
+[3] button "Save"

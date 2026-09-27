@@ -17,6 +17,7 @@ ROOT = pathlib.Path(__file__).resolve().parent
 TREES = ROOT / "fixtures" / "trees"
 SNAPS = ROOT / "fixtures" / "snap"
 REAL = sorted(TREES.glob("real-*.json"))
+TESTAPP = sorted(TREES.glob("testapp-*.json"))
 
 
 def load(name):
@@ -37,7 +38,7 @@ def el(snap, label):
 
 
 # --- properties of every real screen --------------------------------------
-@pytest.mark.parametrize("path", REAL, ids=lambda p: p.stem)
+@pytest.mark.parametrize("path", REAL + TESTAPP, ids=lambda p: p.stem)
 def test_every_real_screen_is_small_and_sane(path):
     d = json.loads(path.read_text())
     snap = S.build(d["tree"], activity=d["meta"].get("activity"))
@@ -338,7 +339,7 @@ GOLDEN = sorted(SNAPS.glob("*.snap.txt"))
 
 def test_every_real_fixture_has_goldens():
     names = {p.name for p in SNAPS.glob("*.txt")}
-    for f in REAL:
+    for f in REAL + TESTAPP:
         assert f"{f.stem}.snap.txt" in names and f"{f.stem}.flat.txt" in names, \
             "run: .venv/bin/python scripts/make_goldens.py"
 
@@ -348,3 +349,227 @@ def test_golden(golden):
     stem, kind = golden.name.rsplit(".", 2)[0], golden.name.split(".")[-2]
     got = text(stem, layout="flat" if kind == "flat" else "spatial")
     assert got + "\n" == golden.read_text(), "run: .venv/bin/python scripts/make_goldens.py (and review the diff)"
+
+
+# --- the test app: TESTAPP.md's "droidctl must" column, per scenario --------
+# Trees captured by `make fixtures` (scripts/capture_fixtures.py) on the SM-N950F.
+def labels(snap):
+    return [e.label_full for e in snap.elements]
+
+
+def test_testapp_splash_is_a_tiny_tree_with_a_progress():
+    snap = build("testapp-splash")
+    assert [e.role for e in snap.elements] == ["progress"]
+    assert any(w.startswith("tiny tree") for w in snap.warnings)
+    # a plain screen with a heading and a button is not "tiny"
+    assert not any(w.startswith("tiny tree") for w in build("testapp-touch_only").warnings)
+
+
+def test_testapp_spinner_forever_shows_its_progress():
+    snap = build("testapp-spinner_forever")
+    assert "progress" in [e.role for e in snap.elements]
+    assert "(unlabeled" not in text("testapp-spinner_forever"), "a spinner needs no name"
+
+
+def test_testapp_canvas_is_an_opaque_view():
+    snap = build("testapp-canvas")
+    assert not snap.elements
+    assert any(w.startswith("opaque view") and "--point" in w for w in snap.warnings)
+
+
+def test_testapp_slow_a11y_says_the_app_window_has_no_tree():
+    """The agent returned the window without a root (and without degraded)."""
+    assert any(w.startswith("no tree for app window s:slow_a11y") for w in build("testapp-slow_a11y").warnings)
+
+
+def test_testapp_skeleton_and_disabled():
+    assert labels(build("testapp-skeleton")) == ["Results", "Loading"]
+    assert el(build("testapp-disabled_then_enabled"), "Submit").ann == ["disabled"]
+
+
+def test_testapp_hidden_alpha_zero_and_zero_size_are_not_listed():
+    assert labels(build("testapp-hidden_a11y")) == ["Hidden from a11y", "Visible"]   # noHideDescendants
+    assert labels(build("testapp-alpha_zero")) == ["Alpha", "Visible"]           # Ghost: alpha 0
+    assert labels(build("testapp-zero_size")) == ["Zero size", "Normal"]         # 0x0 and 1 px
+
+
+def test_testapp_password_is_flagged_and_its_value_never_shown():
+    e = next(e for e in build("testapp-password").elements if e.res_id and e.res_id.endswith("/password"))
+    assert "password" in e.ann and e.role == "input" and e.label_full == ""
+
+
+def test_testapp_overlay_covers_the_buy_button():
+    snap = build("testapp-overlay_blocker")
+    assert "covered" in el(snap, "Buy").ann
+
+
+def test_testapp_partial_drops_the_5_percent_button():
+    """Android pre-clips bounds to the viewport: 'Five' arrives as a 13 px strip
+    flush with the scroller's edge, 'Thirty' as 79 px; the offscreen one is gone."""
+    assert labels(build("testapp-partial")) == ["Partial visibility", "", "Full", "Thirty"]
+
+
+def test_testapp_under_keyboard_lists_submit_as_covered():
+    snap = build("testapp-under_keyboard")
+    assert snap.keyboard is not None
+    sub = el(snap, "Submit")
+    assert "covered" in sub.ann and sub.node.kb
+    assert sp.inter(sub.rect, snap.keyboard) == sub.rect
+
+
+def test_testapp_system_bars_rows_are_content_and_taps_avoid_the_bars():
+    snap = build("testapp-system_bars")
+    rows = [e for e in snap.elements if e.label_full.startswith("Edge row")]
+    assert rows and all(e.region == "content" for e in rows), "rows under the status/nav bar are not app bars"
+    status, nav = 63, 2094
+    for e in rows:
+        assert status <= e.tap[1] < nav, (e.label_full, e.tap)
+    assert el(snap, "Edge row 1").rect[1] == status              # clipped out of the status bar
+    assert el(snap, "Edge row 16").rect[3] == nav                # and out of the navigation bar
+
+
+def test_testapp_buttons_unlabeled_image_button_is_marked():
+    line = next(l for l in text("testapp-buttons").splitlines() if "#mystery" in l)
+    assert "(unlabeled" in line
+
+
+def test_testapp_toggle_switch_label_drops_on_off():
+    snap = build("testapp-toggle")
+    sw = next(e for e in snap.elements if e.role == "switch")
+    assert sw.label_full == "Wi-Fi" and "off" in sw.ann
+    assert el(snap, "Remember me").ann == ["unchecked"]
+
+
+def test_testapp_row_nested_star_stays_its_own_ref():
+    snap = build("testapp-row_nested")
+    row = el(snap, "Ada Lovelace · Lunch tomorrow?")
+    stars = [e for e in snap.elements if e.label_full == "Star"]
+    assert row.role == "row" and len(stars) == 5 and all(s.ref != row.ref for s in stars)
+
+
+def test_testapp_custom_actions_and_swipe_only():
+    assert el(build("testapp-custom_actions"), "Message 1").ann == ["actions=[Archive, Delete]"]
+    assert "actions=" not in text("testapp-swipe_only_delete")
+
+
+def test_testapp_slider_range():
+    assert el(build("testapp-slider"), "Volume").ann == ["range=3/10"]
+
+
+def test_testapp_spinner_is_a_dropdown_and_its_popups_are_popups():
+    assert next(e for e in build("testapp-spinner_dropdown").elements if e.label_full == "Apple").role == "dropdown"
+    for name, want in (("testapp-spinner_dropdown-spinner", ["Apple", "Banana", "Cherry"]),
+                       ("testapp-spinner_dropdown-menu", ["Rename", "Duplicate", "Remove"])):
+        snap = build(name)
+        assert snap.dialog and {e.region for e in snap.elements} == {"popup"}
+        assert [l for l in labels(snap) if l] == want, "shifted popup window bounds must not clip rows"
+
+
+def test_testapp_popup_window_rect_comes_from_its_root():
+    """Android 9 reports the PopupMenu window at [-42,461,473,839] but its root at
+    [42,545,557,923] (shadow insets); the snapshot trusts the root."""
+    snap = build("testapp-spinner_dropdown-menu")
+    pop = next(w for w in snap.windows if w.kind == "popup")
+    assert pop.rect == (42, 545, 557, 923)
+
+
+def test_testapp_canvas_tabs_and_virtual_views():
+    t = text("testapp-tabs_pager")
+    assert '[1] tab "Alpha" selected' in t and "pager 1/3 more→" in t and "Beta content" not in t
+    grid = text("testapp-virtual_views")
+    assert "grid 5x7" in grid and '"October 14"' in grid
+
+
+def test_testapp_form_hint_error_empty():
+    t = text("testapp-form")
+    assert '#name hint="Name" empty' in t
+    assert 'error="Invalid email"' in t
+
+
+def test_testapp_long_list_counts_and_stays_small():
+    t = text("testapp-long_list")
+    assert "list 14/1000 more↓" in t and S.est_tokens(t) < 2000
+
+
+def test_testapp_duplicates_pairs_each_delete_with_its_item():
+    snap = build("testapp-duplicates")
+    d7 = [e for e in snap.elements if e.label_full == "Delete" and "Item 7" in S.context(e.node)]
+    assert len(d7) == 1
+
+
+def test_testapp_nested_scroll_lists_both_scrollables():
+    snap = build("testapp-nested_scroll")
+    outer = [e for e in snap.elements if e.role == "scroll"]
+    carousel = [e for e in snap.elements if e.role == "pager" and e.label_full == "Carousel"]
+    assert len(outer) == 1 and len(carousel) == 1
+    assert carousel[0].container is outer[0]
+    assert all(e.region == "content" for e in snap.elements), "stories are rows, not bars"
+
+
+def test_testapp_dialogs_are_dialogs():
+    for name in ("testapp-dialogs-alert", "testapp-dialogs-fullscreen", "testapp-back_confirm-exit"):
+        snap = build(name)
+        assert snap.dialog, name
+        assert {e.region for e in snap.elements} == {"dialog"}, name
+    assert "Exit?" in labels(build("testapp-back_confirm-exit"))
+    sheet = build("testapp-dialogs-sheet")
+    assert sheet.dialog and {e.region for e in sheet.elements} == {"sheet"}
+
+
+def test_testapp_snackbar_action_is_tappable():
+    snap = build("testapp-snackbar_toast-snackbar")
+    assert el(snap, "UNDO").node.clickable and "Message archived" in labels(snap)
+
+
+def test_testapp_permission_dialog_names_its_package():
+    snap = build("testapp-permission-request")
+    assert snap.pkg == "com.google.android.packageinstaller"
+    assert {"Allow", "Deny"} <= set(labels(snap))
+
+
+def test_testapp_keyboard_toggle_tracks_the_ime_and_never_lists_its_keys():
+    hidden, shown = build("testapp-keyboard_toggle"), build("testapp-keyboard_toggle-kbd")
+    assert hidden.keyboard is None and shown.keyboard is not None
+    assert labels(hidden) == labels(shown), "IME nodes are never app elements"
+
+
+def test_testapp_cart_regions_and_rows():
+    t = text("testapp-cart")
+    assert t.splitlines()[1] == "-- top bar" and "-- bottom bar" in t
+    assert '[4] text "Wireless Mouse"   [5] button "−"   [6] text "1"   [7] button "+"' in t
+
+
+def test_testapp_calendar_and_keypad_are_grids():
+    assert "grid 6x7" in text("testapp-calendar")
+    k = text("testapp-keypad")
+    assert "grid 4x3 of button" in k and '"0"' in k
+
+
+def test_testapp_photo_grid_labels_unlabeled_tiles_by_position():
+    t = text("testapp-photo_grid")
+    assert "?(row 2 col 1)" in t and "?(row 4 col 3)" in t
+    flat = text("testapp-photo_grid", layout="flat")
+    assert '(unlabeled, at "row 3 col 2")' in flat
+
+
+def test_testapp_unlabeled_icons_infer_from_ids():
+    t = text("testapp-unlabeled_icons")
+    for guess in ("share?", "delete?", "edit?", "more?"):
+        assert guess in t
+
+
+def test_testapp_label_left_form_uses_the_visual_label():
+    t = text("testapp-label_left_form")
+    assert 'input (unlabeled, right of "Email") #f_email' in t
+    assert "f email?" not in t
+
+
+def test_testapp_fab_sheet_regions():
+    snap = build("testapp-fab_sheet_drawer")
+    assert el(snap, "Add").region == "fab"
+    assert el(snap, "Filters").region == "sheet" and el(snap, "Favorites only").region == "sheet"
+
+
+def test_testapp_rtl_reading_order_follows_the_screen():
+    first = text("testapp-rtl").splitlines()[2]
+    assert first.index("share?") < first.index('"Cart (4)"') < first.index('"Back"')

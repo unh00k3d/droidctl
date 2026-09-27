@@ -1,0 +1,3 @@
+screen dev.droidctl.testapp/.Main  sig=0c5e  keyboard=hidden  dialog=no
+[1] heading  "Please wait"
+[2] button  "Submit"  disabled

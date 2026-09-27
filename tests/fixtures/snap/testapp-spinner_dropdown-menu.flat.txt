@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=8331  keyboard=hidden  dialog=yes
+[1] list  3/3
+  [2] row  "Rename"
+  [3] row  "Duplicate"
+  [4] row  "Remove"

@@ -1,0 +1,3 @@
+screen dev.droidctl.testapp/.Main  sig=c45e  keyboard=hidden  dialog=no  1080x2220
+(no elements: nothing on screen is labelled or actionable)
+! no tree for app window s:slow_a11y (a slow or broken accessibility provider?)

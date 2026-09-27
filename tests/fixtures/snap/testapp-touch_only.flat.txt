@@ -1,0 +1,3 @@
+screen dev.droidctl.testapp/.Main  sig=8eef  keyboard=hidden  dialog=no
+[1] heading  "Touch only"
+[2] button  "Touch me"

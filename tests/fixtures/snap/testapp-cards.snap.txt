@@ -1,0 +1,10 @@
+screen dev.droidctl.testapp/.Main  sig=0b1b  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Plans"
+grid 6x2
+  [2]heading"Basic"    [3]heading"Standard"
+  [4]text"$5/mo"       [5]text"$10/mo"
+  [6]button"Buy"       [7]button"Buy"
+  [8]heading"Premium"  [9]heading"Enterprise"
+  [10]text"$20/mo"     [11]text"$50/mo"
+  [12]button"Buy"      [13]button"Buy"

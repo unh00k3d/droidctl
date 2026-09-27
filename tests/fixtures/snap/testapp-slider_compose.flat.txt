@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=71ea  keyboard=hidden  dialog=no
+[1] heading  "Sliders"
+[2] text  "Volume 3/10"
+[3] seekbar  "Volume"  range=3/10

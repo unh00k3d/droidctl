@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=336f  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Feed"
+[2] text "Network error. Please try again."
+[3] button "Retry"

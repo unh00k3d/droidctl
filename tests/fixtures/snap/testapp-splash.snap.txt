@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=5374  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] progress
+! tiny tree (2 nodes): a splash or loading screen? try: wait

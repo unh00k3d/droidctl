@@ -1,0 +1,8 @@
+screen dev.droidctl.testapp/.Main  sig=2f13  keyboard=hidden  dialog=no
+[1] heading  "Sliders"
+[2] text  "Volume 3/10"
+[3] seekbar  "Volume"  range=3/10
+[4] text  "Price"
+[5] seekbar  "Price range"
+[6] seekbar  "Price range,Range start, 20"  range=20/100
+[7] seekbar  "Price range,Range end, 80"  range=80/100

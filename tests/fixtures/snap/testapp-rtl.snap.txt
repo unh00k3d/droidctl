@@ -1,0 +1,12 @@
+screen dev.droidctl.testapp/.Main  sig=304b  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] button share? (unlabeled, left of "Cart (4)") #ic_share   [2] heading "Cart (4)"   [3] button "Back"
+-- content
+[4] button "+"   [5] text "1"   [6] button "−"   [7] text "Wireless Mouse"
+[8] text "$24.99"
+[9] button "+"   [10] text "2"   [11] button "−"   [12] text "USB-C Cable"
+[13] text "$9.99"
+[14] button "+"   [15] text "1"   [16] button "−"   [17] text "Laptop Stand"
+[18] text "$39.99"
+-- bottom bar
+[19] button "Checkout"   [20] text "Total $84.96"

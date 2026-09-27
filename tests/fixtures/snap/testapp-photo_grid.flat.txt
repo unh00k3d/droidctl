@@ -1,0 +1,15 @@
+screen dev.droidctl.testapp/.Main  sig=ffdd  keyboard=hidden  dialog=no
+[1] heading  "Photos"
+[2] grid  12/12
+  [3] button  "Photo 1"
+  [4] button  "Photo 2"
+  [5] button  "Photo 3"
+  [6] button  (unlabeled, at "row 2 col 1")  #photo
+  [7] button  "Photo 5"
+  [8] button  "Photo 6"
+  [9] button  "Photo 7"
+  [10] button  (unlabeled, at "row 3 col 2")  #photo
+  [11] button  "Photo 9"
+  [12] button  "Photo 10"
+  [13] button  "Photo 11"
+  [14] button  (unlabeled, at "row 4 col 3")  #photo

@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=4127  keyboard=hidden  dialog=no
+[1] heading  "Ticker"
+[2] text  "4.4 s"
+[3] button  "Tap"

@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=28d2  keyboard=hidden  dialog=no
+[1] heading  "Search"
+[2] input  #search_src_text  hint="Search"  empty
+[3] text  "No search yet"

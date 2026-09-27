@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=bc08  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Rejects set text"
+[2] input #message hint="Message" empty

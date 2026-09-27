@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=0d9e  keyboard=shown  dialog=no
+[1] heading  "Compose"
+[2] input  #message  hint="Message"  empty  focused
+[3] button  "Submit"  covered

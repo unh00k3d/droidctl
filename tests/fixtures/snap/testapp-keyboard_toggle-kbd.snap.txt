@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=6acb  keyboard=shown  dialog=no  1080x2220
+-- content
+[1] heading "Keyboard"
+[2] input #input hint="Type something" empty focused
+[3] button "Hide keyboard"
+-- keyboard (y 1217-2094, covers 40%)

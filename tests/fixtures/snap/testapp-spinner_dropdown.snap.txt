@@ -1,0 +1,7 @@
+screen dev.droidctl.testapp/.Main  sig=1187  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Dropdowns"
+[2] text "Fruit"
+[3] dropdown "Apple"
+[4] button "Menu"
+[5] input #country hint="Country" empty

@@ -1,0 +1,16 @@
+screen dev.droidctl.testapp/.Main  sig=feea  keyboard=hidden  dialog=no
+[1] heading  "Long list"
+[2] list  more↓
+  [3] button  "Row 1"
+  [4] button  "Row 2"
+  [5] button  "Row 3"
+  [6] button  "Row 4"
+  [7] button  "Row 5"
+  [8] button  "Row 6"
+  [9] button  "Row 7"
+  [10] button  "Row 8"
+  [11] button  "Row 9"
+  [12] button  "Row 10"
+  [13] button  "Row 11"
+  [14] button  "Row 12"
+  [15] button  "Row 13"

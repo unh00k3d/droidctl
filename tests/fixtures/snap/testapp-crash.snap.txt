@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=b7ad  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Crash"
+[2] button "Crash"

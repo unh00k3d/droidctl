@@ -16,8 +16,11 @@ clean:
 	cd android && ./gradlew -q clean
 	rm -f $(APK_ASSET)
 
-# Re-capture the test-app scenario fixtures (TESTAPP.md groups 3-5 and 8) from a
-# real device; needs the test app installed and `droidctl setup` done.
+# Re-capture the test-app scenario fixtures (every screen scenario in scenarios.json, plus
+# keyboard and after-action variants) from a real device; needs the test app installed and
+# `droidctl setup` done.
 PYTHON ?= .venv/bin/python
 fixtures:
 	$(PYTHON) scripts/capture_fixtures.py
+	$(PYTHON) scripts/make_goldens.py
+	@echo 'review: git diff tests/fixtures/snap'

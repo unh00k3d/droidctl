@@ -1,0 +1,4 @@
+screen com.google.android.packageinstaller "Allow droidctl test app to take pictures and record video?"  sig=094a  keyboard=hidden  dialog=no
+[1] text  "Allow droidctl test app to take pictures and record video?"
+[2] button  "Deny"
+[3] button  "Allow"

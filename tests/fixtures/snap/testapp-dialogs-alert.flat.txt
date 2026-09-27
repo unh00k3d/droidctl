@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=9939  keyboard=hidden  dialog=yes
+[1] text  "Delete file?"
+[2] text  "This cannot be undone."
+[3] button  "CANCEL"
+[4] button  "DELETE"

@@ -1,0 +1,9 @@
+screen dev.droidctl.testapp/.Main  sig=b4e5  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] heading "Inbox"
+-- content
+[2] row "Ada Lovelace · Lunch tomorrow?"   [3] button "Star"
+[4] row "Alan Turing · Re: the paper"   [5] button "Star"
+[6] row "Grace Hopper · Compiler notes"   [7] button "Star"
+[8] row "Edsger Dijkstra · GOTO considered"   [9] button "Star"
+[10] row "Barbara Liskov · Substitution"   [11] button "Star"

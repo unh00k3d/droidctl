@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=e579  keyboard=hidden  dialog=no
+[1] heading  "Recreate"
+[2] text  "Orientation: portrait"
+[3] input  #keep  hint="Keep me"  empty
+[4] button  "Recreate"
+[5] button  "Rotate"

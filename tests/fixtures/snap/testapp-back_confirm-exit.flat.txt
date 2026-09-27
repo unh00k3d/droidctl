@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=a686  keyboard=hidden  dialog=yes
+[1] text  "Exit?"
+[2] button  "STAY"
+[3] button  "EXIT"

@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=cea7  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Inbox"
+[2] row "Ada Lovelace · Lunch tomorrow?"   [3] button "Star"
+[4] row "Alan Turing · Re: the paper"   [5] button "Star"
+[6] row "Grace Hopper · Compiler notes"   [7] button "Star"

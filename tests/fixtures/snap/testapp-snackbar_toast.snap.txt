@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=d30b  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Messages"
+[2] button "Snackbar"
+[3] button "Toast"

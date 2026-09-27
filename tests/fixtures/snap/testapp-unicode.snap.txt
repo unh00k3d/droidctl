@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=ef0e  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Unicode"
+[2] input #field hint="Type here" empty

@@ -36,6 +36,9 @@ from droidctl import spatial as sp
 TRUNC = 80          # display cap for a merged label (the full text stays searchable)
 SLIVER = 20         # px: a clipped remainder this thin is not worth listing
 MIN_FRAC = 0.10     # below this visible fraction a node is dropped
+TINY = 3            # px: a node thinner than this (0x0, 1 px traps) is never listed
+KB_COVER = 0.5      # an invisible node this much under the keyboard is listed as covered
+TINY_TREE = 3       # an app window with at most this many nodes gets a "tiny tree" warning
 MAX_DEFAULT = 150
 
 SCROLL_ACTIONS = {"scroll_forward", "scroll_backward", "scroll_up", "scroll_down",
@@ -75,6 +78,15 @@ class Win:
         self.title = raw.get("title") or ""
         self.pkg = raw.get("pkg") or (raw.get("root") or {}).get("pkg") or ""
         self.rect = sp.inter(sp.rect(raw.get("bounds")), screen)
+        # Android 9 reports a dialog's/popup's window bounds shifted by its shadow
+        # insets (-84,-84 on the SM-N950F: a PopupMenu window at [-42,461,..]
+        # whose root node is at [42,545,..]); clipping nodes to that cuts rows
+        # off, so trust the root node when it isn't inside the window
+        # (only for a pure shift: an IME's root legitimately spans beyond its window)
+        root, wr = sp.rect((raw.get("root") or {}).get("bounds")), sp.rect(raw.get("bounds"))
+        if (root is not None and wr is not None and root != wr
+                and abs(sp.width(root) - sp.width(wr)) <= 8 and abs(sp.height(root) - sp.height(wr)) <= 8):
+            self.rect = sp.inter(root, screen) or self.rect
         self.kind = None          # main | dialog | popup | behind | system | ime | skip
         self.occluders = []
         self.bars = {}            # "top"/"bottom" -> Node
@@ -83,7 +95,7 @@ class Win:
 class Node:
     __slots__ = ("raw", "win", "parent", "index", "children", "cls", "rect", "clip", "in_scroll",
                  "flags", "actions", "custom", "pieces", "vis", "box", "frac", "shown", "any_shown",
-                 "scroll_like", "is_list", "tabstrip", "tab_item", "el")
+                 "scroll_like", "is_list", "tabstrip", "tab_item", "el", "kb")
 
     def __init__(self, raw, win, parent, index):
         self.raw, self.win, self.parent, self.index = raw, win, parent, index
@@ -99,6 +111,7 @@ class Node:
         self.pieces, self.vis, self.box, self.frac = [], None, None, 0.0
         self.shown = self.any_shown = False
         self.tabstrip = self.tab_item = False
+        self.kb = False           # hidden only by the keyboard (Android reports visible:false)
         self.el = None
 
     # --- intrinsic properties -------------------------------------------
@@ -138,6 +151,12 @@ class Node:
             text = ""
         if self.checkable and desc:        # a Switch's text is its "On"/"Off"
             return desc
+        if self.cls.endswith("Switch") and text:
+            # API 28 android.widget.Switch appends its textOn/textOff: "Wi-Fi OFF"
+            for word in (" ON", " OFF"):
+                if text.endswith(word) and len(text) > len(word):
+                    text = text[:-len(word)]
+                    break
         if text and desc and desc.lower() != text.lower():
             if desc.lower().startswith(text.lower()):
                 return desc
@@ -148,6 +167,12 @@ class Node:
 
     def has_content(self):
         return any(self.get(k) for k in ("text", "desc", "hint", "state", "error"))
+
+    @property
+    def progress(self):
+        """A progress indicator (spinner or bar): worth listing even unlabeled."""
+        return self.cls.endswith("ProgressBar") or bool(
+            self.raw.get("range") and "set_progress" not in self.actions and not self.actionable)
 
     def ancestors(self):
         n = self.parent
@@ -265,7 +290,7 @@ def build(tree, activity=None, system=False):
         root = _make(w.raw["root"], w, None, 0, w.rect, False)
         if w.kind == "main":
             _find_bars(root, w, wins)
-        _visibility(root)
+        _visibility(root, snap.keyboard)
         roots.append((w, root))
 
     snap.roots = [root for _, root in roots]
@@ -273,7 +298,7 @@ def build(tree, activity=None, system=False):
     for w, root in roots:
         _elements(root, None, None, elems)
     elems = [e for e in elems if e.segments or e.node.actionable or e.node.is_list or e.node.tab_item
-             or e.adopted]
+             or e.adopted or e.node.progress]
     for e in elems:
         _finish(e, W)
     elems = _dedupe(elems)
@@ -287,8 +312,10 @@ def build(tree, activity=None, system=False):
     snap.elements = ordered
 
     main = next((w for w in wins if w.kind == "main"), None)
-    snap.pkg = main.pkg if main else (wins[0].pkg if wins else "")
-    snap.title = main.title if main else ""
+    top = main or max((w for w in wins if w.kind in ("dialog", "popup")), key=lambda w: w.layer, default=None)
+    _warn_tree(wins, top, snap)
+    snap.pkg = top.pkg if top else (wins[0].pkg if wins else "")
+    snap.title = top.title if top else ""
     snap.activity = activity or ""
     snap.sig = signature(snap)
     return snap
@@ -302,12 +329,21 @@ def _classify(wins, snap, system):
             if w.rect and sp.area(w.rect) > 0:
                 snap.keyboard = w.rect
     apps = [w for w in wins if w.type == "application" and w.raw.get("root") and w.rect]
-    main = max(apps, key=lambda w: (sp.area(w.rect), -w.layer), default=None)
+
+    def popup(w):
+        return w.title.startswith(("PopupWindow", "Pop-Up Window"))
+
+    def floating(w):
+        # Android 9 titles activity windows (the activity label) but not dialogs,
+        # and a modal dialog is often the only window it lists at all
+        return popup(w) or not w.title or sp.area(w.rect) < 0.7 * area_scr
+
+    main = max((w for w in apps if not floating(w)), key=lambda w: (sp.area(w.rect), -w.layer), default=None)
     for w in apps:
         if w is main:
             w.kind = "main"
-        elif w.layer > main.layer:
-            w.kind = "popup" if w.title.startswith("PopupWindow") else "dialog"
+        elif floating(w) or w.layer > main.layer:
+            w.kind = "popup" if popup(w) else "dialog"
             snap.dialog = True
         else:
             w.kind = "behind"
@@ -334,7 +370,10 @@ def _make(raw, win, parent, index, clip, in_scroll):
     # ScrollViews that cannot scroll right now (content fits) are plain layout
     scrollish = ((n.scrollable or (n.cls in LIST_CLASSES and "Scroll" not in n.cls))
                  and not raw.get("range") and not n.cls.endswith("Spinner"))   # a Spinner "scrolls" its choices
-    n.scroll_like = bool(scrollish and n.rect and (not big or coll))
+    # a scrollable filling the window is usually a layout that merely claims to
+    # scroll (Compose roots report ScrollView around their bars: Drive), unless
+    # it holds a list's worth of content (an edge-to-edge ScrollView of rows)
+    n.scroll_like = bool(scrollish and n.rect and (not big or coll or _list_like(raw)))
     n.tabstrip = rows == 1 and cols >= 2 and not n.scroll_like
     n.is_list = n.scroll_like or (bool(coll) and rows * cols >= 2 and not n.tabstrip)
     n.tab_item = bool(parent and raw.get("item") and any(a.tabstrip for a in [parent, *parent.ancestors()][:3]))
@@ -342,6 +381,20 @@ def _make(raw, win, parent, index, clip, in_scroll):
     for i, c in enumerate(raw.get("children", ())):
         n.children.append(_make(c, win, n, i, child_clip, in_scroll or n.scroll_like))
     return n
+
+
+def _list_like(raw):
+    """Children that look like list content: 3+ sharing a resource-id, or at
+    least 3 (and 30%) clipped out of view (Android reports them inverted)."""
+    kids = raw.get("children", ())
+    ids = {}
+    for c in kids:
+        if c.get("id"):
+            ids[c["id"]] = ids.get(c["id"], 0) + 1
+    if any(v >= 3 for v in ids.values()):
+        return True
+    gone = sum(1 for c in kids if sp.rect(c.get("bounds")) is None)
+    return gone >= 3 and gone >= 0.3 * len(kids)
 
 
 def _walk(n):
@@ -373,6 +426,8 @@ def _find_bars(root, win, wins):
             continue
         if not any(d.actionable or d.has_content() for d in _walk(n)):
             continue
+        if _repeated(n):
+            continue                     # one of many same-id siblings: a list row, not a bar
         if "top" not in win.bars and (n.rect[1] <= top + 8 or n.cls in TOP_BAR_CLASSES) \
                 and n.rect[1] < wr[1] + 0.3 * sp.height(wr):
             win.bars["top"] = n
@@ -381,7 +436,36 @@ def _find_bars(root, win, wins):
             win.bars["bottom"] = n
 
 
-def _visibility(root):
+def _edge_sliver(n):
+    """A thin node flush with its scroller's edge: Android pre-clips bounds to the
+    viewport, so a button 5% scrolled into view arrives as a 13 px strip whose
+    real size is unknown (TESTAPP `partial`). Too little of it shows to tap."""
+    if not n.in_scroll or n.rect is None or n.clip is None:
+        return False
+    r, c = n.rect, n.clip
+    return ((sp.height(r) <= SLIVER and (r[1] == c[1] or r[3] == c[3]))
+            or (sp.width(r) <= SLIVER and (r[0] == c[0] or r[2] == c[2])))
+
+
+def _under_keyboard(n, keyboard):
+    """Android 9 reports a view hidden by the IME as visible:false; it is still
+    there (ACTION_CLICK reaches it), so it is listed and flagged covered."""
+    if keyboard is None or n.rect is None or n.raw.get("visible") is not False:
+        return False
+    if sp.inter(n.rect, n.win.rect) != n.rect or not (n.actionable or n.has_content()):
+        return False
+    return sp.area(sp.inter(n.rect, keyboard)) >= KB_COVER * sp.area(n.rect)
+
+
+def _repeated(n):
+    """Does ``n`` share its resource-id with 3+ siblings (rows of an edge-to-edge list)?"""
+    rid = n.get("id")
+    if not rid or n.parent is None:
+        return False
+    return sum(1 for c in n.parent.children if c.get("id") == rid) >= 3
+
+
+def _visibility(root, keyboard=None):
     bars = list(root.win.bars.values())
 
     def visit(n):
@@ -389,14 +473,17 @@ def _visibility(root):
         cuts = list(n.win.occluders)
         if n.in_scroll:
             cuts += [b.rect for b in bars if not b.is_ancestor_of(n) and b is not n]
-        n.pieces = sp.subtract_all(vr, cuts) if vr else []
+        n.kb = _under_keyboard(n, keyboard)
+        n.pieces = ([vr] if n.kb else sp.subtract_all(vr, cuts)) if vr else []
         n.vis = sp.largest(n.pieces)       # where a tap lands
         n.box = sp.bbox(n.pieces)          # what is shown as the element's bounds
         full = sp.area(n.rect)
         n.frac = sum(sp.area(p) for p in n.pieces) / full if full else 0.0
         sliver = (n.box is not None and min(sp.width(n.box), sp.height(n.box)) <= SLIVER
-                  and min(sp.width(n.rect), sp.height(n.rect)) > SLIVER)
-        ok = n.raw.get("visible") is not False and n.vis is not None and not sliver
+                  and min(sp.width(n.rect), sp.height(n.rect)) > SLIVER) or _edge_sliver(n)
+        tiny = n.rect is not None and min(sp.width(n.rect), sp.height(n.rect)) < TINY
+        ok = ((n.raw.get("visible") is not False or n.kb) and n.vis is not None
+              and not sliver and not tiny)
         child_shown = False
         for c in n.children:
             visit(c)
@@ -447,7 +534,7 @@ def _elements(n, container, absorber, out):
                 _elements(c, container, el, out)
             return
         absorber = None
-    elif n.shown and n.has_content():
+    elif n.shown and (n.has_content() or n.progress):
         if absorber is not None:
             absorber.add_segment(n.own_label())
             n.el = absorber
@@ -501,7 +588,7 @@ def _role(e, win_w):
         return "list" if (coll or n.cls in LIST_CLASSES - {"ScrollView", "NestedScrollView"}) else "scroll"
     if any(x.editable for x in e.nodes):
         return "input"
-    if e.adopted is not None:
+    if e.adopted is not None and not n.cls.endswith("Spinner"):   # a Spinner's selected item
         return _class_role(e.adopted.cls) or "toggle"
     r = _class_role(n.cls)
     if r:
@@ -645,6 +732,13 @@ def _dedupe(elems):
     return [e for e in elems if id(e) not in drop]
 
 
+def _in_sheet(n):
+    def sheety(a):
+        sid = sp.short_id(a.get("id") or "").lower()
+        return "BottomSheet" in a.cls or sid == "sheet" or "bottom_sheet" in sid or sid.endswith("_sheet")
+    return any(sheety(a) for a in [n, *n.ancestors()])
+
+
 def _in_fab(e):
     n = e.node
     idl = (n.get("id") or "").lower()
@@ -664,7 +758,7 @@ def _regions(elems, wins, W, H):
     for w, es in by_win.items():
         if w.kind in ("dialog", "popup"):
             for e in es:
-                e.region = w.kind
+                e.region = "sheet" if _in_sheet(e.node) else w.kind
             continue
         if w.kind == "system":
             for e in es:
@@ -679,14 +773,13 @@ def _regions(elems, wins, W, H):
             bar = next((k for k, b in w.bars.items() if b is n or b.is_ancestor_of(n)), None)
             drawer = next((a for a in n.ancestors() if a.parent is not None and a.parent.cls == "DrawerLayout"
                            and a.index > 0 and a.rect and sp.width(a.rect) < 0.95 * W), None)
-            sheet = any("bottom_sheet" in (a.get("id") or "") or "BottomSheet" in a.cls
-                        for a in [n, *n.ancestors()])
-            if bar:
+            sheet = _in_sheet(n)
+            if sheet:                      # a sheet docked at the bottom is not a bar
+                e.region = "sheet"
+            elif bar:
                 e.region = f"{bar} bar"
             elif drawer is not None:
                 e.region = "drawer"
-            elif sheet:
-                e.region = "sheet"
             elif not n.in_scroll and _in_fab(e):
                 e.region = "fab"
             elif main_list is not None and e is not main_list and not n.in_scroll and r:
@@ -698,6 +791,8 @@ def _regions(elems, wins, W, H):
                     e.region = "content"
             else:
                 e.region = "content"
+        if main_list is None and w.kind == "main" and not w.bars:
+            _position_bars([e for e in es if e.container is None and e.region == "content"], w, H)
         # list members follow their list
         for e in es:
             c = e.container
@@ -705,6 +800,33 @@ def _regions(elems, wins, W, H):
                 c = c.container
             if c is not None:
                 e.region = c.region
+
+
+def _position_bars(es, w, H):
+    """No list and no bar containers: the first visual row, if it hugs the top
+    and holds a control, is the top bar; the last row, if it hugs the bottom,
+    holds a control and sits well apart from the content, is the bottom bar."""
+    rows = sp.group_rows([e for e in es if e.rect and not e.node.in_scroll], key=lambda e: e.rect)
+    if len(rows) < 3:
+        return
+    rows.sort(key=lambda row: min(e.rect[1] for e in row))
+    top, bottom = w.rect[1], w.rect[3]
+    for o in w.occluders:          # status / navigation bars
+        if sp.width(o) >= 0.9 * sp.width(w.rect):
+            if o[1] <= top < o[3]:
+                top = o[3]
+            if o[1] < bottom <= o[3]:
+                bottom = o[1]
+    first, last, prev = rows[0], rows[-1], rows[-2]
+    if (len(first) >= 2 and min(e.rect[1] for e in first) <= top + 0.05 * H     # a lone widget
+            and any(e.node.actionable for e in first)):                          # is not a bar
+        for e in first:
+            e.region = "top bar"
+    gap = min(e.rect[1] for e in last) - max(e.rect[3] for e in prev)
+    if (max(e.rect[3] for e in last) >= bottom - 0.05 * H and gap >= 0.15 * H
+            and any(e.node.actionable for e in last)):
+        for e in last:
+            e.region = "bottom bar"
 
 
 def _draws_above(b, a):
@@ -738,6 +860,8 @@ def _covered(elems):
                     blocked = True
                 pieces = [p for piece in pieces for p in sp.subtract(piece, b.rect)]
         best = sp.largest(pieces)
+        if any(x.kb for x in a.nodes):
+            blocked = True               # under the keyboard (ACTION_CLICK still reaches it)
         if blocked:
             a.covered = True
             if "covered" not in a.ann:
@@ -781,7 +905,7 @@ def _infer(elems):
     """Unlabeled controls: a label guessed from the id, plus the nearest text."""
     texts = [e for e in elems if e.segments and e.rect]
     for e in elems:
-        if e.segments or e.role in ("list", "grid", "pager", "scroll") or not e.rect:
+        if e.segments or e.role in ("list", "grid", "pager", "scroll", "progress") or not e.rect:
             continue
         if e.role == "input" and any(x.get("hint") for x in e.nodes):
             continue
@@ -789,6 +913,10 @@ def _infer(elems):
                        and a.el.segments and not a.el.node.is_list), None)
         if holder is not None:
             e.context = ("in", holder.label)
+            continue
+        item = next((x.raw.get("item") for x in [e.node, *list(e.node.ancestors())[:2]] if x.raw.get("item")), None)
+        if item is not None and e.container is not None and e.container.role == "grid":
+            e.context = ("at", f"row {item.get('row', 0) + 1} col {item.get('col', 0) + 1}")
             continue
         e.inferred = sp.label_from_id(e.res_id)
         if e.region == "fab":
@@ -798,7 +926,34 @@ def _infer(elems):
             t = sp.nearest(same, e.rect, rel, key=lambda x: x.rect)
             if t is not None and sp.gap(t.rect, e.rect, rel) <= max(200, 2 * sp.height(e.rect)):
                 e.context = ({"left": "right of", "right": "left of", "above": "below"}[rel], t.label)
+                if e.role == "input":
+                    e.inferred = None     # its visual label beats a guess from the id ("f email")
                 break
+
+
+def _warn_tree(wins, main, snap):
+    """Say when the app's tree can't be trusted to show what is on screen."""
+    for w in wins:
+        if w.type == "application" and not w.raw.get("root") and (main is None or w.layer >= main.layer):
+            snap.warnings.append(f"no tree for app window {w.title or w.pkg or w.id} "
+                                 "(a slow or broken accessibility provider?)")
+    if main is None:
+        return
+    mine = [e for e in snap.elements if e.node.win is main]
+    if not mine:
+        snap.warnings.append("opaque view: nothing here is labelled or actionable (still loading, "
+                             "or a canvas/game/map?): try wait, shot --marks, or tap --point X,Y")
+        return
+    count = sum(1 for _ in _iter_raw(main.raw.get("root")))
+    if count <= TINY_TREE and not any(e.node.actionable for e in mine):
+        snap.warnings.append(f"tiny tree ({count} nodes): a splash or loading screen? try: wait")
+
+
+def _iter_raw(n):
+    if n:
+        yield n
+        for c in n.get("children", ()):
+            yield from _iter_raw(c)
 
 
 def _warn_overlaps(elems, snap):
@@ -871,7 +1026,7 @@ def element_line(e, snap, opts, compact=False):
         bits.append(e.list_info)
     if e.segments:
         bits.append(f'"{_q(e.label)}"')
-    elif e.role not in ("list", "grid", "pager", "scroll"):
+    elif e.role not in ("list", "grid", "pager", "scroll", "progress"):   # a spinner needs no name
         if (opts is None or opts.infer) and e.inferred:
             bits.append(f"{e.inferred}?")
         if (opts is None or opts.infer) and e.context:
@@ -1030,7 +1185,13 @@ def _grid_lines(run, cols, snap, opts, ind):
         line = ["."] * len(cols)
         for e in row:
             c = sp.column_of(e.rect, cols)
-            txt = f"[{e.ref}]" + (f'"{_q(e.label[:24])}"' if e.segments else (e.role if not shared else "?"))
+            if e.segments:
+                body = f'"{_q(e.label[:24])}"'
+            elif e.context and e.context[0] == "at":
+                body = f"?({e.context[1]})"            # unlabeled: say where it is
+            else:
+                body = e.role if not shared else "?"
+            txt = f"[{e.ref}]" + body
             extra = " ".join(a for a in e.ann if not a.startswith("actions="))
             if extra:
                 txt += " " + extra
@@ -1102,8 +1263,11 @@ def _row_mates(node):
     child, anc = node, node.parent
     while anc is not None and len(anc.children) == 1 and not (anc.is_list or anc.scroll_like):
         child, anc = anc, anc.parent
-    if anc is None or anc.is_list:
+    if anc is None:
         return []
+    # inside a list, siblings are usually other rows (they don't overlap this
+    # one vertically, so they're skipped below); when a flattened list holds a
+    # row's pieces side by side ("Item 7" + its "Delete"), the overlap finds them
     out = []
     for c in anc.children:
         if c is child or c.rect is None or sp.height(c.rect) > 3 * h:

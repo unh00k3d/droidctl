@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=9758  keyboard=hidden  dialog=yes  1080x2220
+-- sheet
+[1] heading "Share via"
+[2] button "Copy link"
+[3] button "Email"

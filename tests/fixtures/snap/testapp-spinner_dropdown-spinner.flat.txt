@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=84f6  keyboard=hidden  dialog=yes
+[1] list  3/3
+  [2] option  "Apple"  checked
+  [3] option  "Banana"
+  [4] option  "Cherry"

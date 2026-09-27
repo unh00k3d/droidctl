@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=c73d  keyboard=hidden  dialog=no
+[1] heading  "Slow"
+[2] text  "Idle"
+[3] button  "Slow"

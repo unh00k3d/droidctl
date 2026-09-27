@@ -1,0 +1,7 @@
+screen dev.droidctl.testapp/.Main  sig=6d6e  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Form"
+[2] input "Name" #name empty
+[3] input "not-an-email" #email error="Invalid email"
+[4] input "Password" #password empty password
+[5] button "Submit"

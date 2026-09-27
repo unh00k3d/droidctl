@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=c711  keyboard=hidden  dialog=no
+[1] button  blocker?  #blocker
+[2] heading  "Shop"  covered
+[3] button  "Buy"  covered
+! overlap [1] [3]

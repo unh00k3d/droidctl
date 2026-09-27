@@ -1,0 +1,8 @@
+screen dev.droidctl.testapp/.Main  sig=4fb7  keyboard=hidden  dialog=no
+[1] heading  "Enter code"
+[2] input  #otp1  hint="•"  empty
+[3] input  #otp2  hint="•"  empty
+[4] input  #otp3  hint="•"  empty
+[5] input  #otp4  hint="•"  empty
+[6] input  #otp5  hint="•"  empty
+[7] input  #otp6  hint="•"  empty

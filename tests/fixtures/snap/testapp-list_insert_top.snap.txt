@@ -1,0 +1,15 @@
+screen dev.droidctl.testapp/.Main  sig=07ce  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] heading "Feed"
+-- content
+[2] list 10/10
+  [3] button "Item 1"
+  [4] button "Item 2"
+  [5] button "Item 3"
+  [6] button "Item 4"
+  [7] button "Item 5"
+  [8] button "Item 6"
+  [9] button "Item 7"
+  [10] button "Item 8"
+  [11] button "Item 9"
+  [12] button "Item 10"

@@ -1,0 +1,13 @@
+screen dev.droidctl.testapp/.Main  sig=bb19  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] heading "Swipe to delete"
+-- content
+[2] list 8/8
+  [3] button "Note 1"
+  [4] button "Note 2"
+  [5] button "Note 3"
+  [6] button "Note 4"
+  [7] button "Note 5"
+  [8] button "Note 6"
+  [9] button "Note 7"
+  [10] button "Note 8"

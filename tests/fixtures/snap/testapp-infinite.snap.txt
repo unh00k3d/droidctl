@@ -1,0 +1,19 @@
+screen dev.droidctl.testapp/.Main  sig=84fc  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] heading "Infinite feed"
+-- content
+[2] list 14/20 more↓
+  [3] button "Post 1"
+  [4] button "Post 2"
+  [5] button "Post 3"
+  [6] button "Post 4"
+  [7] button "Post 5"
+  [8] button "Post 6"
+  [9] button "Post 7"
+  [10] button "Post 8"
+  [11] button "Post 9"
+  [12] button "Post 10"
+  [13] button "Post 11"
+  [14] button "Post 12"
+  [15] button "Post 13"
+  [16] button "Post 14"

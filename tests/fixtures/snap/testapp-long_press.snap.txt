@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=f3db  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Long press"
+[2] button "Hold me" long-press

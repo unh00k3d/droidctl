@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=5a01  keyboard=hidden  dialog=no
+[1] heading  "Results"
+[2] text  "Loading"
+! tiny tree (3 nodes): a splash or loading screen? try: wait

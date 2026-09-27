@@ -1,0 +1,9 @@
+screen dev.droidctl.testapp/.Main  sig=5b6d  keyboard=hidden  dialog=no
+[1] heading  "Contact"
+[2] text  "Email"
+[3] input  (unlabeled, right of "Email")  #f_email  empty
+[4] text  "Password"
+[5] input  (unlabeled, below "Password")  #f_password  empty  password
+[6] text  "Phone"
+[7] input  (unlabeled, right of "Phone")  #f_phone  empty
+[8] button  "Save"

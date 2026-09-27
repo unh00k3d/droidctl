@@ -397,6 +397,8 @@ def _occlusion(elem, snap):
     """A view drawn above the element's tap point (snapshot marks it `covered`)."""
     if not elem.covered or not elem.rect:
         return None
+    if any(n.kb for n in elem.nodes):     # listed only because the IME hides it
+        return {"by": "keyboard", "visible": False}
     c = sp.center(elem.rect)
     over = [b for b in snap.elements if b is not elem and b.rect and b.node.win is elem.node.win
             and not b.node.is_ancestor_of(elem.node) and not elem.node.is_ancestor_of(b.node)

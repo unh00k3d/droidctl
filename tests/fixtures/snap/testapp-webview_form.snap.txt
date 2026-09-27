@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=d6f0  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "WebView"
+[2] web "Web form"   [3] heading "Web form"   [4] text "City"   [5] input #city hint="City City" empty   [6] button "Send"

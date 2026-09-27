@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=8192  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Document"   [2] button share? (unlabeled, right of "Document") #ic_share   [3] button delete? (unlabeled, right of "Document") #ic_delete   [4] button edit? #ic_edit   [5] button more? #ic_more
+[6] text "Quarterly report.pdf"

@@ -1,0 +1,1607 @@
+{
+ "meta": {
+  "name": "testapp-duplicates_compose",
+  "scenario": "duplicates_compose",
+  "note": "",
+  "captured": "2026-09-27T10:13:23+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.2.0",
+   "versionCode": 2
+  },
+  "package": "dev.droidctl.testapp",
+  "activity": "dev.droidctl.testapp/.Main",
+  "dump_ms": 244,
+  "nodes": 82,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 1443,
+  "dump": 716,
+  "degraded": false,
+  "ms": 244,
+  "nodes": 82,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 177,
+    "type": "system",
+    "layer": 3,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 168,
+    "type": "type_-1",
+    "layer": 2,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 171,
+    "type": "system",
+    "layer": 1,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "13:13",
+         "desc": "13:13",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 1366,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "s:duplicates_compose",
+    "pkg": "dev.droidctl.testapp",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "dev.droidctl.testapp",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "androidx.compose.ui.platform.ComposeView",
+       "bounds": [
+        0,
+        63,
+        1080,
+        2094
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 19,
+         "class": "android.view.View",
+         "bounds": [
+          0,
+          63,
+          1080,
+          2094
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "children": [
+          {
+           "handle": 20,
+           "class": "android.view.View",
+           "bounds": [
+            0,
+            63,
+            1080,
+            2094
+           ],
+           "flags": [
+            "enabled"
+           ],
+           "children": [
+            {
+             "handle": 21,
+             "class": "android.widget.TextView",
+             "text": "Items",
+             "bounds": [
+              42,
+              105,
+              206,
+              213
+             ],
+             "flags": [
+              "enabled",
+              "heading"
+             ],
+             "actions": [
+              "set_selection"
+             ]
+            },
+            {
+             "handle": 22,
+             "class": "android.widget.ScrollView",
+             "bounds": [
+              42,
+              213,
+              1038,
+              2052
+             ],
+             "flags": [
+              "enabled",
+              "scrollable"
+             ],
+             "actions": [
+              "scroll_down",
+              "scroll_forward"
+             ],
+             "children": [
+              {
+               "handle": 23,
+               "class": "android.widget.TextView",
+               "text": "Item 1",
+               "bounds": [
+                42,
+                242,
+                799,
+                311
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 24,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                214,
+                1038,
+                340
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 25,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  247,
+                  975,
+                  306
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 26,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  224,
+                  1038,
+                  329
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 27,
+               "class": "android.widget.TextView",
+               "text": "Item 2",
+               "bounds": [
+                42,
+                368,
+                799,
+                437
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 28,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                340,
+                1038,
+                466
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 29,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  373,
+                  975,
+                  432
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 30,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  350,
+                  1038,
+                  455
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 31,
+               "class": "android.widget.TextView",
+               "text": "Item 3",
+               "bounds": [
+                42,
+                494,
+                799,
+                563
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 32,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                466,
+                1038,
+                592
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 33,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  499,
+                  975,
+                  558
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 34,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  476,
+                  1038,
+                  581
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 35,
+               "class": "android.widget.TextView",
+               "text": "Item 4",
+               "bounds": [
+                42,
+                620,
+                799,
+                689
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 36,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                592,
+                1038,
+                718
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 37,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  625,
+                  975,
+                  684
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 38,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  602,
+                  1038,
+                  707
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 39,
+               "class": "android.widget.TextView",
+               "text": "Item 5",
+               "bounds": [
+                42,
+                746,
+                799,
+                815
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 40,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                718,
+                1038,
+                844
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 41,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  751,
+                  975,
+                  810
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 42,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  728,
+                  1038,
+                  833
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 43,
+               "class": "android.widget.TextView",
+               "text": "Item 6",
+               "bounds": [
+                42,
+                872,
+                799,
+                941
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 44,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                844,
+                1038,
+                970
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 45,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  877,
+                  975,
+                  936
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 46,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  854,
+                  1038,
+                  959
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 47,
+               "class": "android.widget.TextView",
+               "text": "Item 7",
+               "bounds": [
+                42,
+                998,
+                799,
+                1067
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 48,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                970,
+                1038,
+                1096
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 49,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1003,
+                  975,
+                  1062
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 50,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  980,
+                  1038,
+                  1085
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 51,
+               "class": "android.widget.TextView",
+               "text": "Item 8",
+               "bounds": [
+                42,
+                1124,
+                799,
+                1193
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 52,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1096,
+                1038,
+                1222
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 53,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1129,
+                  975,
+                  1188
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 54,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1106,
+                  1038,
+                  1211
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 55,
+               "class": "android.widget.TextView",
+               "text": "Item 9",
+               "bounds": [
+                42,
+                1250,
+                799,
+                1319
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 56,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1222,
+                1038,
+                1348
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 57,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1255,
+                  975,
+                  1314
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 58,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1232,
+                  1038,
+                  1337
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 59,
+               "class": "android.widget.TextView",
+               "text": "Item 10",
+               "bounds": [
+                42,
+                1376,
+                799,
+                1445
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 60,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1348,
+                1038,
+                1474
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 61,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1381,
+                  975,
+                  1440
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 62,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1358,
+                  1038,
+                  1463
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 63,
+               "class": "android.widget.TextView",
+               "text": "Item 11",
+               "bounds": [
+                42,
+                1502,
+                799,
+                1571
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 64,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1474,
+                1038,
+                1600
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 65,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1507,
+                  975,
+                  1566
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 66,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1484,
+                  1038,
+                  1589
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 67,
+               "class": "android.widget.TextView",
+               "text": "Item 12",
+               "bounds": [
+                42,
+                1628,
+                799,
+                1697
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 68,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1600,
+                1038,
+                1726
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 69,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1633,
+                  975,
+                  1692
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 70,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1610,
+                  1038,
+                  1715
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 71,
+               "class": "android.widget.TextView",
+               "text": "Item 13",
+               "bounds": [
+                42,
+                1754,
+                799,
+                1823
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 72,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1726,
+                1038,
+                1852
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 73,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1759,
+                  975,
+                  1818
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 74,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1736,
+                  1038,
+                  1841
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 75,
+               "class": "android.widget.TextView",
+               "text": "Item 14",
+               "bounds": [
+                42,
+                1880,
+                799,
+                1949
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 76,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1852,
+                1038,
+                1978
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 77,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  1885,
+                  975,
+                  1944
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 78,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1862,
+                  1038,
+                  1967
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 79,
+               "class": "android.widget.TextView",
+               "text": "Item 15",
+               "bounds": [
+                42,
+                2006,
+                799,
+                2052
+               ],
+               "flags": [
+                "enabled"
+               ],
+               "actions": [
+                "set_selection"
+               ]
+              },
+              {
+               "handle": 80,
+               "class": "android.view.View",
+               "id": "delete",
+               "bounds": [
+                799,
+                1978,
+                1038,
+                2094
+               ],
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 81,
+                 "class": "android.widget.TextView",
+                 "text": "Delete",
+                 "bounds": [
+                  862,
+                  2011,
+                  975,
+                  2052
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                },
+                {
+                 "handle": 82,
+                 "class": "android.widget.Button",
+                 "bounds": [
+                  799,
+                  1988,
+                  1038,
+                  2052
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

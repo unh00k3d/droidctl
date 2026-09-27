@@ -1,0 +1,8 @@
+screen dev.droidctl.testapp/.Main  sig=8506  keyboard=hidden  dialog=no
+[1] heading  "Form"
+[2] input  #name  hint="Name"  empty
+[3] input  "not-an-email"  #email  hint="Email"  error="Invalid email"
+[4] input  #notes  hint="Notes"  empty
+[5] input  #age  hint="Age"  empty
+[6] input  #code  hint="Code (max 5)"  empty
+[7] button  "Submit"

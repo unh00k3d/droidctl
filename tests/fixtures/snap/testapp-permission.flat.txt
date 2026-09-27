@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=9cd8  keyboard=hidden  dialog=no
+[1] heading  "Permission"
+[2] text  "Camera: not granted"
+[3] button  "Request camera"

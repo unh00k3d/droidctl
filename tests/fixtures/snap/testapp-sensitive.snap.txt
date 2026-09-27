@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=5f0f  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Sensitive"
+[2] text "Card 4111 1111 1111 1111"
+[3] button "Pay"
+[4] text "sdk 28: accessibilityDataSensitive needs API 34"

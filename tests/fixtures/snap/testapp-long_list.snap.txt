@@ -1,0 +1,19 @@
+screen dev.droidctl.testapp/.Main  sig=9035  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] heading "Long list"
+-- content
+[2] list 14/1000 more↓
+  [3] button "Row 1"
+  [4] button "Row 2"
+  [5] button "Row 3"
+  [6] button "Row 4"
+  [7] button "Row 5"
+  [8] button "Row 6"
+  [9] button "Row 7"
+  [10] button "Row 8"
+  [11] button "Row 9"
+  [12] button "Row 10"
+  [13] button "Row 11"
+  [14] button "Row 12"
+  [15] button "Row 13"
+  [16] button "Row 14"

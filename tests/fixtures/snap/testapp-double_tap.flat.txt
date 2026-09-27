@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=aaf3  keyboard=hidden  dialog=no
+[1] heading  "Double tap"
+[2] text  "Photo (double-tap to like)"
+! tiny tree (3 nodes): a splash or loading screen? try: wait

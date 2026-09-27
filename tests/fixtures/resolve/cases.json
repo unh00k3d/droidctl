@@ -3,7 +3,7 @@
  "pairs": [
   {"name": "same screen, dumped twice", "a": "static_twice-a", "b": "static_twice-b", "all": "self"},
   {"name": "rows heal by identity after a scroll", "a": "long_list_scroll-a", "b": "long_list_scroll-b", "expect": [
-   {"ref": {"role": "button", "label": "Row 4"}, "result": "ok", "to": {"label": "Row 4"}, "tier": 2},
+   {"ref": {"role": "button", "label": "Row 4"}, "result": "offscreen", "direction": "up", "note": "after the scroll only a 13 px strip (~9%) of Row 4 is left at the list top; Android pre-clips it, so it is dropped like TESTAPP partial's 5% button"},
    {"ref": {"role": "button", "label": "Row 14"}, "result": "ok", "to": {"label": "Row 14"}, "tier": 2},
    {"ref": {"role": "list"}, "result": "ok", "to": {"role": "list"}},
    {"ref": {"role": "button", "label": "Row 1"}, "result": "stale-ref", "reason": "occupied"}

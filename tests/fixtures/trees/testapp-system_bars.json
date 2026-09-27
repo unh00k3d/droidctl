@@ -1,0 +1,1573 @@
+{
+ "meta": {
+  "name": "testapp-system_bars",
+  "scenario": "system_bars",
+  "note": "",
+  "captured": "2026-09-27T10:11:11+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.2.0",
+   "versionCode": 2
+  },
+  "package": "dev.droidctl.testapp",
+  "activity": "dev.droidctl.testapp/.Main",
+  "dump_ms": 51,
+  "nodes": 58,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 957,
+  "dump": 358,
+  "degraded": false,
+  "ms": 51,
+  "nodes": 58,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 177,
+    "type": "system",
+    "layer": 3,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 168,
+    "type": "type_-1",
+    "layer": 2,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 171,
+    "type": "system",
+    "layer": 1,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "13:11",
+         "desc": "13:11",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 1294,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "s:system_bars",
+    "pkg": "dev.droidctl.testapp",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "dev.droidctl.testapp",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "android.widget.ScrollView",
+       "bounds": [
+        0,
+        0,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "focusable",
+        "enabled",
+        "scrollable"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "scroll_forward",
+        "show_on_screen",
+        "scroll_down"
+       ],
+       "children": [
+        {
+         "handle": 19,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 1",
+         "bounds": [
+          0,
+          0,
+          1080,
+          132
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 20,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 2",
+         "bounds": [
+          0,
+          132,
+          1080,
+          264
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 21,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 3",
+         "bounds": [
+          0,
+          264,
+          1080,
+          396
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 22,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 4",
+         "bounds": [
+          0,
+          396,
+          1080,
+          528
+         ],
+         "drawingOrder": 4,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 23,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 5",
+         "bounds": [
+          0,
+          528,
+          1080,
+          660
+         ],
+         "drawingOrder": 5,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 24,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 6",
+         "bounds": [
+          0,
+          660,
+          1080,
+          792
+         ],
+         "drawingOrder": 6,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 25,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 7",
+         "bounds": [
+          0,
+          792,
+          1080,
+          924
+         ],
+         "drawingOrder": 7,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 26,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 8",
+         "bounds": [
+          0,
+          924,
+          1080,
+          1056
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 27,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 9",
+         "bounds": [
+          0,
+          1056,
+          1080,
+          1188
+         ],
+         "drawingOrder": 9,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 28,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 10",
+         "bounds": [
+          0,
+          1188,
+          1080,
+          1320
+         ],
+         "drawingOrder": 10,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 29,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 11",
+         "bounds": [
+          0,
+          1320,
+          1080,
+          1452
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 30,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 12",
+         "bounds": [
+          0,
+          1452,
+          1080,
+          1584
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 31,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 13",
+         "bounds": [
+          0,
+          1584,
+          1080,
+          1716
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 32,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 14",
+         "bounds": [
+          0,
+          1716,
+          1080,
+          1848
+         ],
+         "drawingOrder": 14,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 33,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 15",
+         "bounds": [
+          0,
+          1848,
+          1080,
+          1980
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 34,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 16",
+         "bounds": [
+          0,
+          1980,
+          1080,
+          2112
+         ],
+         "drawingOrder": 16,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 35,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 17",
+         "bounds": [
+          0,
+          2112,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 17,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 36,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 18",
+         "bounds": [
+          0,
+          2244,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 18,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 37,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 19",
+         "bounds": [
+          0,
+          2376,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 19,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 38,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 20",
+         "bounds": [
+          0,
+          2508,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 20,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 39,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 21",
+         "bounds": [
+          0,
+          2640,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 21,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 40,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 22",
+         "bounds": [
+          0,
+          2772,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 22,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 41,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 23",
+         "bounds": [
+          0,
+          2904,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 23,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 42,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 24",
+         "bounds": [
+          0,
+          3036,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 24,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 43,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 25",
+         "bounds": [
+          0,
+          3168,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 25,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 44,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 26",
+         "bounds": [
+          0,
+          3300,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 26,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 45,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 27",
+         "bounds": [
+          0,
+          3432,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 27,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 46,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 28",
+         "bounds": [
+          0,
+          3564,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 28,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 47,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 29",
+         "bounds": [
+          0,
+          3696,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 29,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 48,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 30",
+         "bounds": [
+          0,
+          3828,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 30,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 49,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 31",
+         "bounds": [
+          0,
+          3960,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 31,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 50,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 32",
+         "bounds": [
+          0,
+          4092,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 32,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 51,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 33",
+         "bounds": [
+          0,
+          4224,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 33,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 52,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 34",
+         "bounds": [
+          0,
+          4356,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 34,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 53,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 35",
+         "bounds": [
+          0,
+          4488,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 35,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 54,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 36",
+         "bounds": [
+          0,
+          4620,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 36,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 55,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 37",
+         "bounds": [
+          0,
+          4752,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 37,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 56,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 38",
+         "bounds": [
+          0,
+          4884,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 38,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 57,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 39",
+         "bounds": [
+          0,
+          5016,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 39,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 58,
+         "class": "android.widget.TextView",
+         "id": "dev.droidctl.testapp:id/edge_row",
+         "text": "Edge row 40",
+         "bounds": [
+          0,
+          5148,
+          1080,
+          2220
+         ],
+         "visible": false,
+         "drawingOrder": 40,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

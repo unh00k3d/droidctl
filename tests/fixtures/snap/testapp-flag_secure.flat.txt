@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=bc23  keyboard=hidden  dialog=no
+[1] heading  "Secure"
+[2] text  "Balance: $1,234.56"
+[3] button  "Reveal"

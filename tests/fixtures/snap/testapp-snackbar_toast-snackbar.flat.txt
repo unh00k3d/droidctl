@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=0ed0  keyboard=hidden  dialog=no
+[1] heading  "Messages"
+[2] button  "Snackbar"
+[3] button  "Toast"
+[4] text  "Message archived"
+[5] button  "UNDO"

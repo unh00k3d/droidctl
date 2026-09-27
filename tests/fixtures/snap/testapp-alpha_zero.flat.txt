@@ -1,0 +1,3 @@
+screen dev.droidctl.testapp/.Main  sig=cda4  keyboard=hidden  dialog=no
+[1] heading  "Alpha"
+[2] button  "Visible"

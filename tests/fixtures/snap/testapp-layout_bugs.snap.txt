@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=fb75  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Layout bugs"
+[2] button "Left"   [3] button "Right"
+[4] text "This is a very long product title that will never fit in the space it was given"
+[5] button "x"

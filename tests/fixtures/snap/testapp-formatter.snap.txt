@@ -1,0 +1,4 @@
+screen dev.droidctl.testapp/.Main  sig=c2a9  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "Phone"
+[2] input #phone hint="Phone number" empty

@@ -44,8 +44,13 @@ def test_fixture_is_a_well_formed_raw_tree(path):
         assert w["type"] in WINDOW_TYPES or w["type"].startswith("type_")
         assert len(w["bounds"]) == 4
     apps = [w for w in tree["windows"] if w["type"] == "application" and "root" in w]
-    assert apps, "no application window"
-    assert meta["package"] in {w.get("pkg") for w in apps}, "meta.package is not on screen"
+    if "no root" in meta.get("note", ""):
+        # a real capture of the agent returning an app window without its tree
+        # (TESTAPP slow_a11y); kept as the input for the snapshot's warning
+        assert not apps
+    else:
+        assert apps, "no application window"
+        assert meta["package"] in {w.get("pkg") for w in apps}, "meta.package is not on screen"
 
     handles = []
     for n in nodes(tree):

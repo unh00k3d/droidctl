@@ -1,0 +1,9 @@
+screen dev.droidctl.testapp/.Main  sig=8f5e  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] heading "October 2026"
+grid 5x7 of button
+  .                 .                 .                 [2]"October 1"    [3]"October 2"    [4]"October 3"    [5]"October 4"
+  [6]"October 5"    [7]"October 6"    [8]"October 7"    [9]"October 8"    [10]"October 9"   [11]"October 10"  [12]"October 11"
+  [13]"October 12"  [14]"October 13"  [15]"October 14"  [16]"October 15"  [17]"October 16"  [18]"October 17"  [19]"October 18"
+  [20]"October 19"  [21]"October 20"  [22]"October 21"  [23]"October 22"  [24]"October 23"  [25]"October 24"  [26]"October 25"
+  [27]"October 26"  [28]"October 27"  [29]"October 28"  [30]"October 29"  [31]"October 30"  [32]"October 31"  .

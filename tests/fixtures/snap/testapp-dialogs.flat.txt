@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=acf7  keyboard=hidden  dialog=no
+[1] heading  "Dialogs"
+[2] button  "Alert"
+[3] button  "Full screen"
+[4] button  "Sheet"

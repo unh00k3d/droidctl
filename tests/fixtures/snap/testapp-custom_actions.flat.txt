@@ -1,0 +1,7 @@
+screen dev.droidctl.testapp/.Main  sig=d423  keyboard=hidden  dialog=no
+[1] heading  "Messages"
+[2] button  "Message 1"  actions=[Archive, Delete]
+[3] button  "Message 2"  actions=[Archive, Delete]
+[4] button  "Message 3"  actions=[Archive, Delete]
+[5] button  "Message 4"  actions=[Archive, Delete]
+[6] button  "Message 5"  actions=[Archive, Delete]

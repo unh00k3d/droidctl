@@ -1,0 +1,8 @@
+screen dev.droidctl.testapp/.Main  sig=7b86  keyboard=hidden  dialog=no
+[1] heading  "Toggles"
+[2] switch  "Wi-Fi"  off
+[3] checkbox  "Remember me"  unchecked
+[4] text  "Size"
+[5] radio  "Small"
+[6] radio  "Medium"
+[7] radio  "Large"

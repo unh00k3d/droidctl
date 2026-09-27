@@ -1,0 +1,5 @@
+screen dev.droidctl.testapp/.Main  sig=018b  keyboard=hidden  dialog=no
+[1] heading  "Buttons"
+[2] button  "Save"
+[3] button  "Settings"
+[4] button  mystery?  (unlabeled, below "Settings")  #mystery

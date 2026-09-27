@@ -1,0 +1,6 @@
+screen dev.droidctl.testapp/.Main  sig=dc96  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] button "Open navigation drawer"   [2] text "Mail"   [3] button "More options"
+[4] text "Home"
+-- bottom bar
+[5] tab "Home" selected   [6] tab "Search"   [7] tab "Profile"
