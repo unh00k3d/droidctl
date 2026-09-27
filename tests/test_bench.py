@@ -170,3 +170,13 @@ def test_every_tap_target_is_well_formed():
     assert len({t["name"] for t in ts}) == len(ts)
     for t in ts:
         assert t["dc"][0] == "tap" and t["expect"] and t["pick"]
+
+
+def test_ref_picker_uses_merged_row_parts_as_anchors():
+    els = [{"ref": 2, "label": "Ada Lovelace · Lunch", "bounds": [0, 100, 800, 200]},
+           {"ref": 3, "label": "Star", "bounds": [900, 100, 1000, 200]},
+           {"ref": 4, "label": "Alan Turing · Paper", "bounds": [0, 300, 800, 400]},
+           {"ref": 5, "label": "Star", "bounds": [900, 300, 1000, 400]}]
+    assert tap.pick_ref(els, {"text": "Star", "anchor": "Alan Turing"})[0]["ref"] == 5
+    assert tap.pick_ref(els, {"text": "Nope"})[0] is None
+    assert tap.pick_ref(els, {"text": "Alan Turing"})[0]["ref"] == 4          # a part of a merged row

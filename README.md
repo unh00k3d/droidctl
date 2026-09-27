@@ -159,10 +159,56 @@ Snapshot size: 41–463 tokens per real app screen (Settings, launcher, Google D
 sahibinden, Open Camera; an estimate at 3.5 characters per token), 12–40× smaller than the raw
 accessibility JSON. Every test-app screen is under 260 tokens.
 
+### Tokens per screen
+
+`bench/tokens.py` over every captured fixture (an estimate at 3.5 characters per token):
+
+| fixtures | raw JSON | flat snapshot | spatial snapshot |
+|---|---|---|---|
+| 11 real app screens | median 3,723 | median 151, max 457 | median 166, max 463 (+3.7%) |
+| 91 test-app screens | median 1,793 | median 57, max 407 | median 63, max 399 (+4.9%) |
+
+### Tap accuracy
+
+`bench/tap_accuracy.py`: 52 targets (46 test-app: rows, repeated icons in rows, duplicate
+buttons, grids, Compose, virtual views, unlabeled icons; 6 real: Settings rows, launcher icons).
+Graded by the test app's own `DTA` events (exactly the intended event, nothing else) and by
+`dumpsys` for real apps, never by droidctl's output.
+
+| method | correct | failed safely (typed error, no tap) | wrong target |
+|---|---|---|---|
+| `snapshot`, then `tap REF` (the recommended path) | 50/52 | 1 | 0 |
+| `tap` with locators (`--text/--desc … --right-of/--below`) | 41/52 | 11 | 0 |
+| baseline: `uiautomator dump` + `input tap` at the element's centre (mobile-mcp 1.0.5's Android robot, re-implemented) | 52/52 | 0 | 0 |
+
+- **No method hit a wrong target.** The two `tap REF` misses (a dropped socket mid-tap; a snapshot taken before a grid laid out) both passed 3/3 when rerun.
+- **Locator misses are refusals, and two are droidctl bugs:**
+  - `--desc` doesn't match a description merged from a child (a Compose icon inside a button);
+  - `--right-of`/`--left-of` anchors must equal a whole merged row label (`"Ada Lovelace · Lunch tomorrow?"`), not part of it.
+  - The two `--below` misses are genuinely ambiguous: two Buy buttons sit below in the same column.
+- **Coordinate taps are accurate on static, fully visible targets.** The cases where they go wrong are covered by `tests/e2e` and the resolver's before/after pairs, not by this benchmark: elements occluded by an overlay or the keyboard, moved after a scroll, or on a screen that changed.
+- **mobile-mcp itself was not run.** Its device path needs the separate `mobilecli` binary, which can install an agent on the phone.
+- **`uiautomator dump` suppresses accessibility services while it runs.** droidctl's agent answered again within 0.1 s.
+
+### Layout A/B (reduced run, provisional)
+
+`bench/spatial.py`: `claude-sonnet-5` headless (`claude -p`, only `Bash(droidctl:*)`), 10 test-app
+tasks × 3 layout variants × 1 run. Success comes from the app's `DTA` events. Total cost $3.79.
+
+| variant | success | droidctl calls | input tokens (incl. cache) | wrong taps |
+|---|---|---|---|---|
+| flat | 9/10 | 47 | 1.62M | 0 |
+| spatial (the default) | 9/10 | 45 | 1.51M | 0 |
+| spatial + `shot --marks` | 9/10 | 59 | 2.35M | 1 |
+
+- **The one failure is the same task in every variant, and the task is at fault.** In `delete_item7`, the test app's Delete only logs and never removes the row. Every agent saw no change and tapped again, while the task requires exactly one delete.
+- **Without that task, flat and spatial tie:** 9/9 each, 32 vs 31 calls, spatial 3% fewer tokens. `--marks` has the same success with +41% tokens and 5 more calls.
+- **Reading:** spatial stays the default because it costs nothing extra, but this run doesn't show that it helps. `--marks` stays opt-in.
+- **Caveat:** one run per task and one model is not statistically meaningful.
+
 ### Pending
 
-The spatial-layout A/B (which layers are on by default), tap accuracy against mobile-mcp and
-wireless-adb latency have not been measured yet; see PLAN.md "Open questions".
+Wireless-adb latency, and the full A/B protocol (2 models, 3 runs, per-layer ablations, `--geo`, `--map`).
 
 ## How it is tested
 

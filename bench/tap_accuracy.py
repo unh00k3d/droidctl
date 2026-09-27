@@ -8,10 +8,14 @@ virtual views, unlabeled icons (graded by the app's DTA logcat events: exactly
 the intended event, nothing else), plus real Settings rows and launcher icons
 (graded by `dumpsys activity top` / the focused window, not by droidctl).
 
-Two methods on the same targets:
-  droidctl  `droidctl snapshot`, then `droidctl tap <locator>`, the way an agent
-            would (a ref from the snapshot, or a text/desc/id locator with
-            --right-of/--below for repeated labels).
+Three methods on the same targets:
+  ref       `droidctl snapshot --json`, choose the element's ref with the SAME
+            selection rule the baseline uses (exact label/id; for a repeated
+            label, the one nearest its anchor text), then `droidctl tap REF`.
+            This is the path AGENTS.md recommends, and it isolates droidctl's
+            tap mechanics from the choice of element.
+  locator   `droidctl tap --text/--desc/--id ... [--right-of/--below ANCHOR]`,
+            droidctl's own locator language (refuses rather than guesses).
   baseline  "mobile-mcp style": a re-implementation of mobile-mcp 1.0.5's
             Android legacy robot (lib/android.js: `uiautomator dump`,
             collectElements(), then `input tap` at the rect centre), with the
@@ -106,8 +110,8 @@ REAL = [
      "pick": {"text": "Notifications"}, "top": "Notification", "cat": "real app"},
     {"name": "settings:Sounds and vibration", "start": "settings", "dc": ["tap", "--text", "Sounds and vibration"],
      "pick": {"text": "Sounds and vibration"}, "top": "Sound", "cat": "real app"},
-    {"name": "settings:Lock screen", "start": "settings", "dc": ["tap", "--text", "Lock screen"],
-     "pick": {"text": "Lock screen"}, "top": "LockScreen", "cat": "real app"},
+    {"name": "settings:Connections", "start": "settings", "dc": ["tap", "--text", "Connections"],
+     "pick": {"text": "Connections"}, "top": "Connections", "cat": "real app"},
     {"name": "launcher:Play Store", "start": "home", "dc": ["tap", "--text", "Play Store"],
      "pick": {"text": "Play Store"}, "focus": "com.android.vending", "cat": "real app"},
     {"name": "launcher:Camera", "start": "home", "dc": ["tap", "--text", "Camera"],
@@ -192,6 +196,32 @@ def pick_element(elements, pick):
     return min(cands, key=lambda e: math.dist(centre(e), (ax, ay))), "nearest to anchor"
 
 
+def pick_ref(elements, pick):
+    """The baseline's selection rule, applied to droidctl's snapshot elements:
+    exact label (or id suffix); a repeated label → the one nearest its anchor,
+    where an anchor matches a label exactly or as one ` · ` part of a merged row."""
+    def box(e):
+        l, t, r, b = e["bounds"]
+        return (l + r) / 2, (t + b) / 2
+    if "id" in pick:
+        cands = [e for e in elements if (e.get("id") or "").endswith(":id/" + pick["id"])]
+    else:
+        cands = [e for e in elements if e.get("label") == pick["text"]]
+        if not cands:                      # a merged row: "Display · Brightness, ..."
+            cands = [e for e in elements if pick["text"] in (e.get("label") or "").split(" · ")]
+    cands = [e for e in cands if e.get("bounds")]
+    if not cands:
+        return None, "no element with that label"
+    if len(cands) == 1 or "anchor" not in pick:
+        return cands[0], "first match" if len(cands) > 1 else "unique"
+    anchors = [e for e in elements if e.get("bounds") and (e.get("label") == pick["anchor"]
+               or pick["anchor"] in (e.get("label") or "").split(" · "))]
+    if not anchors:
+        return cands[0], "anchor not found: first match"
+    ax, ay = box(anchors[0])
+    return min(cands, key=lambda e: math.dist(box(e), (ax, ay))), "nearest to anchor"
+
+
 # --------------------------------------------------------------------------
 # running
 # --------------------------------------------------------------------------
@@ -223,15 +253,23 @@ def dc_json(env, *argv, timeout=120):
         return {"ok": False, "error": {"kind": "no-json", "message": (r.stdout + r.stderr)[-300:]}}
 
 
-def run_droidctl(serial, t, env):
+def run_droidctl(serial, t, env, how="locator"):
     real = "start" in t
     if real:
         start_real(serial, t["start"])
     else:
         T.launch(serial, t["scenario"])
-    dc_json(env, "snapshot")
+    snap = dc_json(env, "snapshot")
     t0 = time.monotonic()
-    res = dc_json(env, *t["dc"])
+    extra = {}
+    if how == "ref":
+        el, why_pick = pick_ref(snap.get("elements") or [], t["pick"])
+        extra["pick"] = why_pick
+        if el is None:
+            return {"target": t["name"], "cat": t["cat"], "method": "ref", "ok": False, "why": why_pick}
+        res = dc_json(env, "tap", str(el["ref"]))
+    else:
+        res = dc_json(env, *t["dc"])
     ms = (time.monotonic() - t0) * 1000
     if not res.get("ok", True) and "error" in res:
         ok, why = False, f"{res['error'].get('kind')}: {res['error'].get('message', '')[:100]}"
@@ -243,8 +281,9 @@ def run_droidctl(serial, t, env):
     else:
         time.sleep(0.3)
         ok, why = grade_events(T.dta(serial, t["scenario"]), t["expect"])
-    return {"target": t["name"], "cat": t["cat"], "method": "droidctl", "ok": ok, "why": why,
-            "tap_method": res.get("method"), "ms": round(ms)}
+    refused = (not ok) and "error" in res
+    return {"target": t["name"], "cat": t["cat"], "method": how, "ok": ok, "why": why, "refused": refused,
+            "tap_method": res.get("method"), "ms": round(ms), **extra}
 
 
 def run_baseline(serial, t):
@@ -280,7 +319,7 @@ def run_baseline(serial, t):
 
 def summarize(rows):
     out = {}
-    for m in ("droidctl", "baseline"):
+    for m in ("ref", "locator", "baseline"):
         rs = [r for r in rows if r["method"] == m]
         if not rs:
             continue
@@ -291,6 +330,8 @@ def summarize(rows):
             c[1] += 1
         out[m] = {"correct": sum(r["ok"] for r in rs), "total": len(rs),
                   "accuracy": round(sum(r["ok"] for r in rs) / len(rs), 3),
+                  "refused": sum(1 for r in rs if r.get("refused")),
+                  "wrong_or_no_effect": sum(1 for r in rs if not r["ok"] and not r.get("refused")),
                   "by_category": {k: f"{a}/{b}" for k, (a, b) in sorted(cats.items())},
                   "failures": [f"{r['target']}: {r['why']}" for r in rs if not r["ok"]]}
     return out
@@ -299,7 +340,7 @@ def summarize(rows):
 def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("-d", "--device", default=os.environ.get("ANDROID_SERIAL"), required=False)
-    p.add_argument("--only", choices=["droidctl", "baseline"])
+    p.add_argument("--only", choices=["ref", "locator", "baseline"])
     p.add_argument("--targets", default="all")
     p.add_argument("--no-real", action="store_true")
     p.add_argument("--out", default=os.path.join(HERE, "results", "tap-accuracy.json"))
@@ -314,12 +355,14 @@ def main(argv=None):
     env = dict(os.environ, DROIDCTL_HOME=home, ANDROID_SERIAL=a.device)
     rows = []
     try:
-        if a.only in (None, "droidctl"):
+        for how in ("ref", "locator"):
+            if a.only not in (None, how):
+                continue
             for t in targets:
-                r = run_droidctl(a.device, t, env)
+                r = run_droidctl(a.device, t, env, how)
                 rows.append(r)
-                print(f"droidctl {t['name']:28} {'ok ' if r['ok'] else 'MISS'} {r['why'][:70]}", file=sys.stderr, flush=True)
-            subprocess.run([T.VENV_DROIDCTL, "daemon", "stop"], env=env, capture_output=True)
+                print(f"{how:8} {t['name']:28} {'ok ' if r['ok'] else 'MISS'} {r['why'][:70]}", file=sys.stderr, flush=True)
+        subprocess.run([T.VENV_DROIDCTL, "daemon", "stop"], env=env, capture_output=True)
         recovery = None
         if a.only in (None, "baseline"):
             for t in targets:
