@@ -1,0 +1,577 @@
+{
+ "meta": {
+  "name": "real-opencamera-main",
+  "captured": "2026-09-27T09:08:34+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.1.0",
+   "versionCode": 1
+  },
+  "package": "net.sourceforge.opencamera",
+  "activity": "net.sourceforge.opencamera/net.sourceforge.opencamera.MainActivity",
+  "not_important": false,
+  "settled": true,
+  "dump_ms": 165,
+  "nodes": 19,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 842,
+  "dump": 3,
+  "degraded": false,
+  "ms": 165,
+  "nodes": 19,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 177,
+    "type": "system",
+    "layer": 2,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 168,
+    "type": "type_-1",
+    "layer": 1,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 187,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "Open Camera",
+    "pkg": "net.sourceforge.opencamera",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "net.sourceforge.opencamera",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.ScrollView",
+       "id": "net.sourceforge.opencamera:id/popup_container",
+       "bounds": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "visible": false,
+       "flags": [
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 11,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/exposure_lock",
+       "desc": "Lock exposure",
+       "tooltip": "Lock exposure",
+       "bounds": [
+        4,
+        32,
+        162,
+        190
+       ],
+       "drawingOrder": 15,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 12,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/exposure",
+       "desc": "Exposure",
+       "tooltip": "Exposure",
+       "bounds": [
+        310,
+        32,
+        468,
+        190
+       ],
+       "drawingOrder": 14,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 13,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/popup",
+       "desc": "Popup settings",
+       "tooltip": "Popup settings",
+       "bounds": [
+        616,
+        32,
+        774,
+        190
+       ],
+       "drawingOrder": 13,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 14,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/settings",
+       "desc": "Settings",
+       "tooltip": "Settings",
+       "bounds": [
+        922,
+        32,
+        1080,
+        190
+       ],
+       "drawingOrder": 12,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 15,
+       "class": "android.widget.SeekBar",
+       "id": "net.sourceforge.opencamera:id/zoom_seekbar",
+       "desc": "Zoom",
+       "bounds": [
+        1,
+        1648,
+        132,
+        2042
+       ],
+       "drawingOrder": 8,
+       "flags": [
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "scroll_backward",
+        "set_selection",
+        "show_on_screen",
+        "set_progress"
+       ],
+       "range": {
+        "min": 0,
+        "max": 99,
+        "cur": 99
+       }
+      },
+      {
+       "handle": 16,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/switch_video",
+       "desc": "Switch to video mode",
+       "tooltip": "Switch to video mode",
+       "bounds": [
+        250,
+        1936,
+        408,
+        2094
+       ],
+       "drawingOrder": 6,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 17,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/take_photo",
+       "desc": "Take Photo",
+       "tooltip": "Take Photo",
+       "bounds": [
+        408,
+        1831,
+        671,
+        2094
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 18,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/switch_camera",
+       "desc": "Switch to front camera",
+       "tooltip": "Switch to front camera",
+       "bounds": [
+        671,
+        1936,
+        829,
+        2094
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 19,
+       "class": "android.widget.ImageButton",
+       "id": "net.sourceforge.opencamera:id/gallery",
+       "desc": "Gallery",
+       "tooltip": "Gallery",
+       "bounds": [
+        901,
+        1915,
+        1017,
+        2031
+       ],
+       "drawingOrder": 11,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

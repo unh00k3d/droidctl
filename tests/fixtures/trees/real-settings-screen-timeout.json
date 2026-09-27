@@ -1,0 +1,908 @@
+{
+ "meta": {
+  "name": "real-settings-screen-timeout",
+  "captured": "2026-09-27T08:57:19+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.1.0",
+   "versionCode": 1
+  },
+  "package": "com.android.settings",
+  "activity": "com.android.settings/com.android.settings.Settings$ScreenTimeoutActivity",
+  "not_important": false,
+  "settled": true,
+  "dump_ms": 99,
+  "nodes": 34,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 214,
+  "dump": 40,
+  "degraded": false,
+  "ms": 99,
+  "nodes": 34,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 146,
+    "type": "system",
+    "layer": 3,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 142,
+    "type": "type_-1",
+    "layer": 2,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 145,
+    "type": "system",
+    "layer": 1,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "11:57",
+         "desc": "11:57",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 156,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "Screen timeout",
+    "pkg": "com.android.settings",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.settings",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "android.widget.TextView",
+       "id": "com.android.settings:id/collpasing_app_bar_extended_title",
+       "text": "Screen timeout",
+       "bounds": [
+        0,
+        63,
+        1080,
+        93
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 19,
+       "class": "android.widget.ImageButton",
+       "desc": "Navigate up",
+       "tooltip": "Navigate up",
+       "bounds": [
+        0,
+        63,
+        147,
+        210
+       ],
+       "drawingOrder": 3,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 20,
+       "class": "android.widget.TextView",
+       "text": "Screen timeout",
+       "bounds": [
+        147,
+        100,
+        512,
+        173
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 21,
+       "class": "android.widget.ScrollView",
+       "bounds": [
+        0,
+        242,
+        1080,
+        2094
+       ],
+       "drawingOrder": 5,
+       "flags": [
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 22,
+         "class": "android.widget.ListView",
+         "id": "com.android.settings:id/screen_timeout_list",
+         "bounds": [
+          0,
+          242,
+          1080,
+          1121
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "focusable",
+          "focused",
+          "enabled"
+         ],
+         "actions": [
+          "clear_focus",
+          "select",
+          "clear_selection",
+          "show_on_screen",
+          "scroll_to_position"
+         ],
+         "collection": {
+          "rows": 6,
+          "cols": 1
+         },
+         "children": [
+          {
+           "handle": 23,
+           "class": "android.widget.LinearLayout",
+           "bounds": [
+            0,
+            242,
+            1080,
+            386
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "clickable",
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "click",
+            "show_on_screen"
+           ],
+           "item": {
+            "row": 0,
+            "col": 0
+           },
+           "children": [
+            {
+             "handle": 24,
+             "class": "android.widget.CheckedTextView",
+             "id": "com.android.settings:id/timeout_title",
+             "text": "15 seconds",
+             "bounds": [
+              0,
+              242,
+              1080,
+              386
+             ],
+             "drawingOrder": 1,
+             "flags": [
+              "checkable",
+              "enabled"
+             ],
+             "actions": [
+              "select",
+              "clear_selection",
+              "set_selection",
+              "show_on_screen"
+             ]
+            }
+           ]
+          },
+          {
+           "handle": 25,
+           "class": "android.widget.LinearLayout",
+           "bounds": [
+            0,
+            389,
+            1080,
+            533
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "clickable",
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "click",
+            "show_on_screen"
+           ],
+           "item": {
+            "row": 1,
+            "col": 0
+           },
+           "children": [
+            {
+             "handle": 26,
+             "class": "android.widget.CheckedTextView",
+             "id": "com.android.settings:id/timeout_title",
+             "text": "30 seconds",
+             "bounds": [
+              0,
+              389,
+              1080,
+              533
+             ],
+             "drawingOrder": 1,
+             "flags": [
+              "checkable",
+              "enabled"
+             ],
+             "actions": [
+              "select",
+              "clear_selection",
+              "set_selection",
+              "show_on_screen"
+             ]
+            }
+           ]
+          },
+          {
+           "handle": 27,
+           "class": "android.widget.LinearLayout",
+           "bounds": [
+            0,
+            536,
+            1080,
+            680
+           ],
+           "drawingOrder": 3,
+           "flags": [
+            "clickable",
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "click",
+            "show_on_screen"
+           ],
+           "item": {
+            "row": 2,
+            "col": 0
+           },
+           "children": [
+            {
+             "handle": 28,
+             "class": "android.widget.CheckedTextView",
+             "id": "com.android.settings:id/timeout_title",
+             "text": "1 minute",
+             "bounds": [
+              0,
+              536,
+              1080,
+              680
+             ],
+             "drawingOrder": 1,
+             "flags": [
+              "checkable",
+              "enabled"
+             ],
+             "actions": [
+              "select",
+              "clear_selection",
+              "set_selection",
+              "show_on_screen"
+             ]
+            }
+           ]
+          },
+          {
+           "handle": 29,
+           "class": "android.widget.LinearLayout",
+           "bounds": [
+            0,
+            683,
+            1080,
+            827
+           ],
+           "drawingOrder": 4,
+           "flags": [
+            "clickable",
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "click",
+            "show_on_screen"
+           ],
+           "item": {
+            "row": 3,
+            "col": 0
+           },
+           "children": [
+            {
+             "handle": 30,
+             "class": "android.widget.CheckedTextView",
+             "id": "com.android.settings:id/timeout_title",
+             "text": "2 minutes",
+             "bounds": [
+              0,
+              683,
+              1080,
+              827
+             ],
+             "drawingOrder": 1,
+             "flags": [
+              "checkable",
+              "enabled"
+             ],
+             "actions": [
+              "select",
+              "clear_selection",
+              "set_selection",
+              "show_on_screen"
+             ]
+            }
+           ]
+          },
+          {
+           "handle": 31,
+           "class": "android.widget.LinearLayout",
+           "bounds": [
+            0,
+            830,
+            1080,
+            974
+           ],
+           "drawingOrder": 5,
+           "flags": [
+            "clickable",
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "click",
+            "show_on_screen"
+           ],
+           "item": {
+            "row": 4,
+            "col": 0
+           },
+           "children": [
+            {
+             "handle": 32,
+             "class": "android.widget.CheckedTextView",
+             "id": "com.android.settings:id/timeout_title",
+             "text": "5 minutes",
+             "bounds": [
+              0,
+              830,
+              1080,
+              974
+             ],
+             "drawingOrder": 1,
+             "flags": [
+              "checkable",
+              "enabled"
+             ],
+             "actions": [
+              "select",
+              "clear_selection",
+              "set_selection",
+              "show_on_screen"
+             ]
+            }
+           ]
+          },
+          {
+           "handle": 33,
+           "class": "android.widget.LinearLayout",
+           "bounds": [
+            0,
+            977,
+            1080,
+            1121
+           ],
+           "drawingOrder": 6,
+           "flags": [
+            "clickable",
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "click",
+            "show_on_screen"
+           ],
+           "item": {
+            "row": 5,
+            "col": 0
+           },
+           "children": [
+            {
+             "handle": 34,
+             "class": "android.widget.CheckedTextView",
+             "id": "com.android.settings:id/timeout_title",
+             "text": "10 minutes",
+             "bounds": [
+              0,
+              977,
+              1080,
+              1121
+             ],
+             "drawingOrder": 1,
+             "flags": [
+              "checkable",
+              "checked",
+              "enabled"
+             ],
+             "actions": [
+              "select",
+              "clear_selection",
+              "set_selection",
+              "show_on_screen"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

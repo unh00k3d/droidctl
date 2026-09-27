@@ -1,0 +1,2144 @@
+{
+ "meta": {
+  "name": "real-sahibinden-home",
+  "captured": "2026-09-27T08:58:42+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.1.0",
+   "versionCode": 1
+  },
+  "package": "com.sahibinden",
+  "activity": "com.sahibinden/com.sahibinden.app.main.ui.MainActivity",
+  "not_important": false,
+  "settled": false,
+  "dump_ms": 145,
+  "nodes": 112,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 659,
+  "dump": 49,
+  "degraded": false,
+  "ms": 145,
+  "nodes": 112,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 146,
+    "type": "system",
+    "layer": 3,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 142,
+    "type": "type_-1",
+    "layer": 2,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 145,
+    "type": "system",
+    "layer": 1,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "11:58",
+         "desc": "11:58",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 160,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "sahibinden",
+    "pkg": "com.sahibinden",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.sahibinden",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "androidx.compose.ui.platform.ComposeView",
+       "bounds": [
+        0,
+        0,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 19,
+         "class": "android.view.View",
+         "bounds": [
+          0,
+          0,
+          1080,
+          2220
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "children": [
+          {
+           "handle": 20,
+           "class": "android.view.View",
+           "bounds": [
+            0,
+            0,
+            1080,
+            2220
+           ],
+           "flags": [
+            "enabled"
+           ],
+           "children": [
+            {
+             "handle": 21,
+             "class": "android.view.View",
+             "bounds": [
+              0,
+              0,
+              1080,
+              2220
+             ],
+             "flags": [
+              "enabled"
+             ],
+             "children": [
+              {
+               "handle": 22,
+               "class": "android.widget.ScrollView",
+               "bounds": [
+                0,
+                231,
+                1080,
+                2094
+               ],
+               "flags": [
+                "enabled",
+                "scrollable"
+               ],
+               "actions": [
+                "scroll_down",
+                "scroll_forward"
+               ],
+               "children": [
+                {
+                 "handle": 23,
+                 "class": "android.view.View",
+                 "bounds": [
+                  42,
+                  253,
+                  1038,
+                  379
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "children": [
+                  {
+                   "handle": 24,
+                   "class": "android.view.View",
+                   "bounds": [
+                    53,
+                    253,
+                    1027,
+                    379
+                   ],
+                   "flags": [
+                    "enabled"
+                   ],
+                   "children": [
+                    {
+                     "handle": 25,
+                     "class": "android.view.View",
+                     "bounds": [
+                      17,
+                      253,
+                      127,
+                      379
+                     ],
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ]
+                    },
+                    {
+                     "handle": 26,
+                     "class": "android.widget.EditText",
+                     "id": "searchBar",
+                     "bounds": [
+                      127,
+                      253,
+                      848,
+                      379
+                     ],
+                     "drawingOrder": 1,
+                     "flags": [
+                      "clickable",
+                      "longClickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click",
+                      "long_click",
+                      {
+                       "id": 16908372
+                      }
+                     ],
+                     "children": [
+                      {
+                       "handle": 27,
+                       "class": "android.view.View",
+                       "bounds": [
+                        127,
+                        250,
+                        848,
+                        376
+                       ],
+                       "flags": [
+                        "clickable",
+                        "focusable",
+                        "enabled"
+                       ],
+                       "actions": [
+                        "focus",
+                        "click"
+                       ],
+                       "children": [
+                        {
+                         "handle": 28,
+                         "class": "android.widget.TextView",
+                         "text": "Kelime veya ilan numarası ile ara",
+                         "bounds": [
+                          127,
+                          289,
+                          839,
+                          338
+                         ],
+                         "flags": [
+                          "enabled"
+                         ],
+                         "actions": [
+                          "set_selection"
+                         ]
+                        },
+                        {
+                         "handle": 29,
+                         "class": "android.view.View",
+                         "bounds": [
+                          127,
+                          251,
+                          417,
+                          377
+                         ],
+                         "drawingOrder": 1,
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 30,
+                     "class": "android.widget.Button",
+                     "bounds": [
+                      839,
+                      254,
+                      934,
+                      380
+                     ],
+                     "drawingOrder": 2,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ]
+                    },
+                    {
+                     "handle": 31,
+                     "class": "android.widget.Button",
+                     "bounds": [
+                      934,
+                      254,
+                      1060,
+                      380
+                     ],
+                     "drawingOrder": 3,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "handle": 32,
+                 "class": "android.view.View",
+                 "bounds": [
+                  0,
+                  400,
+                  1080,
+                  2094
+                 ],
+                 "drawingOrder": 1,
+                 "flags": [
+                  "enabled"
+                 ],
+                 "children": [
+                  {
+                   "handle": 33,
+                   "class": "android.view.View",
+                   "bounds": [
+                    0,
+                    400,
+                    1080,
+                    2094
+                   ],
+                   "flags": [
+                    "enabled"
+                   ],
+                   "children": [
+                    {
+                     "handle": 34,
+                     "class": "android.view.View",
+                     "id": "categoryEmlak",
+                     "bounds": [
+                      0,
+                      400,
+                      1080,
+                      558
+                     ],
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 35,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        417,
+                        153,
+                        543
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 36,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          417,
+                          153,
+                          543
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 37,
+                       "class": "android.widget.TextView",
+                       "text": "Emlak",
+                       "bounds": [
+                        158,
+                        422,
+                        313,
+                        489
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 38,
+                       "class": "android.widget.TextView",
+                       "text": "Konut, İş Yeri, Arsa, Konut Projeleri, Bina, Devre Mülk, Turistik Tesis",
+                       "bounds": [
+                        158,
+                        494,
+                        954,
+                        536
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 39,
+                     "class": "android.view.View",
+                     "id": "categoryVasita",
+                     "bounds": [
+                      0,
+                      561,
+                      1080,
+                      719
+                     ],
+                     "drawingOrder": 1,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 40,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        578,
+                        153,
+                        704
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 41,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          578,
+                          153,
+                          704
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 42,
+                       "class": "android.widget.TextView",
+                       "text": "Vasıta",
+                       "bounds": [
+                        158,
+                        583,
+                        308,
+                        650
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 43,
+                       "class": "android.widget.TextView",
+                       "text": "Otomobil, Arazi, SUV & Pickup, Elektrikli Araçlar, Motosiklet, Minivan & Panelvan, Ticari Araçlar, Kiralık Araçlar, Deniz Araçları, Hasarlı Araçlar, Karavan, Klasik Araçlar, Hava Araçları, ATV, UTV, Engelli Plakalı Araçlar",
+                       "bounds": [
+                        158,
+                        655,
+                        954,
+                        697
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 44,
+                     "class": "android.view.View",
+                     "id": "categoryYedekParcaAksesuarDonanimTuning",
+                     "bounds": [
+                      0,
+                      722,
+                      1080,
+                      880
+                     ],
+                     "drawingOrder": 2,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 45,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        739,
+                        153,
+                        865
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 46,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          739,
+                          153,
+                          865
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 47,
+                       "class": "android.widget.TextView",
+                       "text": "Yedek Parça, Aksesuar, Donanım & Tuning",
+                       "bounds": [
+                        158,
+                        744,
+                        954,
+                        811
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 48,
+                       "class": "android.widget.TextView",
+                       "text": "Otomotiv Ekipmanları, Motosiklet Ekipmanları, Deniz Aracı Ekipmanları",
+                       "bounds": [
+                        158,
+                        816,
+                        954,
+                        858
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 49,
+                     "class": "android.view.View",
+                     "id": "categoryİkinciElVeSifirAlisveris",
+                     "bounds": [
+                      0,
+                      883,
+                      1080,
+                      1062
+                     ],
+                     "drawingOrder": 3,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 50,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        910,
+                        153,
+                        1036
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 51,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          910,
+                          153,
+                          1036
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 52,
+                       "class": "android.widget.TextView",
+                       "text": "İkinci El ve Sıfır Alışveriş",
+                       "bounds": [
+                        158,
+                        904,
+                        751,
+                        973
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 53,
+                       "class": "android.view.View",
+                       "bounds": [
+                        158,
+                        947,
+                        459,
+                        1065
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 54,
+                         "class": "android.view.View",
+                         "bounds": [
+                          158,
+                          983,
+                          200,
+                          1036
+                         ],
+                         "flags": [
+                          "enabled"
+                         ],
+                         "children": [
+                          {
+                           "handle": 55,
+                           "class": "android.view.View",
+                           "desc": "add",
+                           "bounds": [
+                            158,
+                            983,
+                            200,
+                            1036
+                           ],
+                           "flags": [
+                            "enabled"
+                           ],
+                           "actions": [
+                            "set_selection"
+                           ]
+                          }
+                         ]
+                        },
+                        {
+                         "handle": 56,
+                         "class": "android.widget.TextView",
+                         "text": "Param Güvende",
+                         "bounds": [
+                          205,
+                          988,
+                          459,
+                          1030
+                         ],
+                         "drawingOrder": 1,
+                         "flags": [
+                          "enabled"
+                         ],
+                         "actions": [
+                          "set_selection"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 57,
+                       "class": "android.widget.TextView",
+                       "text": "Bilgisayar, Cep Telefonu & Aksesuar, Fotoğraf & Kamera, Ev Dekorasyon, Ev Elektroniği, Elektrikli Ev Aletleri, Giyim & Aksesuar, Saat, Anne & Bebek, Kişisel Bakım & Kozmetik, Hobi & Oyuncak, Oyunculara Özel, Kitap, Dergi & Film, Müzik, Spor, Takı & Mücevher, Koleksiyon, Antika, Bahçe & Yapı Market, Teknik Elektronik, Ofis & Kırtasiye, Yiyecek & İçecek, Diğer Her Şey",
+                       "bounds": [
+                        480,
+                        989,
+                        954,
+                        1031
+                       ],
+                       "drawingOrder": 3,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 58,
+                     "class": "android.view.View",
+                     "id": "categoryYepy",
+                     "bounds": [
+                      0,
+                      1065,
+                      1080,
+                      1223
+                     ],
+                     "drawingOrder": 4,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 59,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        1082,
+                        153,
+                        1208
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 60,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          1082,
+                          153,
+                          1208
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 61,
+                       "class": "android.widget.TextView",
+                       "text": "Yepy",
+                       "bounds": [
+                        158,
+                        1086,
+                        275,
+                        1153
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 62,
+                       "class": "android.widget.TextView",
+                       "text": "Yepyenilenmiş teknolojik cihazlar",
+                       "bounds": [
+                        158,
+                        1158,
+                        687,
+                        1202
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 63,
+                     "class": "android.view.View",
+                     "id": "categoryİsMakineleriSanayi",
+                     "bounds": [
+                      0,
+                      1226,
+                      1080,
+                      1384
+                     ],
+                     "drawingOrder": 5,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 64,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        1243,
+                        153,
+                        1369
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 65,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          1243,
+                          153,
+                          1369
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 66,
+                       "class": "android.widget.TextView",
+                       "text": "İş Makineleri & Sanayi",
+                       "bounds": [
+                        158,
+                        1247,
+                        698,
+                        1316
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 67,
+                       "class": "android.widget.TextView",
+                       "text": "İş Makineleri, Tarım Makineleri, Sanayi, Elektrik & Enerji",
+                       "bounds": [
+                        158,
+                        1321,
+                        954,
+                        1363
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 68,
+                     "class": "android.view.View",
+                     "id": "categoryUstalarVeHizmetler",
+                     "bounds": [
+                      0,
+                      1387,
+                      1080,
+                      1545
+                     ],
+                     "drawingOrder": 6,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 69,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        1404,
+                        153,
+                        1530
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 70,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          1404,
+                          153,
+                          1530
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 71,
+                       "class": "android.widget.TextView",
+                       "text": "Ustalar ve Hizmetler",
+                       "bounds": [
+                        158,
+                        1409,
+                        660,
+                        1476
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 72,
+                       "class": "android.widget.TextView",
+                       "text": "Ev Tadilat & Dekorasyon, Nakliye, Araç Servis & Bakım, Tamirat & Teknik Servis , Düğün & Etkinlik, Diğer",
+                       "bounds": [
+                        158,
+                        1481,
+                        954,
+                        1523
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 73,
+                     "class": "android.view.View",
+                     "id": "categoryOzelDersVerenler",
+                     "bounds": [
+                      0,
+                      1548,
+                      1080,
+                      1706
+                     ],
+                     "drawingOrder": 7,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 74,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        1565,
+                        153,
+                        1691
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 75,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          1565,
+                          153,
+                          1691
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 76,
+                       "class": "android.widget.TextView",
+                       "text": "Özel Ders Verenler",
+                       "bounds": [
+                        158,
+                        1570,
+                        622,
+                        1637
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 77,
+                       "class": "android.widget.TextView",
+                       "text": "Lise & Üniversite, İlkokul & Ortaokul, Yabancı Dil, Bilgisayar, Direksiyon, Spor, Sanat, Dans, Müzik & Enstrüman, Tiyatro & Oyunculuk, Kişisel Gelişim, Mesleki Dersler, Özel Eğitim, Çocuk Gelişimi, Güzel Konuşma & Diksiyon, Fotoğrafçılık",
+                       "bounds": [
+                        158,
+                        1642,
+                        954,
+                        1684
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 78,
+                     "class": "android.view.View",
+                     "id": "categoryİsİlanlari",
+                     "bounds": [
+                      0,
+                      1709,
+                      1080,
+                      1867
+                     ],
+                     "drawingOrder": 8,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 79,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        1726,
+                        153,
+                        1852
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 80,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          1726,
+                          153,
+                          1852
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 81,
+                       "class": "android.widget.TextView",
+                       "text": "İş İlanları",
+                       "bounds": [
+                        158,
+                        1730,
+                        382,
+                        1799
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 82,
+                       "class": "android.widget.TextView",
+                       "text": "Avukatlık & Hukuki Danışmanlık, Eğitim, Eğlence & Aktivite, Güzellik & Bakım, IT & Yazılım Geliştirme, İnsan Kaynakları, İnşaat & Yapı, İşletme & Stratejik Yönetim, Koruma & Güvenlik, Lojistik & Taşıma, Mağazacılık ve Perakendecilik, Muhasebe, Finans & Bankacılık, Mühendislik, Müşteri Hizmetleri, Ofis Yönetimi & İdari İşler, Part Time & Ek İş Fırsatları, Pazarlama & Ürün Yönetimi, Radyo, Sinema & Televizyon, Restoran & Konaklama, Sağlık, Satış, Tamir & Bakım, Tarım & Hayvancılık, Tasarım & Yaratıcılık, Tekstil & Konfeksiyon, Üretim & İmalat",
+                       "bounds": [
+                        158,
+                        1804,
+                        901,
+                        1846
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 83,
+                     "class": "android.view.View",
+                     "id": "categoryHayvanlarAlemi",
+                     "bounds": [
+                      0,
+                      1870,
+                      1080,
+                      2028
+                     ],
+                     "drawingOrder": 9,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 84,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        1887,
+                        153,
+                        2013
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 85,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          1887,
+                          153,
+                          2013
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 86,
+                       "class": "android.widget.TextView",
+                       "text": "Hayvanlar Alemi",
+                       "bounds": [
+                        158,
+                        1892,
+                        561,
+                        1959
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 87,
+                       "class": "android.widget.TextView",
+                       "text": "Aksesuar & Ekipman, Yem & Mama, Evcil Hayvanlar, Akvaryum Balıkları, Kümes Hayvanları, Büyükbaş Hayvanlar, Küçükbaş Hayvanlar, Deniz Canlıları, Sürüngenler, Böcekler",
+                       "bounds": [
+                        158,
+                        1964,
+                        651,
+                        2006
+                       ],
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    },
+                    {
+                     "handle": 88,
+                     "class": "android.view.View",
+                     "id": "categoryYardimciArayanlar",
+                     "bounds": [
+                      0,
+                      2031,
+                      1080,
+                      2157
+                     ],
+                     "drawingOrder": 10,
+                     "flags": [
+                      "clickable",
+                      "focusable",
+                      "enabled"
+                     ],
+                     "actions": [
+                      "focus",
+                      "click"
+                     ],
+                     "children": [
+                      {
+                       "handle": 89,
+                       "class": "android.view.View",
+                       "bounds": [
+                        27,
+                        2048,
+                        153,
+                        2157
+                       ],
+                       "flags": [
+                        "enabled"
+                       ],
+                       "children": [
+                        {
+                         "handle": 90,
+                         "class": "android.view.View",
+                         "bounds": [
+                          27,
+                          2048,
+                          153,
+                          2157
+                         ],
+                         "flags": [
+                          "enabled"
+                         ]
+                        }
+                       ]
+                      },
+                      {
+                       "handle": 91,
+                       "class": "android.widget.TextView",
+                       "text": "Yardımcı Arayanlar",
+                       "bounds": [
+                        158,
+                        2053,
+                        621,
+                        2094
+                       ],
+                       "drawingOrder": 1,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      },
+                      {
+                       "handle": 92,
+                       "class": "android.widget.TextView",
+                       "text": "Bebek & Çocuk Bakıcısı, Yaşlı & Hasta Bakıcısı, Temizlikçi & Ev İşlerine Yardımcı",
+                       "bounds": [
+                        158,
+                        2125,
+                        954,
+                        2157
+                       ],
+                       "visible": false,
+                       "drawingOrder": 2,
+                       "flags": [
+                        "enabled"
+                       ],
+                       "actions": [
+                        "set_selection"
+                       ]
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 93,
+               "class": "android.view.View",
+               "bounds": [
+                0,
+                0,
+                1080,
+                231
+               ],
+               "drawingOrder": 1,
+               "flags": [
+                "enabled"
+               ],
+               "children": [
+                {
+                 "handle": 94,
+                 "class": "android.view.View",
+                 "bounds": [
+                  11,
+                  63,
+                  1069,
+                  231
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "children": [
+                  {
+                   "handle": 95,
+                   "class": "android.view.View",
+                   "id": "buttonDrawer",
+                   "bounds": [
+                    22,
+                    84,
+                    148,
+                    210
+                   ],
+                   "flags": [
+                    "clickable",
+                    "focusable",
+                    "enabled"
+                   ],
+                   "actions": [
+                    "focus",
+                    "click"
+                   ]
+                  },
+                  {
+                   "handle": 96,
+                   "class": "android.view.View",
+                   "bounds": [
+                    159,
+                    84,
+                    535,
+                    210
+                   ],
+                   "drawingOrder": 1,
+                   "flags": [
+                    "enabled"
+                   ],
+                   "children": [
+                    {
+                     "handle": 97,
+                     "class": "android.widget.TextView",
+                     "text": "sahibinden.com",
+                     "bounds": [
+                      159,
+                      117,
+                      535,
+                      177
+                     ],
+                     "flags": [
+                      "enabled"
+                     ],
+                     "actions": [
+                      "set_selection"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "handle": 98,
+                   "class": "android.view.View",
+                   "id": "buttonAction_0",
+                   "bounds": [
+                    670,
+                    84,
+                    796,
+                    210
+                   ],
+                   "drawingOrder": 2,
+                   "flags": [
+                    "clickable",
+                    "focusable",
+                    "enabled"
+                   ],
+                   "actions": [
+                    "focus",
+                    "click"
+                   ],
+                   "children": [
+                    {
+                     "handle": 99,
+                     "class": "android.view.View",
+                     "desc": "action_0",
+                     "bounds": [
+                      702,
+                      116,
+                      765,
+                      179
+                     ],
+                     "flags": [
+                      "enabled"
+                     ],
+                     "actions": [
+                      "set_selection"
+                     ]
+                    },
+                    {
+                     "handle": 100,
+                     "class": "android.widget.Button",
+                     "bounds": [
+                      670,
+                      84,
+                      796,
+                      210
+                     ],
+                     "drawingOrder": 1,
+                     "flags": [
+                      "enabled"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "handle": 101,
+                   "class": "android.view.View",
+                   "id": "buttonAction_1",
+                   "bounds": [
+                    801,
+                    84,
+                    927,
+                    210
+                   ],
+                   "drawingOrder": 3,
+                   "flags": [
+                    "clickable",
+                    "focusable",
+                    "enabled"
+                   ],
+                   "actions": [
+                    "focus",
+                    "click"
+                   ],
+                   "children": [
+                    {
+                     "handle": 102,
+                     "class": "android.view.View",
+                     "desc": "action_1",
+                     "bounds": [
+                      833,
+                      116,
+                      896,
+                      179
+                     ],
+                     "flags": [
+                      "enabled"
+                     ],
+                     "actions": [
+                      "set_selection"
+                     ]
+                    },
+                    {
+                     "handle": 103,
+                     "class": "android.widget.Button",
+                     "bounds": [
+                      801,
+                      84,
+                      927,
+                      210
+                     ],
+                     "drawingOrder": 1,
+                     "flags": [
+                      "enabled"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "handle": 104,
+                   "class": "android.view.View",
+                   "id": "buttonAction_2",
+                   "bounds": [
+                    932,
+                    84,
+                    1058,
+                    210
+                   ],
+                   "drawingOrder": 4,
+                   "flags": [
+                    "clickable",
+                    "focusable",
+                    "enabled"
+                   ],
+                   "actions": [
+                    "focus",
+                    "click"
+                   ],
+                   "children": [
+                    {
+                     "handle": 105,
+                     "class": "android.view.View",
+                     "desc": "action_2",
+                     "bounds": [
+                      964,
+                      116,
+                      1027,
+                      179
+                     ],
+                     "flags": [
+                      "enabled"
+                     ],
+                     "actions": [
+                      "set_selection"
+                     ]
+                    },
+                    {
+                     "handle": 106,
+                     "class": "android.widget.Button",
+                     "bounds": [
+                      932,
+                      84,
+                      1058,
+                      210
+                     ],
+                     "drawingOrder": 1,
+                     "flags": [
+                      "enabled"
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 107,
+               "class": "android.view.View",
+               "bounds": [
+                901,
+                1767,
+                1038,
+                1931
+               ],
+               "drawingOrder": 2,
+               "flags": [
+                "enabled"
+               ],
+               "children": [
+                {
+                 "handle": 108,
+                 "class": "android.view.View",
+                 "bounds": [
+                  901,
+                  1767,
+                  1038,
+                  1931
+                 ],
+                 "flags": [
+                  "enabled"
+                 ],
+                 "children": [
+                  {
+                   "handle": 109,
+                   "class": "android.widget.Button",
+                   "id": "floatButton",
+                   "bounds": [
+                    901,
+                    1767,
+                    1038,
+                    1904
+                   ],
+                   "flags": [
+                    "clickable",
+                    "longClickable",
+                    "focusable",
+                    "enabled"
+                   ],
+                   "actions": [
+                    "focus",
+                    "click",
+                    "long_click"
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "handle": 110,
+               "class": "android.view.View",
+               "bounds": [
+                651,
+                1931,
+                1038,
+                2057
+               ],
+               "drawingOrder": 3,
+               "flags": [
+                "clickable",
+                "focusable",
+                "enabled"
+               ],
+               "actions": [
+                "focus",
+                "click"
+               ],
+               "children": [
+                {
+                 "handle": 111,
+                 "class": "android.view.View",
+                 "bounds": [
+                  672,
+                  1932,
+                  809,
+                  2058
+                 ],
+                 "flags": [
+                  "enabled"
+                 ]
+                },
+                {
+                 "handle": 112,
+                 "class": "android.widget.TextView",
+                 "text": "ile ilan ara",
+                 "bounds": [
+                  820,
+                  1970,
+                  1017,
+                  2019
+                 ],
+                 "drawingOrder": 1,
+                 "flags": [
+                  "enabled"
+                 ],
+                 "actions": [
+                  "set_selection"
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -292,6 +292,8 @@ class AgentClient:
                     text = e.get("message", "unknown error")
                     if code == -32001:
                         raise UserError(f"the agent refused this connection: {text}", "device")
+                    if code == -32002:
+                        raise UserError(f"{method}: {text}", "stale-ref")
                     raise UserError(f"{method}: {text} (code {code})", "device")
                 return msg.get("result")
         except socket.timeout:

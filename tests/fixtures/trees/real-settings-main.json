@@ -1,0 +1,1335 @@
+{
+ "meta": {
+  "name": "real-settings-main",
+  "captured": "2026-09-27T08:52:49+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.1.0",
+   "versionCode": 1
+  },
+  "package": "com.android.settings",
+  "activity": "com.android.settings/com.android.settings.Settings",
+  "not_important": false,
+  "settled": true,
+  "dump_ms": 194,
+  "nodes": 51,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 22,
+  "dump": 35,
+  "degraded": false,
+  "ms": 194,
+  "nodes": 51,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 146,
+    "type": "system",
+    "layer": 3,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 142,
+    "type": "type_-1",
+    "layer": 2,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 145,
+    "type": "system",
+    "layer": 1,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "11:52",
+         "desc": "11:52",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 151,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "Settings",
+    "pkg": "com.android.settings",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.settings",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "android.widget.TextView",
+       "id": "com.android.settings:id/collpasing_app_bar_extended_title",
+       "text": "Settings",
+       "bounds": [
+        0,
+        356,
+        1080,
+        510
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 19,
+       "class": "android.widget.Button",
+       "desc": "Search",
+       "bounds": [
+        808,
+        688,
+        935,
+        835
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 20,
+       "class": "android.widget.Button",
+       "desc": "Samsung account profile",
+       "bounds": [
+        935,
+        688,
+        1080,
+        835
+       ],
+       "drawingOrder": 3,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 21,
+       "class": "android.support.v7.widget.RecyclerView",
+       "id": "com.android.settings:id/dashboard_container",
+       "bounds": [
+        0,
+        867,
+        1080,
+        2094
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "focusable",
+        "enabled",
+        "scrollable"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "scroll_forward",
+        "show_on_screen"
+       ],
+       "collection": {
+        "rows": 25,
+        "cols": 1
+       },
+       "children": [
+        {
+         "handle": 22,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          867,
+          1080,
+          1063
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 0,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 23,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Connections",
+           "bounds": [
+            200,
+            904,
+            493,
+            974
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 24,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Wi-Fi, Bluetooth, Data usage, Flight mode",
+           "bounds": [
+            200,
+            974,
+            884,
+            1026
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 25,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1063,
+          1080,
+          1105
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 1,
+          "col": 0
+         }
+        },
+        {
+         "handle": 26,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1105,
+          1080,
+          1303
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 2,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 27,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Sounds and vibration",
+           "bounds": [
+            200,
+            1142,
+            688,
+            1212
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 28,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Sound mode, Ringtone, Volume",
+           "bounds": [
+            200,
+            1212,
+            722,
+            1264
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 29,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1303,
+          1080,
+          1499
+         ],
+         "drawingOrder": 4,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 3,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 30,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Notifications",
+           "bounds": [
+            200,
+            1340,
+            497,
+            1410
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 31,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Block, allow, prioritise",
+           "bounds": [
+            200,
+            1410,
+            562,
+            1462
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 32,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1499,
+          1080,
+          1541
+         ],
+         "drawingOrder": 5,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 4,
+          "col": 0
+         }
+        },
+        {
+         "handle": 33,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1541,
+          1080,
+          1739
+         ],
+         "drawingOrder": 6,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 5,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 34,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Display",
+           "bounds": [
+            200,
+            1578,
+            369,
+            1648
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 35,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Brightness, Blue light filter, Home screen",
+           "bounds": [
+            200,
+            1648,
+            875,
+            1700
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 36,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1739,
+          1080,
+          1937
+         ],
+         "drawingOrder": 7,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 6,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 37,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Wallpapers and themes",
+           "bounds": [
+            200,
+            1776,
+            745,
+            1846
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 38,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Wallpapers, Themes, Icons",
+           "bounds": [
+            200,
+            1846,
+            650,
+            1898
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 39,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          1937,
+          1080,
+          2094
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 7,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 40,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Lock screen",
+           "bounds": [
+            200,
+            1974,
+            481,
+            2044
+           ],
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 41,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Screen lock type, Always On Display, Clock style",
+           "bounds": [
+            200,
+            2044,
+            999,
+            2094
+           ],
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 42,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          2133,
+          1080,
+          2094
+         ],
+         "visible": false,
+         "drawingOrder": 9,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 8,
+          "col": 0
+         }
+        },
+        {
+         "handle": 43,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          2175,
+          1080,
+          2094
+         ],
+         "visible": false,
+         "drawingOrder": 10,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 9,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 44,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Biometrics and security",
+           "bounds": [
+            200,
+            2212,
+            747,
+            2094
+           ],
+           "visible": false,
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 45,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Face recognition, Iris, Privacy",
+           "bounds": [
+            200,
+            2282,
+            687,
+            2094
+           ],
+           "visible": false,
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 46,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          2373,
+          1080,
+          2094
+         ],
+         "visible": false,
+         "drawingOrder": 11,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 10,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 47,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Accounts and backup",
+           "bounds": [
+            200,
+            2410,
+            700,
+            2094
+           ],
+           "visible": false,
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 48,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Samsung Cloud, Smart Switch",
+           "bounds": [
+            200,
+            2480,
+            709,
+            2094
+           ],
+           "visible": false,
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        },
+        {
+         "handle": 49,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.settings:id/dashboard_tile",
+         "bounds": [
+          0,
+          2571,
+          1080,
+          2094
+         ],
+         "visible": false,
+         "drawingOrder": 12,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "click",
+          "show_on_screen"
+         ],
+         "item": {
+          "row": 11,
+          "col": 0
+         },
+         "children": [
+          {
+           "handle": 50,
+           "class": "android.widget.TextView",
+           "id": "android:id/title",
+           "text": "Google",
+           "bounds": [
+            200,
+            2608,
+            365,
+            2094
+           ],
+           "visible": false,
+           "drawingOrder": 1,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          },
+          {
+           "handle": 51,
+           "class": "android.widget.TextView",
+           "id": "android:id/summary",
+           "text": "Google settings",
+           "bounds": [
+            200,
+            2678,
+            464,
+            2094
+           ],
+           "visible": false,
+           "drawingOrder": 2,
+           "flags": [
+            "enabled"
+           ],
+           "actions": [
+            "select",
+            "clear_selection",
+            "set_selection",
+            "show_on_screen"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

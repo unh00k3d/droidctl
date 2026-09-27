@@ -13,14 +13,24 @@ const val TAG = "droidctl"
  */
 class AgentService : AccessibilityService() {
     private var server: Server? = null
+    val tree = Tree(this)
 
     override fun onServiceConnected() {
         Log.i(TAG, "service connected")
         stopServer()
-        server = Server(Rpc(this)).also { it.start() }
+        server = Server(Rpc(this, tree)).also { it.start() }
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // the content-generation counter: cheap, allocation-free, main thread only
+        when (event?.eventType) {
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
+            AccessibilityEvent.TYPE_WINDOWS_CHANGED,
+            AccessibilityEvent.TYPE_VIEW_SCROLLED,
+            AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> tree.gen++
+        }
+    }
 
     override fun onInterrupt() {}
 

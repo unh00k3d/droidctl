@@ -273,6 +273,100 @@ def render_ping(p):
 
 
 # --------------------------------------------------------------------------
+# dev: dump-fixture (real raw trees for the offline tests)
+# --------------------------------------------------------------------------
+FIXTURE_DIR = os.path.join("tests", "fixtures", "trees")
+
+
+def _wait_quiet(client, quiet_ms=500, cap_ms=4000):
+    """Poll the device's content-generation counter until it holds still for quiet_ms."""
+    deadline = time.monotonic() + cap_ms / 1000
+    last, since = client.call("gen")["gen"], time.monotonic()
+    while time.monotonic() < deadline:
+        time.sleep(0.1)
+        g = client.call("gen")["gen"]
+        if g != last:
+            last, since = g, time.monotonic()
+        elif (time.monotonic() - since) * 1000 >= quiet_ms:
+            return True
+    return False
+
+
+def _focused_activity(serial):
+    """`pkg/.Activity` of the focused window, from dumpsys (dev path, not the hot path)."""
+    import re
+    out = dev.sh(dev.adb_device(serial), "dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'")
+    m = re.search(r"mCurrentFocus=Window\{\S+ \S+ ([^\s}]+)\}", out)
+    return m.group(1) if m else None
+
+
+def cmd_dump_fixture(a):
+    import datetime
+    import json
+    import re
+    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", a.name):
+        raise UserError(f"fixture name {a.name!r}: use lowercase letters, digits, '.', '_' and '-'", "bad-args")
+    serial = dev.resolve_serial(a.device)
+    client, info = dev.connect(serial)
+    try:
+        focus = None
+        if a.pkg:
+            deadline = time.monotonic() + a.timeout
+            while True:
+                focus = _focused_activity(serial)
+                if focus and focus.split("/")[0] == a.pkg:
+                    break
+                if time.monotonic() > deadline:
+                    raise UserError(f"{a.pkg} is not in the foreground (focus: {focus})", "timeout")
+                time.sleep(0.3)
+        settled = _wait_quiet(client)
+        # a degraded dump may be the *previous* screen's last good tree: never
+        # save one under this screen's name unless explicitly asked to
+        for _ in range(3):
+            tree = client.call("tree", {"not_important": a.not_important}, timeout=15)
+            if not tree.get("degraded"):
+                break
+            time.sleep(1.0)
+        if tree.get("degraded") and not a.allow_degraded:
+            raise UserError(f"the tree stayed degraded ({tree.get('reason')}, {tree.get('ms')} ms) "
+                            "after 3 tries; not saved", "timeout", hint="retry, or pass --allow-degraded")
+        focus = _focused_activity(serial) or focus
+    finally:
+        client.close()
+    if a.pkg and (not focus or focus.split("/")[0] != a.pkg):
+        raise UserError(f"the foreground changed while dumping (focus: {focus})", "error")
+    apps = [w for w in tree["windows"] if w.get("type") == "application"]
+    meta = {
+        "name": a.name,
+        "captured": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "manufacturer": info.get("manufacturer"), "model": info.get("model"),
+        "sdk": info.get("sdk"), "release": info.get("release"),
+        "screen": info.get("screen"),
+        "agent": {"version": info.get("version"), "versionCode": info.get("versionCode")},
+        "package": (focus or "").split("/")[0] or (apps[0].get("pkg") if apps else None),
+        "activity": focus,
+        "not_important": a.not_important,
+        "settled": settled,
+        "dump_ms": tree.get("ms"), "nodes": tree.get("nodes"), "degraded": tree.get("degraded"),
+    }
+    os.makedirs(a.dir, exist_ok=True)
+    path = os.path.join(a.dir, a.name + ".json")
+    text = json.dumps({"meta": meta, "tree": tree}, ensure_ascii=False, indent=1) + "\n"
+    with open(path + ".tmp", "w", encoding="utf-8") as f:
+        f.write(text)
+    os.replace(path + ".tmp", path)
+    return {"ok": True, "path": path, "bytes": len(text.encode()), **{k: meta[k] for k in
+            ("package", "activity", "nodes", "dump_ms", "degraded", "settled")}}
+
+
+def render_dump_fixture(p):
+    console.print(f"[green]saved[/green] {p['path']}  {p['nodes']} nodes, {p['bytes'] // 1024} KB, "
+                  f"dump {p['dump_ms']} ms  [dim]{p['activity']}[/dim]"
+                  + ("  [yellow]degraded[/yellow]" if p["degraded"] else "")
+                  + ("" if p["settled"] else "  [yellow]never settled[/yellow]"), highlight=False)
+
+
+# --------------------------------------------------------------------------
 # meta commands
 # --------------------------------------------------------------------------
 def cmd_version(a):
@@ -385,6 +479,16 @@ def build_parser():
     sp = sub.add_parser("ping", parents=[jsonopt, devopt], help="round trip to the on-device agent")
     sp.add_argument("--count", type=int, default=1, metavar="N", help="ping N times and report min/median/p95")
     sp.set_defaults(fn=cmd_ping, render=render_ping)
+
+    sp = sub.add_parser("dump-fixture", parents=[jsonopt, devopt],
+                        help="save the current screen's raw tree as a test fixture (dev)")
+    sp.add_argument("name", help="fixture name, e.g. real-settings-main")
+    sp.add_argument("--pkg", metavar="PKG", help="wait until PKG is in the foreground, and fail if it leaves")
+    sp.add_argument("--not-important", action="store_true", help="include views not important for accessibility")
+    sp.add_argument("--dir", default=FIXTURE_DIR, metavar="DIR", help=f"output directory (default {FIXTURE_DIR})")
+    sp.add_argument("--timeout", type=float, default=10.0, metavar="S", help="how long to wait for --pkg")
+    sp.add_argument("--allow-degraded", action="store_true", help="save even a degraded (partial or stale) dump")
+    sp.set_defaults(fn=cmd_dump_fixture, render=render_dump_fixture)
     return p
 
 

@@ -21,6 +21,7 @@ object Codes {
     const val INVALID_PARAMS = -32602
     const val INTERNAL = -32603
     const val UNAUTHORIZED = -32001
+    const val STALE = -32002
 }
 
 class RpcError(val code: Int, message: String) : Exception(message)

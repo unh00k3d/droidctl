@@ -1,6 +1,6 @@
 package dev.droidctl.agent
 
-import android.content.Context
+import android.accessibilityservice.AccessibilityService
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.SystemClock
@@ -9,7 +9,7 @@ import android.view.Display
 import org.json.JSONObject
 
 /** The method table. Handlers run on the connection's thread and return a result object. */
-class Rpc(private val ctx: Context) {
+class Rpc(private val ctx: AccessibilityService, private val tree: Tree) {
     class Ctx(val peerUid: Int)
 
     companion object {
@@ -19,6 +19,9 @@ class Rpc(private val ctx: Context) {
     fun call(method: String, params: JSONObject, c: Ctx): JSONObject = when (method) {
         "ping" -> ping(c)
         "echo" -> params  // transport-only round trip: no device work (benchmarks, health)
+        "gen" -> JSONObject().put("gen", tree.gen)
+        "tree" -> tree.dump(params.optBoolean("not_important", false),
+                            params.optBoolean("windows", true), screen())
         else -> throw RpcError(Codes.METHOD_NOT_FOUND, "method not found: $method")
     }
 
@@ -43,7 +46,7 @@ class Rpc(private val ctx: Context) {
             .put("device", Build.DEVICE)
             .put("screen", screen())
             .put("service", JSONObject().put("connected", true))
-            .put("gen", 0)  // content-generation counter: a placeholder until `tree` lands (M2)
+            .put("gen", tree.gen)
             .put("peer_uid", c.peerUid)
             .put("uptime_ms", SystemClock.uptimeMillis())
     }
