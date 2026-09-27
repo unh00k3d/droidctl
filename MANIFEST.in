@@ -1,0 +1,3 @@
+include LICENSE NOTICE README.md AGENTS.md
+include droidctl/SKILL.md
+include droidctl/assets/*.apk

@@ -1,0 +1,55 @@
+droidctl
+Copyright (c) 2026 Enes Bayram
+Licensed under the MIT License (see LICENSE).
+
+This product adapts designs and parameters from the following projects. No source code
+from them is copied verbatim unless stated; where their ideas or numeric parameters are
+reused, they are credited here and at the point of use in the source.
+
+--------------------------------------------------------------------------------
+Artemis (https://github.com/google/artemis)
+Copyright Google LLC. Licensed under the Apache License, Version 2.0.
+
+  droidctl/resolve.py, tier 4: the element-matching score (id +0.5 / mismatch -0.5,
+  normalized text +0.4, overlap +0.3, tap-point containment +0.3), the size-mismatch
+  rejection, the distance decay and the acceptance thresholds are adapted from Artemis's
+  precondition scoring. The helper-APK install/enable flow and the clipping and
+  fixed-bar detection in the snapshot follow its design. The droidctl agent APK is
+  written fresh in Kotlin.
+
+--------------------------------------------------------------------------------
+Maestro (https://github.com/mobile-dev-inc/maestro)
+Copyright mobile.dev, Inc. Licensed under the Apache License, Version 2.0.
+
+  droidctl/resolve.py, tier 2 (exact attribute match excluding bounds and volatile
+  flags) follows Maestro's element matching; the anti-hallucination guidance in
+  AGENTS.md/SKILL.md ("copy labels verbatim") follows its MCP tool description.
+
+--------------------------------------------------------------------------------
+appium-mcp (https://github.com/appium/appium-mcp)
+Licensed under the Apache License, Version 2.0.
+
+  droidctl/resolve.py, tier 3: the ordered unique-locator strategy (id+text, id+path,
+  text+class, desc).
+
+--------------------------------------------------------------------------------
+android_world (https://github.com/google-research/android_world)
+Copyright Google LLC. Licensed under the Apache License, Version 2.0.
+
+  The "never resolve by index" rule for list members (droidctl/resolve.py).
+
+--------------------------------------------------------------------------------
+chromectl (https://github.com/0xenesbayram/chromectl)
+Copyright (c) 2026 Enes Bayram. MIT License.
+
+  droidctl/core.py (UserError, ERROR_KINDS, emit/die), the parser surface and generated
+  docs in droidctl/cli.py, `run`, and the daemon's NDJSON framing, socket handling and
+  lifecycle in droidctl/daemon.py are ported from chromectl.
+
+--------------------------------------------------------------------------------
+Not included
+
+  No code from droidrun/mobilerun Portal (AGPL-3.0) or from mobilecli (license unclear)
+  is included in droidctl. Ideas documented in PLAN.md and research/ (e.g. the 10%
+  visibility rule, tap-blocker geometry, degraded snapshots) were reimplemented from
+  their descriptions only.

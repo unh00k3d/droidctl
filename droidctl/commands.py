@@ -46,7 +46,7 @@ def _locators(sp, positional=True):
 def _act_opts(sp, method=True):
     if method:
         sp.add_argument("--method", choices=("auto", "action", "gesture"), default="auto",
-                        help="auto: ACTION_CLICK, one event-gated gesture fallback; action/gesture: only that")
+                        help="auto: ACTION_CLICK; one gesture tap only if it was not performed; action/gesture: only that")
     sp.add_argument("--settle", type=int, metavar="MS",
                     help="quiet window before reading the result (default 150; 0 = don't wait)")
     sp.add_argument("--expect-change", action="store_true", help="fail with no-change if nothing changed")

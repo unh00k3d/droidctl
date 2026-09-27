@@ -492,7 +492,7 @@ Every command takes `--json`, `-d SERIAL|NAME` (falls back to `ANDROID_SERIAL`, 
 Any coordinates we print are always in device pixels.
 
 ## Milestones
-0. **Toolchain: done 2026-09-27.** Dev phone: Galaxy Note 8 SM-N950F, Android 9 (API 28), stock plus Magisk (details in CLAUDE.md). Add an API 35 emulator as a second target for API 30+ paths. JDK 21, Go, Android SDK at `~/Android/Sdk` (platform 35, build-tools 35.0.0, platform-tools/adb 37; `ANDROID_HOME` in `~/.zshrc`). Still to do at the start of M1: create the `.venv` with `adbutils`, and connect and authorize the phone (`adb devices`).
+0. **Toolchain: done 2026-09-27.** Dev phone: Galaxy Note 8 SM-N950F, Android 9 (API 28), stock plus Magisk (details in CLAUDE.md). The API 35 emulator as a second target for API 30+ paths is **deferred (user decision 2026-09-27), not dropped**: everything so far is verified on the SM-N950F only. JDK 21, Go, Android SDK at `~/Android/Sdk` (platform 35, build-tools 35.0.0, platform-tools/adb 37; `ANDROID_HOME` in `~/.zshrc`). Still to do at the start of M1: create the `.venv` with `adbutils`, and connect and authorize the phone (`adb devices`).
 1. **Walking skeleton, measured: done 2026-09-27.** Results (SM-N950F, API 28, USB passthrough into a KVM VM; `bench/results/m1-rtt.json`): socket `echo` median 8.3 ms / p95 11.0 (equal to a raw adb-forward echo through toybox `nc`, so this is the transport floor here; it jitters 4–8 ms between runs); `ping` 15.4 / 18.8 ms; a fresh connection plus echo 13.5 ms; a 64 KB echo 48 ms; service bind (settings put → first answer) ~194 ms. Cold `droidctl ping --json` 76 ms end to end (≈48 ms host overhead, an estimate); `python -c pass` 27 ms; `import droidctl.cli` 7 ms cumulative (no adbutils/rich). **Found and fixed:** `LocalSocket` `flush()` polls the send queue with ~10 ms sleeps, adding 10.6 ms to every reply; the agent no longer flushes. APK: 12.7 KB, no `<uses-permission>` at all. Peer UID over `adb forward` = 2000; setup preserves other services; teardown restores the secure settings byte-for-byte. Not measured: wireless adb (needs `adb tcpip` on the user's network). Not yet verified: that a non-shell app uid is rejected (M2, via the debuggable test app's `run-as`).
    Original scope:
    - Gradle project;
@@ -501,27 +501,36 @@ Any coordinates we print are always in device pixels.
    - **Measure the round trip**: raw socket RTT over USB and over wireless adb, a cold `droidctl ping` end-to-end, and `-X importtime`. These numbers decide the Go/Rust gate and the settle defaults.
    - Write `android/agent/PROTOCOL.md` (the language-neutral device contract).
    - Verify on the phone: adb enabling on Android 13+, peer UID = 2000, TalkBack/other services preserved.
-2. **Raw tree:**
+2. **Raw tree: done 2026-09-27.** Device `tree` (all windows, compact schema, per-dump handles, 2 s budget with a `degraded` fallback, `gen` counter); `dump-fixture`; 11 real-app fixtures and 90 test-app fixtures. Steady-state dumps 40–70 ms on the device. The test app (83 scenarios, DTA ground truth, window title `s:<name>`) is built. The banking apps tried crash at start on this rooted phone with or without our service, so no banking fixtures. Known agent limits: `huge_tree` always exceeds the budget and `degraded` then returns the *previous* screen's tree; `slow_a11y` returns a rootless window without `degraded`.
+   Original scope:
    - device `tree` plus handles;
    - `dump-fixture` to capture real trees from your apps and from the test app;
    - build the test app skeleton, scenario registry and DTA logging, plus scenario groups 3–5 from TESTAPP.md;
    - `make fixtures` for golden trees and snapshots.
-3. **Snapshot, test first**, against fixtures: tokens <2k per screen, expected lines (row merge, hint/empty, bars clipped, collection counts, custom actions).
+3. **Snapshot: done 2026-09-27.** 41–463 tokens per real app screen, test-app screens ≤254 (estimates at 3.5 chars/token); 12–40× smaller than raw JSON; spatial adds 3–8% over flat. 202 goldens, each reviewed. Defaults stay provisional until the spatial A/B.
+   Original scope: **Snapshot, test first**, against fixtures: tokens <2k per screen, expected lines (row merge, hint/empty, bars clipped, collection counts, custom actions).
    - Spatial layer: regions, row grouping, grid tables, inferred labels. Golden `.snap.txt` files cover the TESTAPP group 8 scenarios.
-4. **Resolver, test first** on fixture pairs: scrolled, reordered, a different screen with a look-alike OK, a moved element.
-5. **Actions:**
+4. **Resolver: done 2026-09-27.** 10 real before/after pairs from the test app; 242/242 refs resolve to themselves, 0/1250 cross-screen attempts on real apps resolve. Refs carry their visual-row context to separate repeated labels.
+   Original scope: **Resolver, test first** on fixture pairs: scrolled, reordered, a different screen with a look-alike OK, a moved element.
+5. **Actions: done 2026-09-27.** Device `act`/`gesture`/`global`/events/waits (protocol 2); host tap policy, type ladder, scroll, custom actions, settle/diff. Counter `act`+settle 321 ms on the device, `tap`+settle 302 ms in-process (budget <500), cold `droidctl tap` 414 ms; `clicked_event` 10/10; gesture taps at node centres 5/5 under the 1080x2220 override. The fallback policy was changed by measurement (see Actions → tap). e2e: 17/17 with DTA ground truth.
+   Original scope:
    - device `act`, `gesture`, `global`, events, `wait_idle`;
    - host tap policy, type ladder, scroll, custom actions, settle/diff.
-6. **Daemon:** `droidctl daemon` (ported from chromectl `daemon.py`, with structured results, per-device locks, version handshake and idle exit), a permanent subscription, the dirty-flag tree cache, the thin `client.py` with auto-start, `serve --stdio`, `Client`, `watch`, and `DAEMON.md`. Measure cache-hit vs miss, then decide on the Go thin client.
+6. **Daemon and MCP: done 2026-09-27 (host side; real-phone numbers pending).** With a fake agent: CLI → daemon 34.3 ms total (≈7 ms over the 27 ms Python floor; budget <35), resident call 0.33 ms, resident cache-hit snapshot 3.5 ms (budget <5), cache hit rate 0.99. MCP: 12 tools generated from the registry, MCP Inspector CLI passes. The Go thin-client gate stays open: Python boot (27 ms) is the largest host cost.
+   Original scope: **Daemon:** `droidctl daemon` (ported from chromectl `daemon.py`, with structured results, per-device locks, version handshake and idle exit), a permanent subscription, the dirty-flag tree cache, the thin `client.py` with auto-start, `serve --stdio`, `Client`, `watch`, and `DAEMON.md`. Measure cache-hit vs miss, then decide on the Go thin client.
    - **MCP:** `droidctl mcp` (official SDK, tools generated from the registry, image `shot`, `--install` helper), validated with MCP Inspector plus a stdio e2e test.
-7. **Extras:** `screenshot` (+ `--marks`, `--crop`), spatial opt-ins (`--geo`, `--map`, `where`, spatial locators), toasts in the header, `wait`, `run`, `logs`, apps commands, `type --stdin`; test app groups 1, 2 and 6 (timing, security/occlusion, windows).
-8. **Docs and release:** README (including the Background daemon section and CLI vs MCP guidance), AGENTS.md, SKILL.md, DAEMON.md, benchmarks (latency, tokens, tap accuracy vs mobile-mcp, the spatial A/B that decides layout defaults), packaging (APK bundled in the wheel); test app group 7 (device-level) and the scenario coverage gate.
+7. **Extras: mostly done 2026-09-27.** `shot` (screencap fallback on API 28, `--marks`, `--crop`; marks align at 1080x2220), `--geo`/`--map`/`where`, spatial locators, `wait`, `run`, `logs`, app commands, `type --stdin`; test-app groups 1, 2 and 6 exist. **Not done:** toasts in the snapshot header (toasts are reported on action results and `between_calls` instead).
+   Original scope: **Extras:** `screenshot` (+ `--marks`, `--crop`), spatial opt-ins (`--geo`, `--map`, `where`, spatial locators), toasts in the header, `wait`, `run`, `logs`, apps commands, `type --stdin`; test app groups 1, 2 and 6 (timing, security/occlusion, windows).
+8. **Docs and release: in progress.** Done: README (daemon section, CLI vs MCP, security wording, measured benchmarks), AGENTS.md and SKILL.md with generated tables and drift tests, `skill print|install`, NOTICE, `make dist` (the wheel carries the APK; the APK is not committed). **Pending:** the spatial A/B, tap accuracy vs mobile-mcp, test-app group 7 and the scenario coverage gate.
+   Original scope: **Docs and release:** README (including the Background daemon section and CLI vs MCP guidance), AGENTS.md, SKILL.md, DAEMON.md, benchmarks (latency, tokens, tap accuracy vs mobile-mcp, the spatial A/B that decides layout defaults), packaging (APK bundled in the wheel); test app group 7 (device-level) and the scenario coverage gate.
+
+**Verification status (2026-09-27).** Everything above was verified on one device: the SM-N950F (Android 9 / API 28, rooted, USB passthrough into a VM). The API 30+ paths are **implemented but unverified**: device `takeScreenshot` (API 28 uses the host `screencap` fallback), `ime_enter` (API 28 uses `input keyevent 66`), `stateDescription`, `getUniqueId` (resolver tier 1), Android 13+ restricted settings, and API 34 `accessibilityDataSensitive`. Don't claim they work until they run on an API 30+ device or the (deferred) API 35 emulator.
 
 ## Open questions and decision gates
 | question | decided by | when |
 |---|---|---|
 | ~~Does peer-UID auth work (adbd = uid 2000) on the user's phone?~~ **Yes** (peer_uid 2000 on the SM-N950F, 2026-09-27); rejection of an app uid still to be shown in M2 | on-device test | M1 |
-| Can adb enable our service on Android 13+ despite restricted settings? | on-device test (**not possible on the Android 9 dev phone**; use the API 35 emulator or another device) | M1 |
+| Can adb enable our service on Android 13+ despite restricted settings? | on-device test (**not possible on the Android 9 dev phone**; the API 35 emulator is deferred, so this stays open) | before v1.0 |
 | Do a11y bounds, gesture coordinates, `screencap` and `--marks` agree under a display-resolution override (dev phone: 1080x2220 over 1440x2960)? | on-device test | M1/M7 |
 | Do the M1 on-device checks hold on a **stock, unrooted** phone? (dev starts on a rooted phone, where custom ROMs and Magisk/LSPosed can change settings, SELinux and a11y behaviour) | re-run the M1 checks on a stock device | before v1.0 |
 | Real socket RTT (USB and wireless), tree-dump time, settle time → settle defaults | `bench` | M1, M5 |

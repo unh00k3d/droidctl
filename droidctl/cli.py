@@ -6,6 +6,9 @@ Quick start:
     droidctl ping           # round trip to the on-device agent
     droidctl doctor         # what is (not) working, and why
     droidctl cheat          # every command on one screen
+
+The first command starts a background daemon (idle-exit 30m): `droidctl daemon stop`
+stops it, DROIDCTL_NO_DAEMON=1 never starts one.
 """
 import argparse
 import os
@@ -540,6 +543,86 @@ def render_cheat(rows):
 
 
 # --------------------------------------------------------------------------
+# agent skill and the generated docs (AGENTS.md table, SKILL.md)
+# --------------------------------------------------------------------------
+SKILL_DEFAULT_DIR = os.path.expanduser("~/.claude/skills")
+# options every device command takes; the docs state them once instead of per row
+_UNIVERSAL_OPTS = ("--json", "--device SERIAL", "--no-auto-setup")
+# the shared locator group (commands.py `_locators`), shown as one LOCATOR token
+_LOCATOR_OPTS = ("--ref N", "--id ID", "--text TEXT", "--desc DESC", "--class CLASS",
+                 "--role ROLE", "--index I", "--right-of ANCHOR", "--left-of ANCHOR",
+                 "--above ANCHOR", "--below ANCHOR", "--near ANCHOR", "--point X,Y")
+
+
+def _doc_usage(r):
+    """One row's usage for the docs: universal options dropped, locators folded."""
+    opts = [o for o in r["options"] if o not in _UNIVERSAL_OPTS]
+    if all(o in opts for o in _LOCATOR_OPTS):
+        first = opts.index(_LOCATOR_OPTS[0])
+        opts = [o for o in opts if o not in _LOCATOR_OPTS]
+        opts.insert(first, "LOCATOR")
+    return " ".join(r["args"] + opts)
+
+
+def _command_table():
+    """The full command surface as a Markdown table, generated from the parser."""
+    lines = ["| command | usage | what |", "|---|---|---|"]
+    for r in _surface():
+        alias = f" ({'/'.join(r['aliases'])})" if r["aliases"] else ""
+        usage = _doc_usage(r).replace("|", "\\|")
+        usage = f"`{usage}`" if usage else "–"
+        lines.append(f"| `{r['command']}{alias}` | {usage} | {r['help']} |")
+    return "\n".join(lines)
+
+
+def _error_kind_list():
+    """The `error.kind` vocabulary as one inline Markdown line, from ERROR_KINDS."""
+    from droidctl.core import ERROR_KINDS
+    return ", ".join(f"`{k}`" for k in ERROR_KINDS if k != "error")
+
+
+def _error_kind_table():
+    """The `error.kind` vocabulary with meanings, as a Markdown table (AGENTS.md)."""
+    from droidctl.core import ERROR_KINDS
+    return "\n".join(["| kind | meaning |", "|---|---|"]
+                     + [f"| `{k}` | {v} |" for k, v in ERROR_KINDS.items()])
+
+
+def _skill_text():
+    """SKILL.md with the generated bits filled in, so they can never drift."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "SKILL.md")
+    if not os.path.exists(path):
+        raise UserError("SKILL.md is missing from the installed package", "missing-dep")
+    with open(path) as f:
+        body = f.read()
+    return (body.replace("<!-- COMMANDS -->", _command_table())
+                .replace("<!-- ERROR-KINDS -->", _error_kind_list()))
+
+
+def cmd_skill(a):
+    """Print or install the agent skill (docs that ship with the binary)."""
+    text = _skill_text()
+    if a.action == "print":
+        return {"ok": True, "text": text}
+    root = os.path.expanduser(a.dir or SKILL_DEFAULT_DIR)
+    dest = os.path.join(root, "droidctl", "SKILL.md")
+    if os.path.exists(dest) and not a.force:
+        raise UserError(f"{dest} already exists; pass --force to overwrite", "bad-args")
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    with open(dest, "w") as f:
+        f.write(text)
+    return {"ok": True, "path": dest, "chars": len(text)}
+
+
+def render_skill(p):
+    if "text" in p:
+        print(p["text"])
+        return
+    console.print(f"[green]installed[/green] skill → {p['path']}")
+    console.print("[dim]agents that read this directory pick it up next session[/dim]")
+
+
+# --------------------------------------------------------------------------
 # parser and dispatch
 # --------------------------------------------------------------------------
 def build_parser():
@@ -564,6 +647,13 @@ def build_parser():
 
     sp = sub.add_parser("cheat", parents=[jsonopt], help="every command and its options, on one screen")
     sp.set_defaults(fn=cmd_cheat, render=render_cheat)
+
+    sp = sub.add_parser("skill", parents=[jsonopt],
+                        help="print the agent skill (SKILL.md), or install it for Claude Code")
+    sp.add_argument("action", choices=("print", "install"))
+    sp.add_argument("--dir", metavar="DIR", help=f"skills directory (default {SKILL_DEFAULT_DIR})")
+    sp.add_argument("--force", action="store_true", help="overwrite an existing SKILL.md")
+    sp.set_defaults(fn=cmd_skill, render=render_skill)
 
     sp = sub.add_parser("devices", parents=[jsonopt], help="list attached devices and whether droidctl is set up")
     sp.set_defaults(fn=cmd_devices, render=render_devices)

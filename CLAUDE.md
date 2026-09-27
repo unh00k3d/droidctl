@@ -8,7 +8,9 @@ An agent-first Android automation CLI: a compact UI snapshot with refs, element-
 - `research/`: prior-art reports (Artemis, droidrun/mobilerun, mobile-use, mobile-mcp, uiautomator2, android_world, Maestro, agent-device, …) with file:line references. Consult them before re-inventing a heuristic.
 
 ## Status
-- **M1 (walking skeleton) done 2026-09-27**; numbers in PLAN.md. Next: M2 (raw tree, test app, fixtures).
+- **M1–M7 done 2026-09-27** (M7 minus toasts in the snapshot header); M8 docs and packaging done, while the spatial A/B, tap accuracy vs mobile-mcp, test-app group 7 and the scenario coverage gate are pending. Numbers in PLAN.md "Milestones" and `bench/results/`.
+- **Verified on the SM-N950F (API 28) only.** API 30+ paths (device `takeScreenshot`, `ime_enter`, `stateDescription`, `getUniqueId`, Android 13+ restricted settings, API 34 `accessibilityDataSensitive`) are implemented but UNVERIFIED; don't claim they work.
+- Docs are generated: after changing a command or `ERROR_KINDS`, regenerate the AGENTS.md tables (`_command_table`, `_error_kind_table` in cli.py); `tests/test_docs.py` fails when they drift. `make dist` builds the APK and a wheel that carries it (the APK is not committed).
 - Build the APK with `make apk` (Gradle 9.8 wrapper, AGP 9.4.1; build-tools 36.0.0 was auto-installed by AGP). Python: `.venv/bin/pytest`; on-device e2e with `DROIDCTL_SERIAL=<serial>`.
 - The Bash tool's shell does not source `~/.zshrc`: put `~/Android/Sdk/platform-tools` first on PATH yourself, or you get Debian's adb 34.
 - Work milestone by milestone. When a milestone is done, update PLAN.md with measured numbers and resolved open questions.
@@ -27,7 +29,7 @@ An agent-first Android automation CLI: a compact UI snapshot with refs, element-
   - The dev phone exercises the *fallback* paths: no `takeScreenshot` (use host `screencap`), no `ACTION_IME_ENTER` (use `input keyevent 66`), no `stateDescription`, no `getUniqueId` (resolver tiers 2–4 only).
   - Android 13+ restricted settings and API 34 `accessibilityDataSensitive` **cannot be verified on it**.
   - The resolution override (1080x2220 over 1440x2960) is a real-world scaling edge case: a11y bounds, gesture coordinates, `screencap` pixels and `--marks` must all agree. Verify this explicitly.
-  - **Second target:** an API 35 emulator. Nested KVM is available (`/dev/kvm`) and the SDK can install `emulator` + a `system-images;android-35;google_apis;x86_64` image. Use it for the API 30+ paths.
+  - **Second target (deferred by user decision 2026-09-27, not dropped):** an API 35 emulator. Nested KVM is available (`/dev/kvm`) and the SDK can install `emulator` + a `system-images;android-35;google_apis;x86_64` image. Use it for the API 30+ paths.
 
 ## Non-negotiables
 - **Measure, don't assume.** Latency, settle defaults, the spatial-layer defaults and the Go-client question are all decided by measurements and benchmarks (see "Open questions and decision gates" in PLAN.md). Label estimates as estimates.

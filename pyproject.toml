@@ -9,7 +9,7 @@ description = "An agent-first Android automation CLI: compact UI snapshots with 
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Enes Bayram" }]
 dependencies = [
     "adbutils>=2.8",
@@ -18,6 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
+dev = ["build", "pytest>=7"]
 # `droidctl mcp`: the official MCP SDK (a resident process, so its import cost is paid once)
 mcp = ["mcp>=2.2"]
 
@@ -25,10 +26,12 @@ mcp = ["mcp>=2.2"]
 droidctl = "droidctl.client:entry"
 
 [tool.setuptools]
-packages = ["droidctl"]
+packages = ["droidctl", "droidctl.assets"]
 
 [tool.setuptools.package-data]
-droidctl = ["assets/*.apk"]
+# the agent APK is built by `make apk` (not committed) and shipped inside the wheel
+droidctl = ["SKILL.md"]
+"droidctl.assets" = ["*.apk"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

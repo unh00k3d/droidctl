@@ -20,5 +20,5 @@ captures/
 bench/results/*.tmp
 *.log
 
-# built agent APK (whether to commit or bundle it is decided in M8)
+# built agent APK: not committed; `make apk` builds it, `make dist` ships it in the wheel
 droidctl/assets/*.apk

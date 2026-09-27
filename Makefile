@@ -5,7 +5,7 @@ export ANDROID_HOME
 APK_OUT := android/agent/build/outputs/apk/release/agent-release.apk
 APK_ASSET := droidctl/assets/droidctl-agent.apk
 
-.PHONY: apk clean fixtures
+.PHONY: apk clean fixtures dist
 
 apk:
 	cd android && ./gradlew -q :agent:assembleRelease
@@ -24,3 +24,11 @@ fixtures:
 	$(PYTHON) scripts/capture_fixtures.py
 	$(PYTHON) scripts/make_goldens.py
 	@echo 'review: git diff tests/fixtures/snap'
+
+# Wheel + sdist with the agent APK inside (droidctl/assets/droidctl-agent.apk is not
+# committed; the wheel is how it ships). Fails if the APK is missing from the wheel.
+dist: apk
+	rm -rf dist
+	$(PYTHON) -m build --outdir dist .
+	$(PYTHON) -c "import zipfile,glob,sys; n=zipfile.ZipFile(glob.glob('dist/*.whl')[0]).namelist(); sys.exit(0 if {'droidctl/assets/droidctl-agent.apk','droidctl/SKILL.md'} <= set(n) else 'APK or SKILL.md missing from the wheel')"
+	@ls -l dist
