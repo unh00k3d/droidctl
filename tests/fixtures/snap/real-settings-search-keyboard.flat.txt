@@ -1,0 +1,11 @@
+screen com.android.settings.intelligence/.search.SearchActivity  sig=e4b3  keyboard=shown  dialog=no
+[1] button  "Navigate up"
+[2] input  #search_src_text  hint="Search"  empty  focused
+[3] button  "Voice search"
+[4] text  "Recent searches"
+[5] list  3/3
+  [6] row  "View security certificates"
+  [7] button  (unlabeled, in "View security certificates")  #remove_icon
+  [8] row  "Install network certificates"
+  [9] button  (unlabeled, in "Install network certificates")  #remove_icon
+  [10] button  "Clear search history"

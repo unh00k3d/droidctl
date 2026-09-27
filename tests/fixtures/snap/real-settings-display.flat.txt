@@ -1,0 +1,17 @@
+screen com.android.settings/.Settings$DisplaySettingsActivity  sig=2f18  keyboard=hidden  dialog=no
+[1] button  "Navigate up"
+[2] text  "Display"
+[3] list  9/25 more↓
+  [4] row  "Brightness"
+  [5] seekbar  (unlabeled, in "Brightness")  #brightness_seekbar  range=4509/10000
+  [6] row  "Adaptive brightness · On"
+  [7] switch  "Adaptive brightness"  on
+  [8] row  "Blue light filter · Reduce eye strain by limiting the amount of blue light emit…"
+  [9] switch  "Blue light filter"  off
+  [10] row  "Night mode · Use a darker theme to keep your eyes comfortable at night."
+  [11] switch  "Night mode"  off
+  [12] row  "Screen mode · Adaptive display"
+  [13] row  "Font size and style"
+  [14] row  "Screen zoom"
+  [15] row  "Screen resolution · FHD+ (2220 x 1080)"
+  [16] row  "Full screen apps · Choose which apps you want to use in the full screen aspect…"

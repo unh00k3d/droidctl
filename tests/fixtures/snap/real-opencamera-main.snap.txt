@@ -1,0 +1,4 @@
+screen net.sourceforge.opencamera/.MainActivity  sig=bdba  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] button "Lock exposure"   [2] button "Exposure"   [3] button "Popup settings"   [4] button "Settings"
+[5] seekbar "Zoom" range=99/99   [6] button "Switch to video mode"   [7] button "Take Photo"   [8] button "Switch to front camera"   [9] button "Gallery"

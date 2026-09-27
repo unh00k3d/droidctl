@@ -1,0 +1,7 @@
+screen com.sec.android.app.launcher/.activities.LauncherActivity  sig=5f07  keyboard=hidden  dialog=no
+[1] button  "Select items Button"
+[2] button  "Remove from Home Button"
+[3] button  "Disable Button"
+[4] button  "App info"
+[5] row  "Photo Button"
+[6] row  "Video Button"

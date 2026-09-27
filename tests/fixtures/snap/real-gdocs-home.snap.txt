@@ -1,0 +1,13 @@
+screen com.google.android.apps.docs/.drive.app.navigation.NavigationActivity  sig=c37f  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] button "More actions"   [2] input #search_bar hint="Search in Drive" empty   [3] button "Signed in as Test User user@example.com Account and settings."
+[4] tab "Suggested" selected   [5] tab "Activity"
+-- content
+[6] pager more→
+  [7] text "A place for all of your files"
+  [8] text "Tap the + button to upload a file or create something new"
+-- fab
+[9] button "Scan document"
+[10] text "Create new"   [11] toggle "Toggle menu" off actions=[Expand, Collapse, Toggle]
+-- bottom bar
+[12] tab "Home" selected   [13] tab "Starred"   [14] tab "Shared"   [15] tab "Files"

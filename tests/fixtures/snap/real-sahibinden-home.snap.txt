@@ -1,0 +1,22 @@
+screen com.sahibinden/.app.main.ui.MainActivity  sig=eb94  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] button drawer? (unlabeled, left of "sahibinden.com") #buttonDrawer   [2] text "sahibinden.com"   [3] button "action_0"   [4] button "action_1"   [5] button "action_2"
+-- content
+[6] scroll more↓
+  [7] button (unlabeled, left of "Kelime veya ilan numarası ile ara")   [8] input "Kelime veya ilan numarası ile ara" #searchBar empty   [9] button (unlabeled, right of "Kelime veya ilan numarası ile ara")   [10] button (unlabeled, right of "Kelime veya ilan numarası ile ara")
+  [11] row "Emlak · Konut, İş Yeri, Arsa, Konut Projeleri, Bina, Devre Mülk, Turistik Tesis"
+  [12] row "Vasıta · Otomobil, Arazi, SUV & Pickup, Elektrikli Araçlar, Motosiklet, Minivan…"
+  [13] row "Yedek Parça, Aksesuar, Donanım & Tuning · Otomotiv Ekipmanları, Motosiklet Ekip…"
+  [14] row "İkinci El ve Sıfır Alışveriş · add · Param Güvende · Bilgisayar, Cep Telefonu &…"
+  [15] row "Yepy · Yepyenilenmiş teknolojik cihazlar"
+  [16] row "İş Makineleri & Sanayi · İş Makineleri, Tarım Makineleri, Sanayi, Elektrik & En…"
+  [17] row "Ustalar ve Hizmetler · Ev Tadilat & Dekorasyon, Nakliye, Araç Servis & Bakım, T…"
+  [18] row "Özel Ders Verenler · Lise & Üniversite, İlkokul & Ortaokul, Yabancı Dil, Bilgis…"
+  [19] row "İş İlanları · Avukatlık & Hukuki Danışmanlık, Eğitim, Eğlence & Aktivite, Güzel…"
+  [20] row "Hayvanlar Alemi · Aksesuar & Ekipman, Yem & Mama, Evcil Hayvanlar, Akvaryum Bal…"
+  [21] row "Yardımcı Arayanlar"
+[22] button "ile ilan ara"
+-- fab
+[23] button float? #floatButton
+! overlap [19] [23]
+! overlap [20] [22]

@@ -369,6 +369,112 @@ def render_dump_fixture(p):
 # --------------------------------------------------------------------------
 # meta commands
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# look: snapshot and where
+# --------------------------------------------------------------------------
+LAYOUTS = ("spatial", "flat")
+
+
+def _snap_opts(a):
+    from droidctl import snapshot as snap_mod
+    layout = a.layout or os.environ.get("DROIDCTL_LAYOUT") or "spatial"
+    if layout not in LAYOUTS:
+        raise UserError(f"DROIDCTL_LAYOUT={layout!r}: use one of {', '.join(LAYOUTS)}", "bad-args")
+    return snap_mod.Opts(layout=layout, regions=not a.no_regions, rows=not a.no_rows,
+                         grids=not a.no_grids, infer=not a.no_infer, geo=a.geo, map=a.map,
+                         bounds=a.bounds, max=a.max, find=a.find, within=a.within)
+
+
+def cmd_snapshot(a):
+    import json
+    from droidctl import snapshot as snap_mod
+    opts = _snap_opts(a)
+    serial, activity = None, None
+    if a.fixture:
+        try:
+            with open(a.fixture, encoding="utf-8") as f:
+                doc = json.load(f)
+        except OSError as e:
+            raise UserError(f"cannot read {a.fixture}: {e.strerror}", "not-found")
+        tree = doc.get("tree", doc)
+        activity = (doc.get("meta") or {}).get("activity")
+    else:
+        serial = dev.resolve_serial(a.device)
+        client, _info = dev.connect(serial)
+        try:
+            tree = client.call("tree", {}, timeout=15)
+        finally:
+            client.close()
+    if a.raw:
+        return {"ok": True, "raw": tree}
+    snap = snap_mod.build(tree, activity=activity, system=a.system)
+    if a.within is not None and not any(e.ref == a.within for e in snap.elements):
+        raise UserError(f"no element [{a.within}] on this screen", "not-found", hint="run: droidctl snapshot")
+    prev = snap_mod.load_state(serial) if serial else None
+    text = snap_mod.render(snap, opts)
+    changes, unchanged = None, False
+    if a.diff and prev:
+        if prev.get("sig") == snap.sig:
+            changes = snap_mod.diff(prev, snap)
+            unchanged = not changes
+            text = "\n".join([snap_mod.header(snap, opts)] + (changes or ["unchanged"]))
+        else:
+            text += f"\n(new screen: sig was {prev.get('sig')}; full snapshot shown instead of a diff)"
+    elif (prev and not (a.full or a.find or a.within is not None or a.map)
+          and prev.get("sig") == snap.sig and prev.get("lines") == snap_mod.flat_lines(snap)):
+        unchanged = True
+        text = (snap_mod.header(snap, opts)
+                + f"\nunchanged ({len(snap.elements)} elements; --full to print them again)")
+    if serial:
+        snap_mod.save_state(serial, snap_mod.to_state(snap, serial))
+    shown = snap_mod.select(snap, opts)[:opts.max]
+    return {
+        "ok": True,
+        "screen": {"pkg": snap.pkg, "activity": snap.activity or None, "title": snap.title or None,
+                   "sig": snap.sig, "keyboard": bool(snap.keyboard), "dialog": snap.dialog,
+                   "size": [snap.screen[2], snap.screen[3]], "degraded": snap.degraded,
+                   "dump": snap.dump, "gen": snap.gen},
+        "unchanged": unchanged, "diff": changes,
+        "elements": [snap_mod.element_json(e) for e in shown],
+        "total": len(snap.elements), "warnings": snap.warnings,
+        "text": text, "tokens_est": snap_mod.est_tokens(text),
+    }
+
+
+def render_snapshot(p):
+    import json
+    if "raw" in p:
+        print(json.dumps(p["raw"], ensure_ascii=False, indent=1))
+    else:
+        print(p["text"])
+
+
+def cmd_where(a):
+    from droidctl import snapshot as snap_mod
+    serial = dev.resolve_serial(a.device)
+    state = snap_mod.load_state(serial)
+    if not state:
+        raise UserError(f"no saved snapshot for {serial}", "not-found", hint="run: droidctl snapshot")
+    info = snap_mod.where(state, a.ref)
+    if info is None:
+        raise UserError(f"no element [{a.ref}] in the last snapshot", "not-found", hint="run: droidctl snapshot")
+    return {"ok": True, "sig": state.get("sig"), **info}
+
+
+def render_where(p):
+    lab = f' "{p["label"]}"' if p.get("label") else ""
+    parent = ("  inside " + " ".join(f"[{r}]" for r in p["inside"])) if p.get("inside") else ""
+    print(f"[{p['ref']}] {p['role']}{lab}  region={p['region']}{parent}")
+    if p.get("bounds"):
+        b, (w, h) = p["bounds"], p["size"]
+        print(f"  box [{b[0]},{b[1]},{b[2]},{b[3]}]  {w}x{h} px  {p['geo']}  tap {p['tap'][0]},{p['tap'][1]}")
+    for d in ("left", "right", "above", "below"):
+        n = p["neighbours"].get(d)
+        if n:
+            lab = f' "{n["label"]}"' if n.get("label") else ""
+            print(f"  {d:<6} [{n['ref']}] {n['role']}{lab}  gap {n['gap']} px")
+
+
 def cmd_version(a):
     return {"ok": True, "version": __version__, "python": sys.version.split()[0]}
 
@@ -489,6 +595,31 @@ def build_parser():
     sp.add_argument("--timeout", type=float, default=10.0, metavar="S", help="how long to wait for --pkg")
     sp.add_argument("--allow-degraded", action="store_true", help="save even a degraded (partial or stale) dump")
     sp.set_defaults(fn=cmd_dump_fixture, render=render_dump_fixture)
+
+    sp = sub.add_parser("snapshot", aliases=["snap"], parents=[jsonopt, devopt],
+                        help="the screen as a compact list of elements with refs")
+    sp.add_argument("--diff", action="store_true", help="only what changed since the last snapshot")
+    sp.add_argument("--find", metavar="TEXT", help="only elements whose text, hint, desc, error or id contains TEXT")
+    sp.add_argument("--in", dest="within", type=int, metavar="REF", help="only element REF and what is inside it")
+    sp.add_argument("--raw", action="store_true", help="the raw device tree as JSON")
+    sp.add_argument("--bounds", action="store_true", help="add each element's box in device px")
+    sp.add_argument("--layout", choices=LAYOUTS, help="spatial (regions, rows, grids) or flat (default: $DROIDCTL_LAYOUT, else spatial)")
+    sp.add_argument("--no-regions", action="store_true", help="spatial layout without region headers")
+    sp.add_argument("--no-rows", action="store_true", help="spatial layout with one element per line")
+    sp.add_argument("--no-grids", action="store_true", help="spatial layout without grid tables")
+    sp.add_argument("--no-infer", action="store_true", help="don't guess labels for unlabeled controls")
+    sp.add_argument("--geo", action="store_true", help="add each element's box as screen percentages (@x,y wxh)")
+    sp.add_argument("--map", action="store_true", help="add an ASCII wireframe of the screen with refs")
+    sp.add_argument("--system", action="store_true", help="include the status bar, navigation bar and other system windows")
+    sp.add_argument("--max", type=int, default=150, metavar="N", help="print at most N elements (default 150)")
+    sp.add_argument("--full", action="store_true", help="print everything even when the screen is unchanged")
+    sp.add_argument("--fixture", metavar="PATH", help="render a saved fixture instead of the device (offline)")
+    sp.set_defaults(fn=cmd_snapshot, render=render_snapshot)
+
+    sp = sub.add_parser("where", parents=[jsonopt, devopt],
+                        help="an element's box, region and neighbours (from the last snapshot)")
+    sp.add_argument("ref", type=int, help="the element's ref")
+    sp.set_defaults(fn=cmd_where, render=render_where)
     return p
 
 

@@ -1,0 +1,2 @@
+screen com.sahibinden/.app.main.ui.MainActivity  sig=8294  keyboard=hidden  dialog=no  1080x2220
+(no elements: nothing on screen is labelled or actionable)

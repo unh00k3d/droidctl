@@ -1,0 +1,15 @@
+screen com.android.settings/.Settings$ManageApplicationsActivity  sig=19eb  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] button "Navigate up"   [2] text "Apps"   [3] button "Search apps"   [4] button "More options"
+[5] dropdown "All"
+-- content
+[6] list 9/83 more↓
+  [7] row "Android System SafetyCore · 35.57 MB"
+  [8] row "ANT Radio Service · 1.02 MB"
+  [9] row "ANT+ Plugins Service · 15.51 MB"
+  [10] row "App Viewer · 18.79 MB"
+  [11] row "Appium Settings · 9.41 MB"
+  [12] row "AppWysGuide · 384 MB"
+  [13] row "Bixby Home · 11.69 MB"   [14] button "More settings"
+  [15] row "Bixby Vision · 7.97 MB"
+  [16] row "Bixby Voice"   [17] button "More settings"

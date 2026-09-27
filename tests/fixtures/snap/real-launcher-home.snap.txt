@@ -1,0 +1,9 @@
+screen com.sec.android.app.launcher/.activities.LauncherActivity  sig=27e0  keyboard=hidden  dialog=no  1080x2220
+-- content
+[1] widget "Weather · Tap for weather info"
+[2] widget "Search" long-press   [3] button "Google Search"   [4] button "Google's 28th birthday"   [5] button "Voice search"   [6] button "Camera search"
+[7] button "Phone" actions=[Move item]
+[8] button "Messages" actions=[Move item]   [9] button "Play Store" actions=[Move item]   [10] button "Camera" actions=[Move item]
+! overlap [3] [4]
+! overlap [3] [5]
+! overlap [3] [6]

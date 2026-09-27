@@ -1,0 +1,10 @@
+screen com.android.settings/.Settings$ScreenTimeoutActivity  sig=f4cd  keyboard=hidden  dialog=no
+[1] button  "Navigate up"
+[2] text  "Screen timeout"
+[3] list  6/6
+  [4] option  "15 seconds"
+  [5] option  "30 seconds"
+  [6] option  "1 minute"
+  [7] option  "2 minutes"
+  [8] option  "5 minutes"
+  [9] option  "10 minutes"  checked

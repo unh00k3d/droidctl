@@ -1,0 +1,12 @@
+screen com.android.settings/.Settings  sig=07ef  keyboard=hidden  dialog=no  1080x2220
+-- top bar
+[1] text "Settings"
+[2] button "Search"   [3] button "Samsung account profile"
+-- content
+[4] list 8/25 more↓
+  [5] row "Connections · Wi-Fi, Bluetooth, Data usage, Flight mode"
+  [6] row "Sounds and vibration · Sound mode, Ringtone, Volume"
+  [7] row "Notifications · Block, allow, prioritise"
+  [8] row "Display · Brightness, Blue light filter, Home screen"
+  [9] row "Wallpapers and themes · Wallpapers, Themes, Icons"
+  [10] row "Lock screen · Screen lock type, Always On Display, Clock style"
