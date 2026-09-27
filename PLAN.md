@@ -492,13 +492,7 @@ Every command takes `--json`, `-d SERIAL|NAME` (falls back to `ANDROID_SERIAL`, 
 Any coordinates we print are always in device pixels.
 
 ## Milestones
-0. **Toolchain** (install on this machine):
-   - `adb` (platform-tools);
-   - a full JDK 17/21 (only a JRE is installed; `javac` is missing);
-   - Android SDK cmdline-tools with `platforms;android-35` and `build-tools;35.0.0`;
-   - the Gradle wrapper (downloads itself);
-   - `pip install adbutils`;
-   - phone with USB debugging on, then `adb devices`.
+0. **Toolchain: done 2026-09-27.** JDK 21, Go, Android SDK at `~/Android/Sdk` (platform 35, build-tools 35.0.0, platform-tools/adb 37; `ANDROID_HOME` in `~/.zshrc`). Still to do at the start of M1: create the `.venv` with `adbutils`, and connect and authorize the phone (`adb devices`).
 1. **Walking skeleton, measured:**
    - Gradle project;
    - a service with a socket, `ping` and the peer-UID check;
