@@ -330,7 +330,39 @@ def test_enter_below_api_30_is_keyevent_66(home, monkeypatch):
     s = session(monkeypatch, t0)
     done = with_text(t0, "q")
     s._client.act_replies = [{"performed": True, "tree": done}]
-    act.cmd_type(type_args(id="message", content="q", enter=True))
+    out = act.cmd_type(type_args(id="message", content="q", enter=True))
+    assert ("input", "keyevent", "66") in s.shell_calls
+    assert s._client.count("act", "focus") == 0            # this field already has input focus
+    assert out["steps"][-1] == {"method": "enter", "via": "keyevent", "focused": True}
+
+
+def _unfocused(t):
+    t = json.loads(json.dumps(t))
+
+    def walk(n):
+        if n.get("flags"):
+            n["flags"] = [f for f in n["flags"] if f != "focused"]
+        for c in n.get("children", []):
+            walk(c)
+    for w in t["windows"]:
+        if w.get("root"):
+            walk(w["root"])
+    return t
+
+
+def test_enter_focuses_the_field_before_the_text_below_api_30(home, monkeypatch):
+    """A key event goes to the input focus, which ACTION_SET_TEXT does not give, so
+    --enter went nowhere (a banking QA app calculator). Focus comes BEFORE the text:
+    that field rewrote "250" to "25" when it gained focus after being filled."""
+    t0 = _unfocused(tree("under_keyboard-a"))
+    s = session(monkeypatch, t0)
+    s._client.act_replies = [{"performed": True},                                   # focus
+                             {"performed": True, "tree": with_text(tree("under_keyboard-a"), "q")}]
+    out = act.cmd_type(type_args(id="message", content="q", enter=True))
+    acts = [c[3] for c in s._client.calls if c[0] == "act"]
+    assert acts[:2] == ["focus", "set_text"] and acts.count("focus") == 1
+    assert [x["method"] for x in out["steps"]] == ["focus", "set_text", "enter"]
+    assert out["steps"][-1] == {"method": "enter", "via": "keyevent", "focused": True}
     assert ("input", "keyevent", "66") in s.shell_calls
 
 
@@ -359,6 +391,64 @@ def test_mark_boxes_scale_with_the_image(home):
     ref = next(iter(full))
     assert all(abs(a / 2 - b) <= 1 for a, b in zip(full[ref], half[ref]))
     assert full[ref] == tuple(state["refs"][str(ref)]["bounds"])
+
+
+def test_scroll_at_the_edge_reports_it_and_never_swipes(home, monkeypatch):
+    """The list scrolls (scroll_forward) but not up: it is at the start. The old
+    fallback swiped anyway, which in a pager or pull-to-refresh does something else."""
+    t = json.loads((FIX.parent / "resolve" / "long_list_scroll-a.json").read_text())["tree"]
+    s = session(monkeypatch, t)
+    lst = next(e.ref for e in S.build(t).elements if e.node.scrollable)
+    out = act.cmd_scroll(args(ref=lst, direction="up"))
+    assert out["edge"] == "start" and not out["changed"] and "warning" in out
+    assert s._client.count("gesture") == 0 and s._client.count("act") == 0
+
+
+def test_gesture_taps_settle_longer_unless_told():
+    """No clicked event anchors a gesture's settle, and an activity the app starts
+    after the tab's own feedback came after 150 ms of quiet (a banking QA app tabs)."""
+    base = act._settle(args())
+    assert act._tap_settle(args(), base)["quiet_ms"] == act.GESTURE_TAP_QUIET_MS
+    assert act._tap_settle(args(), base)["timeout_ms"] == base["timeout_ms"]
+    told = act._settle(args(settle=80))
+    assert act._tap_settle(args(settle=80), told)["quiet_ms"] == 80     # --settle wins
+    assert act._tap_settle(args(settle=0), None) is None                 # --settle 0: none
+
+
+def test_a_settled_no_root_frame_is_read_again(home, monkeypatch):
+    """After `back` the returning activity's root was not fetched in time
+    (degraded: no-root) and no later event re-dumped it: the result showed an
+    empty screen (a banking QA app, 4 in 5). finish() reads again, bounded."""
+    rootless = dict(_trees("testapp-slow_a11y")[0], ms=120)   # a quick no-root: window not ready
+    assert rootless.get("reason") == "no-root"
+    s = session(monkeypatch, tree("cart_inc-a"))
+    s._client.current = tree("cart_inc-b")                  # what a fresh read returns
+    s._client.tree = lambda **kw: tree("cart_inc-b")
+    out = act.finish(s, args(), "back", {"performed": True, "tree": rootless},
+                     act._pre_lines(s, None))
+    assert out["screen"]["sig"] == S.build(tree("cart_inc-b")).sig
+    assert not S.build(tree("cart_inc-b")).degraded
+
+
+def test_session_tree_reads_past_an_activity_transition(home, monkeypatch):
+    """A tree read mid-transition shows two screens; Session.tree() reads again
+    (bounded) until the closing window is gone (real Settings back transition)."""
+    mid = _trees("real-settings-back-transition")[0]
+    done = tree("cart_inc-a")
+    s = session(monkeypatch, done)
+    frames = [mid, mid, done]
+    s._client.tree = lambda **kw: frames.pop(0) if frames else done
+    assert s.tree() is done and not frames
+
+
+def test_a_slow_no_root_frame_is_not_read_again(home, monkeypatch):
+    """A slow no-root dump is a busy app (ui_hang): re-reading only delays the answer."""
+    rootless = _trees("testapp-slow_a11y")[0]                  # ms 1504
+    s = session(monkeypatch, tree("cart_inc-a"))
+    calls = []
+    s._client.tree = lambda **kw: calls.append(1) or tree("cart_inc-b")
+    out = act.finish(s, args(), "back", {"performed": True, "tree": rootless}, act._pre_lines(s, None))
+    assert not calls and "degraded" in out["text"]
 
 
 def test_swipe_points_scroll_down_moves_the_finger_up():
@@ -490,6 +580,18 @@ def test_wait_role_gone_passes_a_rootless_frame_and_ends_when_the_spinner_goes(h
     out = act.cmd_wait(_wait_args())
     assert out["matched"] and not frames[1:]                  # consumed up to the loaded screen
     assert s.state["sig"] == S.build(frames[0]).sig           # the next ref resolves against it
+
+
+def test_wait_role_shows_the_screen_it_saved(home, monkeypatch):
+    """The saved state is what the next snapshot calls "unchanged", so the wait
+    has to show every element of it, not just the header (a banking QA app tour)."""
+    frames = _trees("testapp-spinner_forever", "testapp-cart")
+    s = session(monkeypatch, frames[0])
+    s._client.tree = lambda **kw: frames.pop(0) if len(frames) > 1 else frames[0]
+    out = act.cmd_wait(_wait_args())
+    loaded = S.build(frames[0])
+    assert S.render(loaded, S.Opts()) in out["text"]
+    assert all(f"[{e.ref}]" in out["text"] for e in loaded.elements)
 
 
 def test_wait_role_times_out_on_a_spinner_that_never_ends(home, monkeypatch):

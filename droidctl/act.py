@@ -33,6 +33,11 @@ DIFF_MAX = 80
 SETTLE_QUIET_MS = 150
 SETTLE_FIRST_MS = 600
 SETTLE_CAP_MS = 2000
+# A gesture tap has no clicked event to anchor the settle, and the target's own
+# feedback (a tab turning selected) is the first change; an activity the app then
+# starts can come after 150 ms of quiet (a banking QA app bottom tabs: START ~400 ms
+# later, missed 1 in 3). Gesture taps are the rare path, so they wait longer.
+GESTURE_TAP_QUIET_MS = 450
 
 
 # --------------------------------------------------------------------------
@@ -116,7 +121,13 @@ class Session:
 
     # -- device reads
     def tree(self):
-        return self.call("tree", timeout=15.0)
+        """The current tree, never a frame mid-activity-transition (bounded wait)."""
+        t = self.call("tree", timeout=15.0)
+        deadline = time.monotonic() + TRANSITION_WAIT_S
+        while S.leaving_windows(t) and time.monotonic() < deadline:
+            time.sleep(0.1)
+            t = self.call("tree", timeout=15.0)
+        return t
 
     def snap(self):
         return S.build(self.tree())
@@ -295,6 +306,8 @@ def _toast(events):
 
 
 CATCH_UP_S = 1.5
+TRANSITION_WAIT_S = 1.0     # an activity animation is ~200-400 ms; bounded so nothing hangs
+QUICK_DUMP_MS = 800         # a no-root dump faster than this was a window not ready, not a busy app
 
 
 def _moved_on(events, pre):
@@ -324,14 +337,37 @@ def _catch_up(sess, pre, post):
 
 
 def _transitional(snap):
-    """A frame mid-transition: an app window with no root yet, or nothing drawn."""
-    return bool(snap.degraded or getattr(snap, "incomplete", False) or not snap.elements)
+    """A frame mid-transition: an app window with no root yet, nothing drawn, or
+    a closing activity window still stacked over the new one."""
+    return bool(snap.degraded or getattr(snap, "incomplete", False) or not snap.elements
+                or getattr(snap, "leaving", False))
 
 
 def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     """Build the post-action snapshot, diff it against `pre`, save it, shape the result."""
-    tree = (reply or {}).get("tree") or sess.tree()
+    tree = (reply or {}).get("tree")
+    if tree is None or S.leaving_windows(tree):   # settled mid-transition: read again
+        tree = sess.tree()
     post = S.build(tree)
+    # Settled on a frame the new screen has not drawn into yet, or whose root the
+    # agent could not fetch in time (after `back` the returning activity came back
+    # degraded:no-root in 4 of 5, a banking QA app, and no later event re-dumps it):
+    # read again, bounded, until something is drawn. A screen that really is empty
+    # (a canvas, a splash) costs TRANSITION_WAIT_S once and is reported as it is.
+    # Not with --settle 0 (the caller asked for the frame as it is), and a no-root
+    # only when the dump was quick: a slow no-root is a busy app (ui_hang), where
+    # every read costs the 2 s budget and reading again only delays the answer.
+    def not_drawn_yet(snap, raw):
+        if not snap.elements and not snap.degraded:
+            return True
+        return snap.degraded == "no-root" and (raw or {}).get("ms", 0) < QUICK_DUMP_MS
+    deadline = time.monotonic() + TRANSITION_WAIT_S
+    raw = tree
+    while (getattr(a, "settle", None) != 0 and pre.get("lines") and not_drawn_yet(post, raw)
+           and time.monotonic() < deadline):
+        time.sleep(0.12)
+        raw = sess.tree()
+        post = S.build(raw)
     events = (reply or {}).get("events") or []
     seqs = [e["seq"] for e in events if isinstance(e.get("seq"), int)]
     # the toasts this result reports must not come back in the next snapshot's header
@@ -425,7 +461,7 @@ def cmd_tap(a):
     if getattr(a, "double", False):
         return _gesture_tap(sess, a, t, pre, settle, "double")
     if t.point:
-        return finish(sess, a, "gesture", _gesture(sess, "tap", [t.tap], settle), pre, t)
+        return finish(sess, a, "gesture", _gesture(sess, "tap", [t.tap], _tap_settle(a, settle)), pre, t)
     if method == "gesture":
         if t.res is not None:
             R.check_occlusion(t.res, "gesture")
@@ -464,7 +500,7 @@ def cmd_tap(a):
         return finish(sess, a, "action", r, pre, t, warning=f"{why}, and {moved}; not tapping by position")
     if t.res is not None and t.occluded:
         R.check_occlusion(t.res, "gesture")
-    g = _gesture(sess, "tap", [t.tap], settle)
+    g = _gesture(sess, "tap", [t.tap], _tap_settle(a, settle))
     return finish(sess, a, "gesture-fallback", g, pre, t,
                   warning=f"{why}; tapped once at {t.tap[0]},{t.tap[1]}")
 
@@ -487,10 +523,18 @@ def _screen_moved(sess, r, pre):
     return None
 
 
+def _tap_settle(a, settle):
+    """The settle for a gesture tap: longer quiet unless --settle was given."""
+    if settle is None or getattr(a, "settle", None) is not None:
+        return settle
+    return dict(settle, quiet_ms=max(settle["quiet_ms"], GESTURE_TAP_QUIET_MS))
+
+
 def _gesture_tap(sess, a, t, pre, settle, typ, warning=None):
     if t.tap is None:
         raise UserError("the element has no visible area to tap", "offscreen")
-    return finish(sess, a, "gesture", _gesture(sess, typ, [t.tap], settle), pre, t, warning=warning)
+    return finish(sess, a, "gesture", _gesture(sess, typ, [t.tap], _tap_settle(a, settle)), pre, t,
+                  warning=warning)
 
 
 def cmd_long_press(a):
@@ -587,6 +631,7 @@ def cmd_dismiss(a):
 DIRS = ("up", "down", "left", "right")
 _SCROLL = {"down": ("scroll_down", "scroll_forward"), "up": ("scroll_up", "scroll_backward"),
            "right": ("scroll_right", "scroll_forward"), "left": ("scroll_left", "scroll_backward")}
+_SCROLL_ACTIONS = {x for pair in _SCROLL.values() for x in pair}
 
 
 def _main_scroller(snap):
@@ -621,6 +666,16 @@ def cmd_scroll(a):
         pre = _pre_lines(sess, t)
     node = t.node
     action = _scroll_action(node, a.direction)
+    acts = node.actions if node is not None else set((t.rec or {}).get("scroll") or ())
+    if acts & _SCROLL_ACTIONS and action not in acts:
+        # the container scrolls, just not this way: it is at that edge. A swipe
+        # would do nothing here at best, and inside a pager or a pull-to-refresh
+        # it would switch pages or refresh (a banking QA app tour)
+        edge = "end" if action in ("scroll_forward", "scroll_down", "scroll_right") else "start"
+        out = finish(sess, a, "none", {"performed": False}, pre, t,
+                     warning=f"already at the {edge}: the list offers no {action}")
+        out["edge"] = edge
+        return out
     r = _act(sess, t, action=action, settle=_settle(a), a=a)
     if r is not None and r.get("performed"):
         return finish(sess, a, "action", r, pre, t, extra={"action": action})
@@ -880,6 +935,16 @@ def _type(sess, a, t):
             return val is not None and len(val) == len(target)
         return val == target or _same_digits(val, target)
 
+    # 0. --enter needs the input focus. Take it BEFORE the text, the order a person
+    #    uses: some fields rewrite their value when they gain focus (a banking QA app
+    #    calculator: focusing a field holding "250" turned it into "25").
+    if a.enter and not (t.node is not None and "focused" in t.node.flags):
+        try:
+            rf = _act(sess, t, action="focus", force=force, a=a)
+            steps.append({"method": "focus", "performed": bool(rf and rf.get("performed"))})
+        except UserError as e:
+            steps.append({"method": "focus", "error": e.kind})
+
     # 1. ACTION_SET_TEXT (no tap, Unicode-safe)
     r = _act(sess, t, action="set_text", args={"text": target}, force=force,
              settle={"quiet_ms": 150, "first_ms": 400, "timeout_ms": 1500}, a=a)
@@ -946,8 +1011,7 @@ def _type(sess, a, t):
                             data={"steps": steps, "value": val})
         warning = f"the field shows {val!r}, not {target!r} (a formatter, a length limit or auto-advance?)"
     if a.enter:
-        _enter(sess, node, snap)
-        steps.append({"method": "enter"})
+        steps.append(dict(_enter(sess, node, snap), method="enter"))
         reply = None
     extra = {"value": None if want["password"] else val, "verified": ok(val),
              "steps": steps}
@@ -957,16 +1021,28 @@ def _type(sess, a, t):
 
 
 def _enter(sess, node, snap):
+    """Press the IME action on `node`; returns how it was delivered."""
     if sess.sdk >= 30 and node is not None:
         try:
             r = sess.call("act", snap.dump, node.raw["handle"], action="ime_enter", retry=False)
             if r.get("performed"):
-                return
+                return {"via": "ime_enter"}
         except UserError as e:
             if e.kind not in ("unsupported", "stale-ref"):
                 raise
+    # A key event goes to whatever has input focus, and ACTION_SET_TEXT does not
+    # give the field focus: without this, --enter on API < 30 went nowhere
+    # (a banking QA app calculator: the amount was never submitted).
+    focused = node is not None and "focused" in node.flags
+    if node is not None and not focused:
+        try:
+            focused = bool(sess.call("act", snap.dump, node.raw["handle"], action="focus",
+                                     retry=False).get("performed"))
+        except UserError:
+            pass
     sess.shell("input", "keyevent", "66")
     sess.call("wait_idle", 150, 2000)
+    return {"via": "keyevent", "focused": focused}
 
 
 def cmd_type(a):
@@ -1078,7 +1154,10 @@ def _wait_role(sess, a):
             what = f"role={a.role!r}" + (f" text={a.text!r}" if a.text else "") + (" gone" if a.gone else "")
             return {"ok": True, "matched": True, "ms": ms,
                     "condition": {"role": a.role, "text": a.text, "gone": bool(a.gone)},
-                    "text": f"matched {what} after {ms} ms\n" + S.header(snap, S.Opts())}
+                    # the whole screen, not just its header: the state saved above is
+                    # what the next `snapshot` compares against, so an agent that was
+                    # only shown a header would get "unchanged" for a screen it never saw
+                    "text": f"matched {what} after {ms} ms\n" + S.render(snap, S.Opts())}
         left = deadline - time.monotonic()
         if left <= 0:
             raise UserError(f"gave up after {a.timeout:g} s waiting for role={a.role!r}"

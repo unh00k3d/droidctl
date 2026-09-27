@@ -319,6 +319,7 @@ class Snap:
         self.dialog = False
         self.degraded = None          # the agent's reason ("timeout", "truncated", "no-root", ...) or None
         self.incomplete = set()       # ids of windows whose tree was not read completely
+        self.leaving = set()          # ids of activity windows mid-transition (see leaving_windows)
         self.unread = 0               # subtrees the agent did not read (degraded dumps)
         self.screen = (0, 0, 1, 1)
         self.elements = []            # in ref order (ref = index + 1)
@@ -328,6 +329,31 @@ class Snap:
         self.roots = []               # the Node tree of every kept window (the resolver searches it)
         self.toast = None             # a toast since the previous snapshot (set by the caller)
         self.evseq = None             # the agent's event-ring position this snapshot has seen
+
+
+def leaving_windows(tree):
+    """Ids of activity windows on their way out (or in): during an activity
+    transition the closing window stays in the list, stacked ABOVE the one that
+    now has focus, for the length of the animation (~200 ms measured on the
+    SM-N950F, a banking QA app back navigation). Such a frame shows two screens at
+    once; a locator then matched the old screen's elements. A same-package,
+    near-full-screen application window above the focused one that has neither
+    focus nor the active flag is that transition (a real dialog takes focus)."""
+    wins = [w for w in tree.get("windows", ()) if w.get("type") == "application"]
+    focus = [w for w in wins if w.get("focused") or w.get("active")]
+    if not focus:
+        return set()
+    f = max(focus, key=lambda w: w.get("layer", 0))
+    scr = tree.get("screen") or {}
+    area = (scr.get("w") or 1080) * (scr.get("h") or 1920)
+    out = set()
+    for w in wins:
+        b = w.get("bounds") or [0, 0, 0, 0]
+        big = max(0, b[2] - b[0]) * max(0, b[3] - b[1]) >= 0.9 * area
+        if (w is not f and not (w.get("focused") or w.get("active")) and big
+                and w.get("layer", 0) > f.get("layer", 0) and w.get("pkg") == f.get("pkg")):
+            out.add(w.get("id"))
+    return out
 
 
 def build(tree, activity=None, system=False):
@@ -340,6 +366,7 @@ def build(tree, activity=None, system=False):
     snap.dump, snap.gen = tree.get("dump"), tree.get("gen")
     if tree.get("degraded"):
         snap.degraded = tree.get("reason") or "yes"
+    snap.leaving = leaving_windows(tree)
 
     wins = [Win(w, screen) for w in tree.get("windows", ())]
     for w in wins:
@@ -385,6 +412,9 @@ def build(tree, activity=None, system=False):
     main = next((w for w in wins if w.kind == "main"), None)
     top = main or max((w for w in wins if w.kind in ("dialog", "popup")), key=lambda w: w.layer, default=None)
     _warn_tree(wins, top, snap)
+    if snap.leaving:
+        snap.warnings.append("mid-transition: the previous screen's window is still closing over this "
+                             "one (read again: droidctl snapshot)")
     snap.pkg = top.pkg if top else (wins[0].pkg if wins else "")
     snap.title = top.title if top else ""
     snap.activity = activity or ""
@@ -793,18 +823,33 @@ def _list_info(e):
 # --------------------------------------------------------------------------
 # dedupe, regions, cover, order, inference, warnings
 # --------------------------------------------------------------------------
+_CONTAINER_ROLES = {"list", "grid", "scroll", "pager", "web"}
+
+
 def _dedupe(elems):
     """Same text within 8 px: keep the actionable (or outer) one."""
     drop = set()
     for i, a in enumerate(elems):
-        if id(a) in drop or not a.rect or not a.segments:
+        if id(a) in drop or not a.rect or not a.label_full:   # (a desc-only label has no segments)
             continue
         for b in elems[i + 1:]:
             if id(b) in drop or not b.rect or b.node.win is not a.node.win:
                 continue
-            if a.label_full.lower() == b.label_full.lower() and sp.near(a.rect, b.rect):
+            # same label and either near (8 px) or one inside the other: a selected
+            # tab is a non-clickable container labelled by its desc around a text
+            # child saying the same (a banking QA app "My Status" tabs), listed twice
+            # (not when the outer one is a container: a WebView titled like its h1
+            # keeps the heading, which is page structure, not a repeat)
+            nested = ((a.node in b.node.ancestors() and a.role not in _CONTAINER_ROLES)
+                      or (b.node in a.node.ancestors() and b.role not in _CONTAINER_ROLES))
+            if a.label_full.lower() == b.label_full.lower() and (sp.near(a.rect, b.rect) or nested):
                 loser = b if (a.node.actionable or not b.node.actionable) else a
                 drop.add(id(loser))
+    # containers list their members too, and _order walks those: a duplicate
+    # dropped only here came straight back inside its list/pager
+    for e in elems:
+        if e.children:
+            e.children = [c for c in e.children if id(c) not in drop]
     return [e for e in elems if id(e) not in drop]
 
 
@@ -1426,6 +1471,8 @@ def ref_record(e, snap):
         "tap": list(e.tap) if e.tap else None, "region": e.region,
         "parent": e.container.ref if e.container else None,
         "password": any("password" in x.flags for x in e.nodes),
+        # which ways it can scroll now, so a fast-path `scroll` knows it is at an edge
+        "scroll": sorted(x for x in n.actions if x.startswith("scroll_") and x != "scroll_to_position"),
     }
 
 
@@ -1443,7 +1490,9 @@ def to_state(snap, serial=None):
              "role", "label", "text", "desc", "hint",   # the fingerprint
              "id", "uid", "vid", "class", "path": [anchor_id, [child indices]],
              "ctx": [labels around it],                 # see context()
-             "bounds", "tap", "region", "parent"}},
+             "bounds", "tap", "region", "parent",
+             "password": bool,                          # never through the clipboard
+             "scroll": [scroll_* actions offered now]}},# a fast-path scroll knows its edges
          "evseq": last agent event seq already reported (toast header), or null}
     """
     refs = {str(e.ref): ref_record(e, snap) for e in snap.elements}

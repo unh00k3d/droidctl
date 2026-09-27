@@ -22,6 +22,7 @@ class Tree(private val svc: AccessibilityService) {
         const val BUDGET_MS = 2000L
         const val MAX_NODES = 10000
         const val MAX_DEPTH = 120
+        const val PROBES = 6       // nodes re-read past the cache per dump (see dump)
 
         /** Standard action ids -> names. Anything not here with a label is a custom action. */
         val STANDARD: Map<Int, String> = buildMap {
@@ -138,10 +139,27 @@ class Tree(private val svc: AccessibilityService) {
         setNotImportant(notImportant)
         val t0 = SystemClock.uptimeMillis()
         val startGen = gen
-        val walk = Walk(t0 + budgetMs, maxNodes)
-        val windows = JSONArray()
-        val missing = collect(allWindows, walk, windows)
+        var walk = Walk(t0 + budgetMs, maxNodes)
+        var windows = JSONArray()
+        var missing = collect(allWindows, walk, windows)
         walk.run()
+        // Android's node cache is only invalidated by accessibility events, and a view
+        // that moves without one (a translation animation: a list sliding down under a
+        // search bar that appeared) keeps its old bounds in the cache indefinitely
+        // (measured on the SM-N950F, a banking QA app: a whole RecyclerView ~150 px off, so
+        // a visible row was dropped as hidden). Re-read a few nodes past the cache; if
+        // any moved, rebuild the cache and read again once.
+        var rebuilt = false
+        if (!walk.timedOut && walk.stale()) {
+            for (n in walk.handles.values) recycle(n)
+            rebuildCache(notImportant)
+            rebuilt = true
+            android.util.Log.i(TAG, "node cache was stale (a probed node moved): rebuilt")
+            walk = Walk(t0 + budgetMs, maxNodes)
+            windows = JSONArray()
+            missing = collect(allWindows, walk, windows)
+            walk.run()
+        }
         val ms = SystemClock.uptimeMillis() - t0
 
         for (n in handles.values) recycle(n)
@@ -160,8 +178,15 @@ class Tree(private val svc: AccessibilityService) {
             .put("screen", screen)
             .put("windows", windows)
         if (reasons.isNotEmpty()) out.put("reason", reasons.joinToString(","))
+        if (rebuilt) out.put("cache_rebuilt", true)
         if (walk.pending > 0) out.put("unread", walk.pending)
         return@synchronized out
+    }
+
+    /** A service-info change makes the system drop this service's node cache. */
+    private fun rebuildCache(notImportant: Boolean) {
+        setNotImportant(!notImportant)
+        setNotImportant(notImportant)
     }
 
     private fun setNotImportant(on: Boolean) {
@@ -293,10 +318,36 @@ class Tree(private val svc: AccessibilityService) {
         private inner class Item(val n: AccessibilityNodeInfo, val o: JSONObject, val pkg: String?, val depth: Int)
         private val queue = java.util.ArrayDeque<Item>()
 
+        // nodes to re-check past the cache: scroll containers (what moves) first,
+        // then shallow ones; a handful keeps the clean-screen cost to a few IPCs
+        private val movers = ArrayList<Pair<AccessibilityNodeInfo, Rect>>()
+        private val shallow = ArrayList<Pair<AccessibilityNodeInfo, Rect>>()
+
+        private fun note(n: AccessibilityNodeInfo, depth: Int) {
+            if (n.isScrollable && movers.size < PROBES) movers.add(n to Rect(rect))
+            else if (depth in 1..2 && shallow.size < PROBES) shallow.add(n to Rect(rect))
+        }
+
+        /** True if any probed node's live bounds differ from what the cache gave us. */
+        fun stale(): Boolean {
+            val live = Rect()
+            for ((n, seen) in (movers + shallow).take(PROBES)) {
+                val copy = AccessibilityNodeInfo.obtain(n)
+                try {
+                    if (!copy.refresh()) continue          // gone since: not a geometry question
+                    copy.getBoundsInScreen(live)
+                    if (live != seen) return true
+                } catch (_: Exception) {
+                } finally { recycle(copy) }
+            }
+            return false
+        }
+
         fun timeLeft(): Long = deadline - SystemClock.uptimeMillis()
 
         fun root(n: AccessibilityNodeInfo): JSONObject {
             val o = describe(n, null)
+            note(n, 0)
             queue.add(Item(n, o, n.packageName?.toString(), 0))
             return o
         }
@@ -315,6 +366,7 @@ class Tree(private val svc: AccessibilityService) {
                     if (handles.size >= maxNodes) { truncated = true; break }
                     val c = try { it.n.getChild(i) } catch (_: Exception) { null } ?: continue
                     val co = describe(c, it.pkg)
+                    note(c, it.depth + 1)
                     kids.put(co)
                     batch.add(Item(c, co, c.packageName?.toString() ?: it.pkg, it.depth + 1))
                 }

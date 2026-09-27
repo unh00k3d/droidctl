@@ -444,6 +444,11 @@ def cmd_snapshot(a):
         client, _info = dev.connect(serial)
         try:
             tree = client.call("tree", {}, timeout=15)
+            # never a frame mid-activity-transition (two screens at once); bounded
+            deadline = time.monotonic() + 1.0
+            while snap_mod.leaving_windows(tree) and time.monotonic() < deadline:
+                time.sleep(0.1)
+                tree = client.call("tree", {}, timeout=15)
             if not a.raw:
                 toast, evseq = _recent_toast(client, prev_state)
         finally:

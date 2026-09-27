@@ -1,0 +1,20 @@
+screen com.android.settings "Settings"  sig=3f0d  keyboard=hidden  dialog=yes
+[1] button  "Navigate up"
+[2] text  "Display"
+[3] button  "Search"
+[4] list  9/25 more↓
+  [5] row  "Brightness"
+  [6] seekbar  (unlabeled, in "Brightness")  #brightness_seekbar  range=1411/10000
+  [7] row  "Adaptive brightness · On"
+  [8] switch  "Adaptive brightness"  on
+  [9] row  "Blue light filter · Reduce eye strain by limiting the amount of blue light emit…"
+  [10] switch  "Blue light filter"  off
+  [11] row  "Night mode · Use a darker theme to keep your eyes comfortable at night."
+  [12] switch  "Night mode"  off
+  [13] row  "Screen mode · Adaptive display"
+  [14] row  "Font size and style"
+  [15] row  "Screen zoom"
+  [16] row  "Screen resolution · FHD+ (2220 x 1080)"
+  [17] row  "Full screen apps · Choose which apps you want to use in the full screen aspect…"
+! opaque view: nothing here is labelled or actionable (still loading, or a canvas/game/map?): try wait, shot --marks, or tap --point X,Y
+! mid-transition: the previous screen's window is still closing over this one (read again: droidctl snapshot)

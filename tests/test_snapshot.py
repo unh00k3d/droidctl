@@ -709,3 +709,30 @@ def test_bidi_marks_are_dropped_but_zwj_is_kept():
     assert S._clean("Values \u200b\u200bof") == "Values of"
     family = "\U0001F468‍\U0001F469‍\U0001F467"
     assert S._clean(family) == family
+
+
+def test_a_selected_tab_is_listed_once():
+    """The selected tab is a non-clickable container labelled by its desc around a
+    text child saying the same; it was listed twice (a banking QA app "My Status").
+    Real capture, trimmed to the app bar."""
+    snap = build("real-bank-qa-status-tabs")
+    labels = [e.label_full for e in snap.elements]
+    for tab in ("My Assets", "My Expenses", "My Debts"):
+        assert labels.count(tab) == 1, (tab, labels)
+
+
+def test_a_closing_activity_window_is_recognised_as_leaving():
+    """Right after `back` the closing activity window stays in the list, stacked
+    over the returning one, unfocused (real capture: Settings > Display > back).
+    A locator on such a frame matched the old screen (a banking QA app)."""
+    d = load("real-settings-back-transition")
+    assert S.leaving_windows(d["tree"]) == {695}
+    assert S.build(d["tree"]).leaving == {695}
+
+
+def test_no_settled_real_screen_is_mistaken_for_a_transition():
+    for path in sorted(TREES.glob("*.json")):
+        if path.stem == "real-settings-back-transition":
+            continue
+        tree = json.loads(path.read_text())["tree"]
+        assert not S.leaving_windows(tree), path.stem
