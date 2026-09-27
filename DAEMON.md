@@ -158,9 +158,18 @@ After a crash, the next call finds a dead socket and starts a new daemon.
 - **One thread per client connection.** Command output is thread-local: the process's
   `sys.stdout`/`sys.stderr`/`sys.stdin` are proxies that route to the running request's
   buffers, and droidctl's rich consoles are built per request for the client's terminal.
-- **The working directory and environment are process-wide.** A request whose
-  `cwd`/`env` differs from what is set waits until no request with other values is
-  running (`_Gate`). Requests that share them run concurrently.
+- **The working directory and environment are process-wide**, so they are kept out of
+  the way:
+  - The client's `ANDROID_SERIAL` becomes the command's `-d`; the daemon never sets it
+    in its environment.
+  - Path arguments (`--out`, `--file`, `--dir`, `--fixture`, `run FILE`, `install APK`)
+    are made absolute against the client's `cwd`. Only `run`, whose steps may hold
+    relative paths, needs the process cwd.
+  - What is left is applied under a gate (`_Gate`): `DROIDCTL_*` settings, the adb
+    server port, and `run`'s cwd. A request that needs other values waits until no
+    request with different ones is running.
+  - So two agents on different phones, or in different directories, never wait for
+    each other.
 - **Per device:**
   - A mutating command holds that device's command lock for its whole run, so two
     agents' taps on one phone never interleave. It waits at most 120 s, then fails with

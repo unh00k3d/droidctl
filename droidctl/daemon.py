@@ -156,47 +156,65 @@ def _install_stdio():
 
 
 # --------------------------------------------------------------------------
-# cwd and environment: process-wide, so requests that need a different one
-# wait until no request with another one is running
+# cwd and environment. Both are process-wide, so they are the one thing
+# concurrent requests can't each have their own of. Kept to the minimum:
+# - ANDROID_SERIAL is not applied at all: it becomes the command's -d;
+# - path arguments are made absolute against the client's cwd, so only `run`
+#   (whose steps may hold relative paths) needs the process cwd;
+# - rendering settings (NO_COLOR, COLUMNS, TERM) are per request already.
+# What is left (DROIDCTL_*, ANDROID_ADB_SERVER_PORT) is applied under a gate:
+# a request needing other values waits until none with different ones runs.
 # --------------------------------------------------------------------------
 _KEEP_ENV = {"DROIDCTL_HOME", "DROIDCTL_IDLE", "DROIDCTL_NO_DAEMON", "DROIDCTL_AUTOSTART"}
+PATH_ARGS = ("file", "out", "apk", "dir", "fixture")
+CWD_COMMANDS = {"run"}
+
+
+def _gate_env(env):
+    return {k: v for k, v in (env or {}).items()
+            if (k.startswith("DROIDCTL_") and k not in _KEEP_ENV) or k == "ANDROID_ADB_SERVER_PORT"}
 
 
 class _Gate:
     def __init__(self):
         self.cond = threading.Condition()
-        self.key = None
-        self.active = 0
-        self.managed = set()
+        self.env_key, self.env_active = None, 0
+        self.cwd, self.cwd_active = None, 0
+        self.managed = {"ANDROID_ADB_SERVER_PORT"}
 
-    def enter(self, cwd, env):
-        env = {k: v for k, v in (env or {}).items() if k not in _KEEP_ENV}
-        key = (cwd, tuple(sorted(env.items())))
+    def enter(self, env, cwd=None):
+        """-> a token for exit(). `cwd` only for requests that need the process cwd."""
+        env = _gate_env(env)
+        key = tuple(sorted(env.items()))
         with self.cond:
-            while self.active and self.key != key:
+            while ((self.env_active and self.env_key != key)
+                   or (cwd and self.cwd_active and self.cwd != cwd)):
                 self.cond.wait()
-            if self.key != key:
-                self._apply(cwd, env)
-                self.key = key
-            self.active += 1
+            if self.env_key != key:
+                self.managed |= set(env)
+                for k in self.managed:
+                    if k in env:
+                        os.environ[k] = env[k]
+                    else:
+                        os.environ.pop(k, None)
+                self.env_key = key
+            self.env_active += 1
+            if cwd:
+                if self.cwd != cwd:
+                    try:
+                        os.chdir(cwd)
+                    except OSError:
+                        os.chdir(os.path.expanduser("~"))
+                    self.cwd = cwd
+                self.cwd_active += 1
+        return bool(cwd)
 
-    def exit(self):
+    def exit(self, used_cwd):
         with self.cond:
-            self.active -= 1
+            self.env_active -= 1
+            if used_cwd:
+                self.cwd_active -= 1
             self.cond.notify_all()
-
-    def _apply(self, cwd, env):
-        if cwd:
-            try:
-                os.chdir(cwd)
-            except OSError:
-                os.chdir(os.path.expanduser("~"))
-        self.managed |= set(env) | {k for k in cl._ENV_KEYS}
-        for k in self.managed:
-            if k in env:
-                os.environ[k] = env[k]
-            else:
-                os.environ.pop(k, None)
 
 
 _GATE = _Gate()
@@ -537,16 +555,17 @@ def _pool_connect(serial, timeout=5.0):
 # --------------------------------------------------------------------------
 # running one command line
 # --------------------------------------------------------------------------
-_PARSERS = {}
+_PARSER = None
 
 
 def _parser():
-    from droidctl import cli
-    key = os.environ.get("ANDROID_SERIAL")    # build_parser bakes it in as -d's default
-    p = _PARSERS.get(key)
-    if p is None:
-        p = _PARSERS[key] = cli.build_parser()
-    return p
+    """Built once. serve() removed ANDROID_SERIAL from the daemon's env, so -d
+    defaults to None here and execute() applies the client's ANDROID_SERIAL."""
+    global _PARSER
+    if _PARSER is None:
+        from droidctl import cli
+        _PARSER = cli.build_parser()
+    return _PARSER
 
 
 def execute(params):
@@ -562,8 +581,7 @@ def execute(params):
     _TL.env = params.get("env") or {}
     _TL.consoles = {}
     result = {"mode": "daemon"}
-    _GATE.enter(params.get("cwd"), params.get("env"))
-    ctx = None
+    ctx, gate = None, None
     try:
         try:
             args = _parser().parse_args(argv)
@@ -572,6 +590,17 @@ def execute(params):
             return dict(result, code=code, stdout=out.getvalue(), stderr=err.getvalue(), json=False)
         if args.cmd in cl.LOCAL:
             return {"passthrough": True, "mode": "daemon"}
+        env, cwd = params.get("env") or {}, params.get("cwd")
+        if hasattr(args, "device") and args.device is None and env.get("ANDROID_SERIAL"):
+            args.device = env["ANDROID_SERIAL"]
+        if cwd:
+            for attr in PATH_ARGS:
+                v = getattr(args, attr, None)
+                if isinstance(v, str) and v and v != "-" and not os.path.isabs(os.path.expanduser(v)):
+                    setattr(args, attr, os.path.join(cwd, v))
+                elif isinstance(v, str) and v.startswith("~"):
+                    setattr(args, attr, os.path.expanduser(v))
+        gate = _GATE.enter(env, cwd if args.cmd in CWD_COMMANDS else None)
         want_json = bool(getattr(args, "json", False))
         ctx = _TL.ctx = _Ctx(args.cmd in READ_ONLY)
         payload, error, code, exited = None, None, 0, False
@@ -627,7 +656,8 @@ def execute(params):
             ctx.finish()
         _TL.ctx = None
         _forget_act_sessions()
-        _GATE.exit()
+        if gate is not None:
+            _GATE.exit(gate)
         _TL.out = _TL.err = _TL.stdin = None
         _TL.consoles = {}
 
@@ -812,11 +842,12 @@ class Server:
         from droidctl import device as dev
         from droidctl.core import UserError
         try:
-            _GATE.enter(params.get("cwd"), params.get("env"))
+            env = params.get("env") or {}
+            gate = _GATE.enter(env)
             try:
-                serial = dev.resolve_serial(params.get("device"))
+                serial = dev.resolve_serial(params.get("device") or env.get("ANDROID_SERIAL"))
             finally:
-                _GATE.exit()
+                _GATE.exit(gate)
             sess = POOL.get(serial)
         except UserError as e:
             cl.send(f, {"jsonrpc": "2.0", "id": rid,
@@ -870,6 +901,7 @@ def serve():
     log.propagate = False
     server = Server()
     server.bind()
+    os.environ.pop("ANDROID_SERIAL", None)    # per request (the client's), never the spawner's
     _install_stdio()
     dev._connect_hook = _pool_connect
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):

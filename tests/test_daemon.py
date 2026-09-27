@@ -413,3 +413,41 @@ def test_run_reads_its_steps_from_stdin_through_the_daemon(phones):
     r = dc(env, "run", "-d", "AAA", "--json", stdin="snapshot\nversion\n")
     p = js(r)
     assert p["ok"] and p["steps"] == 2 and p["mode"] == "daemon"
+
+
+def test_agents_with_different_serials_and_cwds_do_not_block_each_other(phones, tmp_path):
+    """ANDROID_SERIAL is the command's -d (not process env) and path arguments are made
+    absolute, so neither makes one client wait for another's long command."""
+    env, a, b = phones
+    js(dc(env, "version", "--json"))
+    other = tmp_path / "elsewhere"
+    other.mkdir()
+    slow = subprocess.Popen([PY, "-m", "droidctl.client", "snapshot", "--json"],
+                            env=dict(env, ANDROID_SERIAL="BBB"), cwd=str(other),
+                            stdout=subprocess.PIPE, text=True)
+    time.sleep(0.3)
+    t0 = time.monotonic()
+    fast = js(subprocess.run([PY, "-m", "droidctl.client", "snapshot", "--json"],
+                             env=dict(env, ANDROID_SERIAL="AAA"), cwd=str(tmp_path),
+                             capture_output=True, text=True, timeout=30))
+    assert fast["ok"] and time.monotonic() - t0 < 1.5
+    assert slow.poll() is None
+    assert json.loads(slow.communicate(timeout=30)[0])["ok"]
+    assert a.calls["tree"] >= 1 and b.calls["tree"] >= 1          # each went to its own phone
+
+
+def test_relative_paths_resolve_against_the_clients_cwd(home, tmp_path):
+    env = _env(home)
+    src = os.path.join(os.path.dirname(__file__), "fixtures", "trees", "real-settings-main.json")
+    work = tmp_path / "work"
+    (work / "fx").mkdir(parents=True)
+    with open(src) as f, open(work / "fx" / "t.json", "w") as g:
+        g.write(f.read())
+    (work / "steps.txt").write_text("snapshot --fixture fx/t.json\n")
+    r = subprocess.run([PY, "-m", "droidctl.client", "snapshot", "--fixture", "fx/t.json", "--json"],
+                       env=env, cwd=str(work), capture_output=True, text=True, timeout=30)
+    assert js(r)["screen"]["pkg"] == "com.android.settings"
+    r = subprocess.run([PY, "-m", "droidctl.client", "run", "steps.txt", "--json"],
+                       env=env, cwd=str(work), capture_output=True, text=True, timeout=30)
+    p = js(r)
+    assert p["ok"] and p["results"][0]["result"]["screen"]["pkg"] == "com.android.settings"
