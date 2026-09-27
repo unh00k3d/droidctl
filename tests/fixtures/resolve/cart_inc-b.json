@@ -1,0 +1,959 @@
+{
+ "meta": {
+  "name": "cart_inc-b",
+  "scenario": "cart",
+  "note": "+ tapped on Wireless Mouse (qty 1 -> 2)",
+  "captured": "2026-09-27T09:41:37+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.2.0",
+   "versionCode": 2
+  },
+  "package": "dev.droidctl.testapp",
+  "activity": "dev.droidctl.testapp/.Main",
+  "dump_ms": 52,
+  "nodes": 37,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 695,
+  "dump": 152,
+  "degraded": false,
+  "ms": 52,
+  "nodes": 37,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 177,
+    "type": "system",
+    "layer": 3,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 168,
+    "type": "type_-1",
+    "layer": 2,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 171,
+    "type": "system",
+    "layer": 1,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "12:41",
+         "desc": "12:41",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 825,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "s:cart",
+    "pkg": "dev.droidctl.testapp",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "dev.droidctl.testapp",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "android.widget.ImageButton",
+       "id": "dev.droidctl.testapp:id/back",
+       "desc": "Back",
+       "tooltip": "Back",
+       "bounds": [
+        0,
+        63,
+        146,
+        197
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 19,
+       "class": "android.widget.TextView",
+       "text": "Cart (4)",
+       "bounds": [
+        146,
+        77,
+        934,
+        183
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "enabled",
+        "heading"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 20,
+       "class": "android.widget.ImageButton",
+       "id": "dev.droidctl.testapp:id/ic_share",
+       "bounds": [
+        934,
+        63,
+        1080,
+        197
+       ],
+       "drawingOrder": 3,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 21,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/item_name",
+       "text": "Wireless Mouse",
+       "bounds": [
+        42,
+        207,
+        492,
+        289
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 22,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/item_price",
+       "text": "$24.99",
+       "bounds": [
+        42,
+        289,
+        492,
+        363
+       ],
+       "drawingOrder": 5,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 23,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/minus",
+       "text": "−",
+       "bounds": [
+        492,
+        222,
+        723,
+        348
+       ],
+       "drawingOrder": 7,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 24,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/qty",
+       "text": "2",
+       "bounds": [
+        723,
+        240,
+        828,
+        330
+       ],
+       "drawingOrder": 6,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 25,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/plus",
+       "text": "+",
+       "bounds": [
+        828,
+        222,
+        1059,
+        348
+       ],
+       "drawingOrder": 8,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 26,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/item_name",
+       "text": "USB-C Cable",
+       "bounds": [
+        42,
+        383,
+        492,
+        465
+       ],
+       "drawingOrder": 9,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 27,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/item_price",
+       "text": "$9.99",
+       "bounds": [
+        42,
+        465,
+        492,
+        539
+       ],
+       "drawingOrder": 10,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 28,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/minus",
+       "text": "−",
+       "bounds": [
+        492,
+        398,
+        723,
+        524
+       ],
+       "drawingOrder": 12,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 29,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/qty",
+       "text": "2",
+       "bounds": [
+        723,
+        416,
+        828,
+        506
+       ],
+       "drawingOrder": 11,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 30,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/plus",
+       "text": "+",
+       "bounds": [
+        828,
+        398,
+        1059,
+        524
+       ],
+       "drawingOrder": 13,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 31,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/item_name",
+       "text": "Laptop Stand",
+       "bounds": [
+        42,
+        559,
+        492,
+        641
+       ],
+       "drawingOrder": 14,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 32,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/item_price",
+       "text": "$39.99",
+       "bounds": [
+        42,
+        641,
+        492,
+        715
+       ],
+       "drawingOrder": 15,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 33,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/minus",
+       "text": "−",
+       "bounds": [
+        492,
+        574,
+        723,
+        700
+       ],
+       "drawingOrder": 17,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 34,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/qty",
+       "text": "1",
+       "bounds": [
+        723,
+        592,
+        828,
+        682
+       ],
+       "drawingOrder": 16,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 35,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/plus",
+       "text": "+",
+       "bounds": [
+        828,
+        574,
+        1059,
+        700
+       ],
+       "drawingOrder": 18,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 36,
+       "class": "android.widget.TextView",
+       "id": "dev.droidctl.testapp:id/total",
+       "text": "Total $84.96",
+       "bounds": [
+        42,
+        1961,
+        807,
+        2058
+       ],
+       "drawingOrder": 19,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 37,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/checkout",
+       "text": "Checkout",
+       "bounds": [
+        807,
+        1947,
+        1038,
+        2073
+       ],
+       "drawingOrder": 20,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

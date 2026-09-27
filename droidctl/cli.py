@@ -633,7 +633,7 @@ def dispatch(args):
     try:
         payload = args.fn(args)
     except UserError as e:
-        die(args, e.kind, e, e.hint)
+        die(args, e.kind, e, e.hint, getattr(e, "data", None))
     emit(args, payload, getattr(args, "render", None))
     # a payload that reports ok=false (doctor with a failed check) still printed
     # in full, but the exit code has to tell a script something is wrong

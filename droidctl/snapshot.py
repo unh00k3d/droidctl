@@ -237,6 +237,7 @@ class Snap:
         self.warnings = []
         self.dump = self.gen = None
         self.windows = []
+        self.roots = []               # the Node tree of every kept window (the resolver searches it)
 
 
 def build(tree, activity=None, system=False):
@@ -267,6 +268,7 @@ def build(tree, activity=None, system=False):
         _visibility(root)
         roots.append((w, root))
 
+    snap.roots = [root for _, root in roots]
     elems = []
     for w, root in roots:
         _elements(root, None, None, elems)
@@ -1071,6 +1073,109 @@ def _path(n):
     return x.parent.get("id"), list(reversed(steps))
 
 
+CTX_MAX = 4          # context segments kept per ref
+CTX_CHARS = 60
+
+
+def _texts(n, out):
+    """Labels in ``n``'s subtree (document order); list and scroll contents are
+    skipped, since they change with every scroll."""
+    if len(out) >= CTX_MAX or n.is_list or n.scroll_like:
+        return
+    lab = n.own_label() or n.get("hint")
+    if lab and lab[:CTX_CHARS] not in out:
+        out.append(lab[:CTX_CHARS])
+    for c in n.children:
+        _texts(c, out)
+
+
+def _row_mates(node):
+    """Labels of the node's visual row: siblings (at the first level that has
+    any) whose vertical span overlaps its own. Android's accessibility tree
+    drops unimportant layouts, so a "row" is often not a node at all; the
+    geometry is what still says which "Delete" goes with which "Item 7"."""
+    if node.rect is None:
+        return []
+    h = sp.height(node.rect)
+    if node.win.rect is not None and h > 0.2 * sp.height(node.win.rect):
+        return []
+    child, anc = node, node.parent
+    while anc is not None and len(anc.children) == 1 and not (anc.is_list or anc.scroll_like):
+        child, anc = anc, anc.parent
+    if anc is None or anc.is_list:
+        return []
+    out = []
+    for c in anc.children:
+        if c is child or c.rect is None or sp.height(c.rect) > 3 * h:
+            continue
+        if min(c.rect[3], node.rect[3]) - max(c.rect[1], node.rect[1]) > 0:
+            _texts(c, out)
+    return out
+
+
+def context(node, own=()):
+    """The words around a node, which the resolver uses to tell identical
+    controls apart ("Delete" in the row "Item 7", the "+" of "Wireless Mouse")
+    and to refuse a look-alike on a different screen.
+
+    First its row-mates (see _row_mates). Failing that, the labels in its
+    nearest ancestor that has any, other than its own subtree; that walk stops
+    at a list or scroll container, so a list item never borrows its
+    neighbours'."""
+    own = {s.lower() for s in own}
+    mates = [t for t in _row_mates(node) if t.lower() not in own]
+    if mates:
+        return mates[:CTX_MAX]
+    child = node
+    for anc in node.ancestors():
+        # a list, a scroll view, or a ScrollView's single content holder: the
+        # siblings from here on are other rows
+        if anc.is_list or anc.scroll_like or (anc.parent is not None and anc.parent.scroll_like
+                                               and len(anc.parent.children) == 1):
+            return []
+        # two or more clickable siblings shaped like us: a collection (Compose
+        # lists are often plain containers), so the siblings are other rows
+        if child.clickable and sum(1 for c in anc.children if c is not child and c.clickable
+                                   and c.cls == child.cls) >= 2:
+            return []
+        out = []
+        for c in anc.children:
+            if c is not child:
+                _texts(c, out)
+        out = [t for t in out if t.lower() not in own]
+        if out:
+            return out[:CTX_MAX]
+        child = anc
+    return []
+
+
+def click_node(e):
+    """The node a tap should ACTION_CLICK: the element's own clickable node, a
+    folded one, else its nearest clickable ancestor (a text inside a row)."""
+    for n in e.nodes:
+        if n.clickable:
+            return n
+    return next((a for a in e.node.ancestors() if a.clickable), None)
+
+
+def ref_record(e, snap):
+    """One ref's saved fingerprint (see to_state)."""
+    n = e.node
+    anchor, steps = _path(n)
+    cn = click_node(e)
+    return {
+        "handle": n.raw.get("handle"), "dump": snap.dump, "window": n.win.id,
+        "click": cn.raw.get("handle") if cn is not None else None,
+        "role": e.role, "label": e.label_full, "text": n.get("text"), "desc": n.get("desc"),
+        "hint": n.get("hint"), "id": e.res_id, "uid": n.raw.get("uid"), "vid": n.raw.get("vid"),
+        "class": n.raw.get("class"), "path": [anchor, steps],
+        "ctx": context(n, e.segments),
+        "bounds": list(e.rect) if e.rect else None,
+        "tap": list(e.tap) if e.tap else None, "region": e.region,
+        "parent": e.container.ref if e.container else None,
+    }
+
+
 def to_state(snap, serial=None):
     """The saved form (``~/.droidctl/snaps/<serial>.json``), read by the resolver.
 
@@ -1081,22 +1186,13 @@ def to_state(snap, serial=None):
          "lines": [canonical flat lines],               # for --diff and `unchanged`
          "refs": {"<ref>": {
              "handle", "dump", "window",                # the fast path: act on the handle
+             "click",                                   # handle to ACTION_CLICK (self/folded/ancestor)
              "role", "label", "text", "desc", "hint",   # the fingerprint
-             "id", "uid", "class", "path": [anchor_id, [child indices]],
+             "id", "uid", "vid", "class", "path": [anchor_id, [child indices]],
+             "ctx": [labels around it],                 # see context()
              "bounds", "tap", "region", "parent"}}}
     """
-    refs = {}
-    for e in snap.elements:
-        n = e.node
-        anchor, steps = _path(n)
-        refs[str(e.ref)] = {
-            "handle": n.raw.get("handle"), "dump": snap.dump, "window": n.win.id,
-            "role": e.role, "label": e.label_full, "text": n.get("text"), "desc": n.get("desc"),
-            "hint": n.get("hint"), "id": e.res_id, "uid": n.raw.get("uid"), "class": n.raw.get("class"),
-            "path": [anchor, steps], "bounds": list(e.rect) if e.rect else None,
-            "tap": list(e.tap) if e.tap else None, "region": e.region,
-            "parent": e.container.ref if e.container else None,
-        }
+    refs = {str(e.ref): ref_record(e, snap) for e in snap.elements}
     return {"version": 1, "serial": serial, "created": round(time.time(), 3), "dump": snap.dump,
             "gen": snap.gen, "sig": snap.sig, "pkg": snap.pkg, "activity": snap.activity,
             "title": snap.title, "screen": list(snap.screen),

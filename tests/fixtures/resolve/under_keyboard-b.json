@@ -1,0 +1,1609 @@
+{
+ "meta": {
+  "name": "under_keyboard-b",
+  "scenario": "under_keyboard",
+  "note": "input tapped: keyboard over Submit",
+  "captured": "2026-09-27T09:41:50+00:00",
+  "manufacturer": "samsung",
+  "model": "SM-N950F",
+  "sdk": 28,
+  "release": "9",
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "agent": {
+   "version": "0.2.0",
+   "versionCode": 2
+  },
+  "package": "dev.droidctl.testapp",
+  "activity": "dev.droidctl.testapp/.Main",
+  "dump_ms": 97,
+  "nodes": 76,
+  "degraded": false
+ },
+ "tree": {
+  "gen": 737,
+  "dump": 175,
+  "degraded": false,
+  "ms": 97,
+  "nodes": 76,
+  "screen": {
+   "w": 1080,
+   "h": 2220,
+   "density": 420,
+   "rotation": 0
+  },
+  "windows": [
+   {
+    "id": 177,
+    "type": "system",
+    "layer": 4,
+    "bounds": [
+     0,
+     2094,
+     1080,
+     2220
+    ],
+    "title": "Navigation bar",
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 1,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "id": "com.android.systemui:id/navigation_bar_frame",
+     "bounds": [
+      0,
+      2094,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 2,
+       "class": "android.widget.FrameLayout",
+       "bounds": [
+        0,
+        2094,
+        1080,
+        2220
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 3,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/recent_apps",
+         "desc": "Recents",
+         "bounds": [
+          118,
+          2094,
+          357,
+          2220
+         ],
+         "drawingOrder": 1,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 4,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/back",
+         "desc": "Back",
+         "bounds": [
+          723,
+          2094,
+          962,
+          2220
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "clickable",
+          "longClickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        },
+        {
+         "handle": 5,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/home",
+         "desc": "Home",
+         "bounds": [
+          420,
+          2094,
+          659,
+          2220
+         ],
+         "drawingOrder": 8,
+         "flags": [
+          "clickable",
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "click",
+          "long_click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 168,
+    "type": "type_-1",
+    "layer": 3,
+    "bounds": [
+     1038,
+     470,
+     1080,
+     899
+    ],
+    "pkg": "com.samsung.android.app.cocktailbarservice",
+    "root": {
+     "handle": 6,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.samsung.android.app.cocktailbarservice",
+     "bounds": [
+      1013,
+      470,
+      1080,
+      899
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 7,
+       "class": "android.widget.FrameLayout",
+       "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
+       "desc": "Edge panel handle",
+       "tooltip": "Edge panel handle",
+       "bounds": [
+        1069,
+        470,
+        1080,
+        899
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 8,
+       "class": "android.view.View",
+       "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
+       "bounds": [
+        1118,
+        470,
+        1080,
+        899
+       ],
+       "visible": false,
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 171,
+    "type": "system",
+    "layer": 2,
+    "bounds": [
+     0,
+     0,
+     1080,
+     63
+    ],
+    "pkg": "com.android.systemui",
+    "root": {
+     "handle": 9,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.android.systemui",
+     "bounds": [
+      0,
+      0,
+      1080,
+      63
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 10,
+       "class": "android.widget.FrameLayout",
+       "id": "com.android.systemui:id/status_bar",
+       "pane": "Status bar",
+       "bounds": [
+        0,
+        0,
+        1080,
+        63
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 11,
+         "class": "android.widget.TextView",
+         "id": "com.android.systemui:id/clock",
+         "text": "12:41",
+         "desc": "12:41",
+         "bounds": [
+          55,
+          0,
+          163,
+          63
+         ],
+         "drawingOrder": 2,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 12,
+         "class": "android.widget.ImageView",
+         "desc": "Android system notification: Certificate authority installed",
+         "bounds": [
+          163,
+          0,
+          213,
+          63
+         ],
+         "drawingOrder": 3,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 13,
+         "class": "android.widget.ImageView",
+         "desc": "Ringer silent.",
+         "bounds": [
+          865,
+          2,
+          903,
+          60
+         ],
+         "drawingOrder": 11,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 14,
+         "class": "android.widget.FrameLayout",
+         "id": "com.android.systemui:id/wifi_combo",
+         "desc": "Wi-Fi signal full.",
+         "bounds": [
+          903,
+          2,
+          957,
+          60
+         ],
+         "drawingOrder": 12,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 15,
+         "class": "android.widget.ImageView",
+         "id": "com.android.systemui:id/mobile_signal",
+         "desc": "Phone signal full.",
+         "bounds": [
+          957,
+          12,
+          996,
+          49
+         ],
+         "drawingOrder": 13,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        },
+        {
+         "handle": 16,
+         "class": "android.widget.LinearLayout",
+         "id": "com.android.systemui:id/battery",
+         "desc": "Battery charging, 100 percent.",
+         "bounds": [
+          1004,
+          0,
+          1025,
+          63
+         ],
+         "drawingOrder": 15,
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 174,
+    "type": "input_method",
+    "layer": 1,
+    "bounds": [
+     0,
+     1217,
+     1080,
+     2094
+    ],
+    "pkg": "com.sec.android.inputmethod",
+    "root": {
+     "handle": 17,
+     "class": "android.widget.FrameLayout",
+     "pkg": "com.sec.android.inputmethod",
+     "bounds": [
+      0,
+      63,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 18,
+       "class": "android.widget.ImageButton",
+       "id": "com.sec.android.inputmethod:id/toolbar_toggle",
+       "desc": "Show predictive text",
+       "tooltip": "Show predictive text",
+       "bounds": [
+        0,
+        1238,
+        123,
+        1346
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 19,
+       "class": "android.widget.RelativeLayout",
+       "id": "com.sec.android.inputmethod:id/tool_bar_page",
+       "desc": "Emojis",
+       "tooltip": "Emojis",
+       "bounds": [
+        126,
+        1238,
+        294,
+        1346
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focused",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 20,
+       "class": "android.widget.RelativeLayout",
+       "id": "com.sec.android.inputmethod:id/tool_bar_page",
+       "desc": "Stickers",
+       "tooltip": "Stickers",
+       "bounds": [
+        294,
+        1238,
+        462,
+        1346
+       ],
+       "drawingOrder": 3,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focused",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 21,
+       "class": "android.widget.RelativeLayout",
+       "id": "com.sec.android.inputmethod:id/tool_bar_page",
+       "desc": "GIF keyboard",
+       "tooltip": "GIF keyboard",
+       "bounds": [
+        462,
+        1238,
+        630,
+        1346
+       ],
+       "drawingOrder": 4,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focused",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 22,
+       "class": "android.widget.RelativeLayout",
+       "id": "com.sec.android.inputmethod:id/tool_bar_page",
+       "desc": "Voice input",
+       "tooltip": "Voice input",
+       "bounds": [
+        630,
+        1238,
+        798,
+        1346
+       ],
+       "drawingOrder": 5,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focused",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 23,
+       "class": "android.widget.RelativeLayout",
+       "id": "com.sec.android.inputmethod:id/tool_bar_page",
+       "desc": "Settings",
+       "tooltip": "Settings",
+       "bounds": [
+        798,
+        1238,
+        966,
+        1346
+       ],
+       "drawingOrder": 6,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focused",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 24,
+       "class": "android.widget.ImageButton",
+       "id": "com.sec.android.inputmethod:id/toolbar_expand",
+       "desc": "Expand toolbar",
+       "tooltip": "Expand toolbar",
+       "bounds": [
+        967,
+        1252,
+        1046,
+        1331
+       ],
+       "drawingOrder": 7,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 25,
+       "class": "android.widget.ImageButton",
+       "id": "com.sec.android.inputmethod:id/toolbar_toggle_button",
+       "desc": "Show toolbar functions",
+       "tooltip": "Show toolbar functions",
+       "bounds": [
+        1080,
+        1238,
+        1080,
+        1346
+       ],
+       "visible": false,
+       "drawingOrder": 9,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen",
+        "show_tooltip"
+       ]
+      },
+      {
+       "handle": 26,
+       "class": "android.widget.LinearLayout",
+       "id": "com.sec.android.inputmethod:id/expand_btn_layout",
+       "bounds": [
+        1206,
+        1238,
+        1080,
+        1346
+       ],
+       "visible": false,
+       "drawingOrder": 11,
+       "flags": [
+        "clickable",
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "click",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 27,
+         "class": "android.widget.ImageButton",
+         "id": "com.sec.android.inputmethod:id/expand_btn",
+         "desc": "Expand",
+         "tooltip": "Expand",
+         "bounds": [
+          1206,
+          1252,
+          1080,
+          1331
+         ],
+         "visible": false,
+         "drawingOrder": 1,
+         "flags": [
+          "focusable",
+          "enabled"
+         ],
+         "actions": [
+          "focus",
+          "select",
+          "clear_selection",
+          "set_selection",
+          "show_on_screen",
+          "show_tooltip"
+         ]
+        }
+       ]
+      },
+      {
+       "handle": 28,
+       "class": "bnl",
+       "id": "com.sec.android.inputmethod:id/candidate_layout",
+       "bounds": [
+        1206,
+        1238,
+        1080,
+        1346
+       ],
+       "visible": false,
+       "drawingOrder": 10,
+       "flags": [
+        "enabled",
+        "scrollable"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 29,
+       "class": "android.view.View",
+       "id": "com.sec.android.inputmethod:id/keyboardView",
+       "bounds": [
+        0,
+        1346,
+        1080,
+        2094
+       ],
+       "drawingOrder": 12,
+       "flags": [
+        "enabled"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "show_on_screen"
+       ],
+       "children": [
+        {
+         "handle": 30,
+         "class": "bkn$a",
+         "bounds": [
+          23,
+          1365,
+          111,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 31,
+         "class": "bkn$a",
+         "bounds": [
+          128,
+          1365,
+          216,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 32,
+         "class": "bkn$a",
+         "bounds": [
+          233,
+          1365,
+          321,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 33,
+         "class": "bkn$a",
+         "bounds": [
+          338,
+          1365,
+          426,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 34,
+         "class": "bkn$a",
+         "bounds": [
+          443,
+          1365,
+          531,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 35,
+         "class": "bkn$a",
+         "bounds": [
+          548,
+          1365,
+          636,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 36,
+         "class": "bkn$a",
+         "bounds": [
+          653,
+          1365,
+          741,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 37,
+         "class": "bkn$a",
+         "bounds": [
+          758,
+          1365,
+          846,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 38,
+         "class": "bkn$a",
+         "bounds": [
+          863,
+          1365,
+          951,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 39,
+         "class": "bkn$a",
+         "bounds": [
+          968,
+          1365,
+          1056,
+          1465
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 40,
+         "class": "bkn$a",
+         "bounds": [
+          23,
+          1485,
+          111,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 41,
+         "class": "bkn$a",
+         "bounds": [
+          128,
+          1485,
+          216,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 42,
+         "class": "bkn$a",
+         "bounds": [
+          233,
+          1485,
+          321,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 43,
+         "class": "bkn$a",
+         "bounds": [
+          338,
+          1485,
+          426,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 44,
+         "class": "bkn$a",
+         "bounds": [
+          443,
+          1485,
+          531,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 45,
+         "class": "bkn$a",
+         "bounds": [
+          548,
+          1485,
+          636,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 46,
+         "class": "bkn$a",
+         "bounds": [
+          653,
+          1485,
+          741,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 47,
+         "class": "bkn$a",
+         "bounds": [
+          758,
+          1485,
+          846,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 48,
+         "class": "bkn$a",
+         "bounds": [
+          863,
+          1485,
+          951,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 49,
+         "class": "bkn$a",
+         "bounds": [
+          968,
+          1485,
+          1056,
+          1612
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 50,
+         "class": "bkn$a",
+         "bounds": [
+          76,
+          1632,
+          164,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 51,
+         "class": "bkn$a",
+         "bounds": [
+          181,
+          1632,
+          269,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 52,
+         "class": "bkn$a",
+         "bounds": [
+          286,
+          1632,
+          374,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 53,
+         "class": "bkn$a",
+         "bounds": [
+          391,
+          1632,
+          479,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 54,
+         "class": "bkn$a",
+         "bounds": [
+          496,
+          1632,
+          584,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 55,
+         "class": "bkn$a",
+         "bounds": [
+          601,
+          1632,
+          689,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 56,
+         "class": "bkn$a",
+         "bounds": [
+          706,
+          1632,
+          794,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 57,
+         "class": "bkn$a",
+         "bounds": [
+          811,
+          1632,
+          899,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 58,
+         "class": "bkn$a",
+         "bounds": [
+          916,
+          1632,
+          1004,
+          1759
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 59,
+         "class": "bkn$a",
+         "bounds": [
+          23,
+          1779,
+          148,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 60,
+         "class": "bkn$a",
+         "bounds": [
+          181,
+          1779,
+          269,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 61,
+         "class": "bkn$a",
+         "bounds": [
+          286,
+          1779,
+          374,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 62,
+         "class": "bkn$a",
+         "bounds": [
+          391,
+          1779,
+          479,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 63,
+         "class": "bkn$a",
+         "bounds": [
+          496,
+          1779,
+          584,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 64,
+         "class": "bkn$a",
+         "bounds": [
+          601,
+          1779,
+          689,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 65,
+         "class": "bkn$a",
+         "bounds": [
+          706,
+          1779,
+          794,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 66,
+         "class": "bkn$a",
+         "bounds": [
+          811,
+          1779,
+          899,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 67,
+         "class": "bkn$a",
+         "bounds": [
+          932,
+          1779,
+          1057,
+          1906
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 68,
+         "class": "bkn$a",
+         "bounds": [
+          23,
+          1926,
+          164,
+          2053
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 69,
+         "class": "bkn$a",
+         "bounds": [
+          181,
+          1926,
+          269,
+          2053
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 70,
+         "class": "bkn$a",
+         "bounds": [
+          286,
+          1926,
+          794,
+          2053
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 71,
+         "class": "bkn$a",
+         "bounds": [
+          811,
+          1926,
+          899,
+          2053
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        },
+        {
+         "handle": 72,
+         "class": "bkn$a",
+         "bounds": [
+          916,
+          1926,
+          1057,
+          2053
+         ],
+         "flags": [
+          "enabled"
+         ],
+         "actions": [
+          "click"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 829,
+    "type": "application",
+    "layer": 0,
+    "bounds": [
+     0,
+     0,
+     1080,
+     2220
+    ],
+    "title": "s:under_keyboard",
+    "pkg": "dev.droidctl.testapp",
+    "active": true,
+    "focused": true,
+    "root": {
+     "handle": 73,
+     "class": "android.widget.FrameLayout",
+     "pkg": "dev.droidctl.testapp",
+     "bounds": [
+      0,
+      0,
+      1080,
+      2220
+     ],
+     "flags": [
+      "enabled"
+     ],
+     "actions": [
+      "select",
+      "clear_selection",
+      "show_on_screen"
+     ],
+     "children": [
+      {
+       "handle": 74,
+       "class": "android.widget.TextView",
+       "text": "Compose",
+       "bounds": [
+        42,
+        105,
+        1038,
+        211
+       ],
+       "drawingOrder": 1,
+       "flags": [
+        "enabled",
+        "heading"
+       ],
+       "actions": [
+        "select",
+        "clear_selection",
+        "set_selection",
+        "show_on_screen"
+       ]
+      },
+      {
+       "handle": 75,
+       "class": "android.widget.EditText",
+       "id": "dev.droidctl.testapp:id/message",
+       "text": "Message",
+       "hint": "Message",
+       "bounds": [
+        42,
+        211,
+        1038,
+        336
+       ],
+       "drawingOrder": 2,
+       "flags": [
+        "clickable",
+        "longClickable",
+        "focusable",
+        "focused",
+        "enabled",
+        "editable",
+        "showingHint"
+       ],
+       "actions": [
+        "clear_focus",
+        "select",
+        "clear_selection",
+        "click",
+        "long_click",
+        "paste",
+        "set_text",
+        "show_on_screen"
+       ],
+       "inputType": 131073
+      },
+      {
+       "handle": 76,
+       "class": "android.widget.Button",
+       "id": "dev.droidctl.testapp:id/submit",
+       "text": "Submit",
+       "bounds": [
+        0,
+        1926,
+        1080,
+        2094
+       ],
+       "visible": false,
+       "drawingOrder": 3,
+       "flags": [
+        "clickable",
+        "focusable",
+        "enabled"
+       ],
+       "actions": [
+        "focus",
+        "select",
+        "clear_selection",
+        "click",
+        "set_selection",
+        "show_on_screen"
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

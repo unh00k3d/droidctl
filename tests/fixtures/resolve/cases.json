@@ -1,0 +1,68 @@
+{
+ "about": "Resolver cases over REAL trees (tests/fixtures/resolve: test-app pairs from scripts/capture_resolve_pairs.py; tests/fixtures/trees: real apps). Language-neutral: a ref is picked in tree A by role/label (and ctx_has, a word in its context), resolved against tree B, and the outcome compared. result is 'ok' or an error kind; reason/direction/occluded/tier are checked when given.",
+ "pairs": [
+  {"name": "same screen, dumped twice", "a": "static_twice-a", "b": "static_twice-b", "all": "self"},
+  {"name": "rows heal by identity after a scroll", "a": "long_list_scroll-a", "b": "long_list_scroll-b", "expect": [
+   {"ref": {"role": "button", "label": "Row 4"}, "result": "ok", "to": {"label": "Row 4"}, "tier": 2},
+   {"ref": {"role": "button", "label": "Row 14"}, "result": "ok", "to": {"label": "Row 14"}, "tier": 2},
+   {"ref": {"role": "list"}, "result": "ok", "to": {"role": "list"}},
+   {"ref": {"role": "button", "label": "Row 1"}, "result": "stale-ref", "reason": "occupied"}
+  ]},
+  {"name": "a row inserted at the top: refs follow identity, never the index", "a": "list_insert_top-a", "b": "list_insert_top-b", "expect": [
+   {"ref": {"role": "button", "label": "Item 1"}, "result": "ok", "to": {"label": "Item 1"}, "tier": 2},
+   {"ref": {"role": "button", "label": "Item 5"}, "result": "ok", "to": {"label": "Item 5"}, "tier": 2},
+   {"ref": {"role": "button", "label": "Item 10"}, "result": "ok", "to": {"label": "Item 10"}, "tier": 2}
+  ]},
+  {"name": "identical Delete buttons resolve through their row", "a": "duplicates_scroll-a", "b": "duplicates_scroll-b", "expect": [
+   {"ref": {"role": "button", "label": "Delete", "ctx_has": "Item 7"}, "result": "ok", "to": {"label": "Delete", "ctx_has": "Item 7"}, "tier": 2},
+   {"ref": {"role": "button", "label": "Delete", "ctx_has": "Item 12"}, "result": "ok", "to": {"label": "Delete", "ctx_has": "Item 12"}, "tier": 2},
+   {"ref": {"role": "text", "label": "Item 1"}, "result": "offscreen", "direction": "up"},
+   {"ref": {"role": "heading", "label": "Items"}, "result": "offscreen", "direction": "up"},
+   {"ref": {"role": "button", "label": "Delete", "ctx_has": "Item 1"}, "result": "stale-ref"}
+  ]},
+  {"name": "a look-alike OK on the next screen is not the same OK", "a": "lookalike_ok-a", "b": "lookalike_ok-b", "expect": [
+   {"ref": {"role": "button", "label": "OK"}, "result": "stale-ref", "reason": "occupied"},
+   {"ref": {"role": "text", "label": "Confirm your order?"}, "result": "stale-ref"}
+  ]},
+  {"name": "a changed quantity heals in its own row, never another row's", "a": "cart_inc-a", "b": "cart_inc-b", "expect": [
+   {"ref": {"role": "text", "label": "1", "ctx_has": "Wireless Mouse"}, "result": "ok", "to": {"label": "2", "ctx_has": "Wireless Mouse"}, "tier": 4},
+   {"ref": {"role": "text", "label": "1", "ctx_has": "Laptop Stand"}, "result": "ok", "to": {"label": "1", "ctx_has": "Laptop Stand"}},
+   {"ref": {"role": "button", "label": "+", "ctx_has": "Wireless Mouse"}, "result": "ok", "to": {"label": "+", "ctx_has": "Wireless Mouse"}},
+   {"ref": {"role": "button", "label": "−", "ctx_has": "USB-C Cable"}, "result": "ok", "to": {"label": "−", "ctx_has": "USB-C Cable"}},
+   {"ref": {"role": "text", "label": "Wireless Mouse"}, "result": "ok", "to": {"label": "Wireless Mouse"}},
+   {"ref": {"role": "text", "label": "$24.99"}, "result": "ok", "to": {"label": "$24.99"}},
+   {"ref": {"role": "button", "label": "Checkout"}, "result": "ok", "to": {"label": "Checkout"}, "tier": 2}
+  ]},
+  {"name": "refs heal after a drag reorder", "a": "drag_reorder-a", "b": "drag_reorder-b", "expect": [
+   {"ref": {"role": "text", "label": "Task 1"}, "result": "ok", "to": {"label": "Task 1"}, "tier": 2, "moved_min": 150},
+   {"ref": {"role": "button", "label": "Drag handle", "ctx_has": "Task 1"}, "result": "ok", "to": {"label": "Drag handle", "ctx_has": "Task 1"}, "tier": 2},
+   {"ref": {"role": "text", "label": "Task 2"}, "result": "ok", "to": {"label": "Task 2"}, "tier": 2},
+   {"ref": {"role": "text", "label": "Task 5"}, "result": "ok", "to": {"label": "Task 5"}, "tier": 2, "moved_max": 0}
+  ]},
+  {"name": "a button under the keyboard still resolves, flagged occluded", "a": "under_keyboard-a", "b": "under_keyboard-b", "expect": [
+   {"ref": {"role": "button", "label": "Submit"}, "result": "ok", "to": {"label": "Submit"}, "occluded": "keyboard",
+    "methods": {"auto": "ok", "action": "ok", "gesture": "occluded"}},
+   {"ref": {"role": "heading", "label": "Compose"}, "result": "ok", "to": {"label": "Compose"}, "tier": 2}
+  ]},
+  {"name": "Settings: a different page is a different screen", "a": "real-settings-main", "b": "real-settings-display", "all": "stale-ref"},
+  {"name": "Settings: display page vs screen-timeout page", "a": "real-settings-display", "b": "real-settings-screen-timeout", "all": "stale-ref"},
+  {"name": "Settings: main vs search with the keyboard", "a": "real-settings-main", "b": "real-settings-search-keyboard", "all": "stale-ref"},
+  {"name": "launcher: the icon popup hides the home screen", "a": "real-launcher-home", "b": "real-launcher-icon-popup", "all": "stale-ref"},
+  {"name": "sahibinden: splash vs home", "a": "real-sahibinden-home", "b": "real-sahibinden-splash", "all": "stale-ref"}
+ ],
+ "locators": [
+  {"name": "a bare text that repeats is ambiguous", "tree": "duplicates_scroll-b", "find": {"text": "Delete"}, "result": "ambiguous"},
+  {"name": "a spatial locator picks the row", "tree": "duplicates_scroll-b", "find": {"text": "Delete", "right_of": "Item 7"}, "result": "ok", "to": {"label": "Delete", "ctx_has": "Item 7"}},
+  {"name": "the + right of a product", "tree": "cart_inc-a", "find": {"text": "+", "right_of": "Wireless Mouse"}, "result": "ok", "to": {"label": "+", "ctx_has": "Wireless Mouse"}},
+  {"name": "two buttons right of a product: ambiguous, not the nearest", "tree": "cart_inc-a", "find": {"role": "button", "right_of": "Wireless Mouse"}, "result": "ambiguous"},
+  {"name": "--index picks explicitly", "tree": "cart_inc-a", "find": {"text": "+", "index": 1}, "result": "ok", "to": {"label": "+", "ctx_has": "USB-C Cable"}},
+  {"name": "--id matches the short resource id", "tree": "cart_inc-a", "find": {"id": "checkout"}, "result": "ok", "to": {"label": "Checkout"}},
+  {"name": "an element scrolled out of its viewport is offscreen", "tree": "partial-a", "find": {"text": "Offscreen"}, "result": "offscreen", "direction": "down"},
+  {"name": "a view drawn over the button: occluded unless --method action", "tree": "overlay_blocker-a", "find": {"text": "Buy"}, "result": "ok", "to": {"label": "Buy"}, "occluded": "view",
+   "methods": {"auto": "occluded", "action": "ok", "gesture": "occluded"}},
+  {"name": "under the keyboard by locator", "tree": "under_keyboard-b", "find": {"text": "Submit"}, "result": "ok", "occluded": "keyboard"},
+  {"name": "nothing matches", "tree": "cart_inc-a", "find": {"text": "Wishlist"}, "result": "not-found"},
+  {"name": "a text on a real Samsung Settings screen", "tree": "real-settings-main", "find": {"text": "Display"}, "result": "ok", "to": {"role": "row"}},
+  {"name": "a real Compose search field by hint", "tree": "real-sahibinden-home", "find": {"role": "input"}, "result": "ok", "to": {"role": "input"}}
+ ]
+}
