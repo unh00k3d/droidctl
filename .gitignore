@@ -19,3 +19,6 @@ captures/
 # droidctl runtime / benchmarks
 bench/results/*.tmp
 *.log
+
+# built agent APK (whether to commit or bundle it is decided in M8)
+droidctl/assets/*.apk
