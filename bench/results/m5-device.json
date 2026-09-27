@@ -1,0 +1,140 @@
+{
+  "date": "2026-09-27",
+  "device": "SM-N950F",
+  "sdk": 28,
+  "agent": "0.2.0",
+  "transport": "usb-passthrough-vm",
+  "note": "settle = wait for the first event after the action (first_ms 600), then quiet 150 ms",
+  "counter_act_settle": {
+    "host_ms": {
+      "n": 10,
+      "min": 287.6,
+      "median": 321.4,
+      "p95": 355.6,
+      "max": 355.6
+    },
+    "settle_ms": {
+      "n": 10,
+      "min": 209,
+      "median": 237.0,
+      "p95": 258,
+      "max": 258
+    },
+    "perform_ms": {
+      "n": 10,
+      "min": 4,
+      "median": 16.0,
+      "p95": 25,
+      "max": 25
+    },
+    "first_event_ms": {
+      "n": 10,
+      "min": 56,
+      "median": 77.5,
+      "p95": 90,
+      "max": 90
+    },
+    "clicked_event": "10/10",
+    "tree_shows": "Count: 10",
+    "dta_clicks": 10,
+    "dta_last_n": 10
+  },
+  "counter_act_no_settle": {
+    "host_ms_incl_click_event_wait": {
+      "n": 10,
+      "min": 92.4,
+      "median": 100.9,
+      "p95": 119.6,
+      "max": 119.6
+    },
+    "clicked_event": "10/10"
+  },
+  "gesture_tap_center": {
+    "point": [
+      540,
+      371
+    ],
+    "bounds": [
+      42,
+      308,
+      1038,
+      434
+    ],
+    "gesture_ms": {
+      "n": 5,
+      "min": 64,
+      "median": 65,
+      "p95": 68,
+      "max": 68
+    },
+    "dta_clicks": "5/5"
+  },
+  "settings_nav_act_settle": {
+    "host_ms": {
+      "n": 5,
+      "min": 875.7,
+      "median": 876.7,
+      "p95": 894.2,
+      "max": 894.2
+    },
+    "settle_ms": {
+      "n": 5,
+      "min": 787,
+      "median": 791,
+      "p95": 798,
+      "max": 798
+    },
+    "perform_ms": {
+      "n": 5,
+      "min": 45,
+      "median": 51,
+      "p95": 53,
+      "max": 53
+    },
+    "first_event_ms": {
+      "n": 5,
+      "min": 305,
+      "median": 309,
+      "p95": 319,
+      "max": 319
+    },
+    "new_page_in_settled_tree": "5/5",
+    "tree_dump_ms": {
+      "n": 5,
+      "min": 67,
+      "median": 71,
+      "p95": 77,
+      "max": 77
+    }
+  },
+  "wait_idle": {
+    "host_ms_on_idle_screen": {
+      "n": 10,
+      "min": 5.7,
+      "median": 7.4,
+      "p95": 11.2,
+      "max": 11.2
+    }
+  },
+  "toast": {
+    "toast_seen": true,
+    "text": "Saved!",
+    "wait_ms": 6,
+    "clicked_event": true
+  },
+  "ime": {
+    "keyboard_shown_after_click": true,
+    "keyboard_hidden_after_back": true,
+    "ime_events": [
+      true,
+      false
+    ]
+  },
+  "subscribe": {
+    "pushed": [
+      "window_content",
+      "clicked"
+    ],
+    "clicked_pushed": true
+  }
+}

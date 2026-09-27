@@ -22,9 +22,25 @@ object Codes {
     const val INTERNAL = -32603
     const val UNAUTHORIZED = -32001
     const val STALE = -32002
+    const val GONE = -32003
+    const val DISABLED = -32004
+    const val NOT_VISIBLE = -32005
+    const val UNSUPPORTED = -32006
+    const val TIMEOUT = -32007
+    const val SECURE_WINDOW = -32008
+    const val CANCELLED = -32009
 }
 
 class RpcError(val code: Int, message: String) : Exception(message)
+
+/** One client connection: who it is, and a way to push notifications to it. */
+class Conn(val uid: Int, private val out: OutputStream) {
+    /** Writes a JSON-RPC notification; false once the peer is gone. */
+    fun notify(method: String, params: JSONObject): Boolean = try {
+        Server.write(out, JSONObject().put("jsonrpc", "2.0").put("method", method).put("params", params))
+        true
+    } catch (_: IOException) { false }
+}
 
 /**
  * NDJSON JSON-RPC 2.0 over the abstract unix socket "droidctl".
@@ -37,6 +53,17 @@ class Server(private val rpc: Rpc) {
         const val SOCKET_NAME = "droidctl"
         const val MAX_LINE = 1 shl 20
         val ALLOWED_UIDS = setOf(2000, 0)
+
+        /** Every write to a connection goes through here, so replies and pushed events never interleave. */
+        fun write(out: OutputStream, obj: JSONObject) {
+            val bytes = (obj.toString() + "\n").toByteArray(Charsets.UTF_8)
+            // No flush(): LocalSocket's stream is unbuffered, and its flush() polls the
+            // socket's send queue (SIOCOUTQ) with ~10 ms sleeps until adbd drains it.
+            // Measured on the SM-N950F: +10.6 ms per reply (bench/results/m1-rtt.json).
+            synchronized(out) {
+                out.write(bytes)
+            }
+        }
     }
 
     @Volatile private var stopping = false
@@ -92,6 +119,7 @@ class Server(private val rpc: Rpc) {
 
     private fun serve(sock: LocalSocket) {
         clients.add(sock)
+        var conn: Conn? = null
         try {
             val uid = sock.peerCredentials.uid
             val out = sock.outputStream
@@ -100,6 +128,7 @@ class Server(private val rpc: Rpc) {
                 write(out, error(null, Codes.UNAUTHORIZED, "unauthorized uid $uid"))
                 return
             }
+            conn = Conn(uid, out)
             val input = sock.inputStream.buffered()
             while (!stopping) {
                 val line = try { readLine(input) } catch (e: LineTooLong) {
@@ -107,7 +136,7 @@ class Server(private val rpc: Rpc) {
                     continue
                 } ?: break
                 if (line.isBlank()) continue
-                val reply = handle(line, uid) ?: continue
+                val reply = handle(line, conn) ?: continue
                 write(out, reply)
             }
         } catch (e: IOException) {
@@ -115,13 +144,14 @@ class Server(private val rpc: Rpc) {
         } catch (e: Exception) {
             Log.e(TAG, "connection crashed", e)
         } finally {
+            conn?.let { rpc.closed(it) }
             clients.remove(sock)
             try { sock.close() } catch (_: Exception) {}
         }
     }
 
     /** Returns the reply line, or null for a notification (no id). */
-    private fun handle(line: String, uid: Int): JSONObject? {
+    private fun handle(line: String, conn: Conn): JSONObject? {
         val req = try { JSONObject(line) } catch (e: JSONException) {
             return error(null, Codes.PARSE, "parse error: ${e.message}")
         }
@@ -136,7 +166,7 @@ class Server(private val rpc: Rpc) {
             return if (hasId) error(id, Codes.INVALID_PARAMS, "params must be an object") else null
         }
         val result = try {
-            rpc.call(method, params as? JSONObject ?: JSONObject(), Rpc.Ctx(uid))
+            rpc.call(method, params as? JSONObject ?: JSONObject(), conn)
         } catch (e: RpcError) {
             return if (hasId) error(id, e.code, e.message ?: "") else null
         } catch (e: Throwable) {
@@ -151,15 +181,6 @@ class Server(private val rpc: Rpc) {
         JSONObject().put("jsonrpc", "2.0").put("id", id ?: JSONObject.NULL)
             .put("error", JSONObject().put("code", code).put("message", message))
 
-    private fun write(out: OutputStream, obj: JSONObject) {
-        val bytes = (obj.toString() + "\n").toByteArray(Charsets.UTF_8)
-        // No flush(): LocalSocket's stream is unbuffered, and its flush() polls the
-        // socket's send queue (SIOCOUTQ) with ~10 ms sleeps until adbd drains it.
-        // Measured on the SM-N950F: +10.6 ms per reply (bench/results/m1-rtt.json).
-        synchronized(out) {
-            out.write(bytes)
-        }
-    }
 
     private class LineTooLong : IOException()
 

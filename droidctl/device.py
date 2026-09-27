@@ -6,6 +6,7 @@ directly for `host:devices` and `host:list-forward`, so `adbutils` (and the
 requests/PIL it drags in, ~150 ms) loads only for setup-type work: shell,
 install, creating or removing a forward.
 """
+import collections
 import json
 import os
 import re
@@ -18,11 +19,11 @@ PKG = "dev.droidctl.agent"
 SERVICE_CLASS = "dev.droidctl.agent.AgentService"
 COMPONENT = f"{PKG}/.AgentService"            # the short form we write to settings
 REMOTE = "localabstract:droidctl"
-PROTOCOL = 1
+PROTOCOL = 2
 # The versionCode of the APK bundled in droidctl/assets. It has to match the
 # agent's build.gradle.kts (a unit test checks); setup compares it with what
 # the phone reports so an unchanged agent is not reinstalled.
-AGENT_VERSION_CODE = 1
+AGENT_VERSION_CODE = 2
 APK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "droidctl-agent.apk")
 DEVICE_TMP_APK = "/data/local/tmp/droidctl-agent.apk"
 
@@ -250,18 +251,50 @@ def a11y_enabled(d):
 # --------------------------------------------------------------------------
 # the agent socket: NDJSON JSON-RPC 2.0 (stdlib only)
 # --------------------------------------------------------------------------
+# Device JSON-RPC error codes (PROTOCOL.md "Errors") -> (error.kind, message prefix)
+DEVICE_ERRORS = {
+    -32001: ("device", "the agent refused this connection"),
+    -32002: ("stale-ref", "stale dump"),
+    -32003: ("stale-ref", "gone"),
+    -32004: ("disabled", "disabled"),
+    -32005: ("offscreen", "not visible"),
+    -32006: ("unsupported", "unsupported"),
+    -32007: ("timeout", "timed out"),
+    -32008: ("secure-window", "secure window"),
+    -32009: ("device", "gesture cancelled"),
+}
+
+
 class AgentClient:
-    """One persistent connection to the on-device agent, good for many calls."""
+    """One persistent connection to the on-device agent, good for many calls.
+
+    Pushed notifications (after `subscribe`) are queued while waiting for a reply
+    and handed out by `notifications()`.
+    """
 
     def __init__(self, port, host="127.0.0.1", timeout=5.0):
         self.port = port
         self._id = 0
+        self._notes = collections.deque(maxlen=5000)
         try:
             self._sock = socket.create_connection((host, port), timeout=timeout)
         except OSError as e:
             raise UserError(f"nothing listening on tcp:{port}: {e}", "connection")
         self._sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self._r = self._sock.makefile("rb")
+
+    def _read(self, method, timeout):
+        self._sock.settimeout(timeout)
+        line = self._r.readline()
+        if not line:
+            # adb accepts the forwarded connect even when nothing listens
+            # on the device, then closes it: EOF here means no agent
+            raise UserError("the agent closed the connection before replying "
+                            "(service not running?)", "connection")
+        try:
+            return json.loads(line)
+        except ValueError:
+            raise UserError(f"the agent sent invalid JSON: {line[:200]!r}", "device")
 
     def call(self, method, params=None, timeout=10.0):
         self._id += 1
@@ -272,34 +305,97 @@ class AgentClient:
             self._sock.settimeout(timeout)
             self._sock.sendall(json.dumps(req, separators=(",", ":")).encode() + b"\n")
             while True:
-                line = self._r.readline()
-                if not line:
-                    # adb accepts the forwarded connect even when nothing listens
-                    # on the device, then closes it: EOF here means no agent
-                    raise UserError("the agent closed the connection before replying "
-                                    "(service not running?)", "connection")
-                try:
-                    msg = json.loads(line)
-                except ValueError:
-                    raise UserError(f"the agent sent invalid JSON: {line[:200]!r}", "device")
+                msg = self._read(method, timeout)
                 if "id" not in msg:
-                    continue                      # a notification; not ours to answer
+                    self._notes.append(msg)       # a pushed event; keep it for notifications()
+                    continue
                 if msg["id"] is not None and msg["id"] != self._id:
                     continue                      # a late reply to an older request
                 if "error" in msg:
-                    e = msg["error"] or {}
-                    code = e.get("code")
-                    text = e.get("message", "unknown error")
-                    if code == -32001:
-                        raise UserError(f"the agent refused this connection: {text}", "device")
-                    if code == -32002:
-                        raise UserError(f"{method}: {text}", "stale-ref")
-                    raise UserError(f"{method}: {text} (code {code})", "device")
+                    raise error_from(method, msg["error"] or {})
                 return msg.get("result")
         except socket.timeout:
             raise UserError(f"{method}: no reply within {timeout:g}s", "timeout")
         except (ConnectionError, OSError) as e:
             raise UserError(f"{method}: connection lost: {e}", "connection")
+
+    def notifications(self, timeout=1.0):
+        """Yield pushed notification params until `timeout` passes with none."""
+        while True:
+            while self._notes:
+                yield self._notes.popleft().get("params")
+            try:
+                msg = self._read("notification", timeout)
+            except socket.timeout:
+                return
+            except (ConnectionError, OSError) as e:
+                raise UserError(f"connection lost: {e}", "connection")
+            if "id" not in msg:
+                yield msg.get("params")
+
+    # -- typed wrappers (PROTOCOL.md). Timeouts cover the device-side wait plus slack.
+    def ping(self):
+        return self.call("ping")
+
+    def tree(self, not_important=False, timeout=10.0):
+        return self.call("tree", {"not_important": not_important}, timeout=timeout)
+
+    def act(self, dump, handle, action=None, custom=None, args=None, settle=None,
+            force=False, event_ms=None):
+        p = {"dump": dump, "handle": handle}
+        if custom is not None:
+            p["custom"] = custom
+        else:
+            p["action"] = action
+        if args:
+            p["args"] = args
+        if settle is not None:
+            p["settle"] = settle
+        if force:
+            p["force"] = True
+        if event_ms is not None:
+            p["event_ms"] = event_ms
+        return self.call("act", p, timeout=_settle_budget(settle))
+
+    def gesture(self, type, points, ms=None, settle=None):
+        p = {"type": type, "points": [list(map(int, pt)) for pt in points]}
+        if ms is not None:
+            p["ms"] = ms
+        if settle is not None:
+            p["settle"] = settle
+        return self.call("gesture", p, timeout=_settle_budget(settle) + (ms or 0) / 1000)
+
+    def global_action(self, name, settle=None):
+        p = {"name": name}
+        if settle is not None:
+            p["settle"] = settle
+        return self.call("global", p, timeout=_settle_budget(settle))
+
+    def events(self, since=0, limit=None):
+        p = {"since": since}
+        if limit:
+            p["limit"] = limit
+        return self.call("events", p)
+
+    def wait_idle(self, quiet_ms=150, timeout_ms=2000):
+        return self.call("wait_idle", {"quiet_ms": quiet_ms, "timeout_ms": timeout_ms},
+                         timeout=timeout_ms / 1000 + 5)
+
+    def wait_for(self, timeout_ms=5000, **cond):
+        cond = {k: v for k, v in cond.items() if v is not None}
+        return self.call("wait_for", dict(cond, timeout_ms=timeout_ms), timeout=timeout_ms / 1000 + 5)
+
+    def current(self):
+        return self.call("current")
+
+    def clipboard(self, set=None):
+        return self.call("clipboard", {} if set is None else {"set": set})
+
+    def subscribe(self, events=None):
+        return self.call("subscribe", {"events": list(events)} if events else {})
+
+    def unsubscribe(self):
+        return self.call("unsubscribe")
 
     def close(self):
         try:
@@ -313,6 +409,77 @@ class AgentClient:
 
     def __exit__(self, *exc):
         self.close()
+
+
+def error_from(method, err):
+    """A device JSON-RPC error object -> UserError with the right error.kind."""
+    code = err.get("code")
+    text = err.get("message", "unknown error")
+    kind, _ = DEVICE_ERRORS.get(code, ("device", ""))
+    if code == -32001:
+        return UserError(f"the agent refused this connection: {text}", kind)
+    if code in DEVICE_ERRORS:
+        return UserError(f"{method}: {text}", kind)
+    return UserError(f"{method}: {text} (code {code})", kind)
+
+
+def _settle_budget(settle):
+    """Seconds to wait for a reply that may include a device-side settle and a tree dump."""
+    t = 5.0
+    if settle:
+        t += settle.get("timeout_ms", 2000) / 1000 + 3.0   # + the tree dump's 2 s budget
+    return t
+
+
+def screenshot(client, serial, scale=0.5, quality=70, crop=None):
+    """A downscaled JPEG: the agent's takeScreenshot (API 30+), else `adb exec-out screencap`.
+
+    -> {format, w, h, scale, data (base64), source}. FLAG_SECURE raises secure-window
+    from the agent; screencap of a secure window comes back black (not detectable here).
+    """
+    p = {"scale": scale, "quality": quality}
+    if crop:
+        p["crop"] = list(crop)
+    try:
+        r = client.call("screenshot", p, timeout=10.0)
+        r["source"] = "agent"
+        return r
+    except UserError as e:
+        if e.kind != "unsupported":
+            raise
+    return screencap_jpeg(serial, scale, quality, crop)
+
+
+def screencap_jpeg(serial, scale=0.5, quality=70, crop=None):
+    import base64
+    import io
+    import subprocess
+    try:
+        png = subprocess.run([adb_path(), "-s", serial, "exec-out", "screencap", "-p"],
+                             capture_output=True, timeout=15, check=True).stdout
+    except (subprocess.SubprocessError, OSError) as e:
+        raise UserError(f"screencap failed: {e}", "adb")
+    try:
+        from PIL import Image
+    except ImportError:
+        raise UserError("Pillow is needed for screenshots on API < 30", "missing-dep",
+                        hint="pip install pillow")
+    img = Image.open(io.BytesIO(png)).convert("RGB")
+    if crop:
+        img = img.crop(tuple(crop))
+    if scale != 1:
+        img = img.resize((max(1, int(img.width * scale)), max(1, int(img.height * scale))))
+    buf = io.BytesIO()
+    img.save(buf, "JPEG", quality=quality)
+    return {"format": "jpeg", "w": img.width, "h": img.height, "scale": scale,
+            "data": base64.b64encode(buf.getvalue()).decode(), "source": "screencap"}
+
+
+def adb_path():
+    """The SDK's adb when ANDROID_HOME points at one, else whatever is on PATH."""
+    home = os.environ.get("ANDROID_HOME") or os.path.expanduser("~/Android/Sdk")
+    cand = os.path.join(home, "platform-tools", "adb")
+    return cand if os.path.exists(cand) else "adb"
 
 
 def diagnose(serial):

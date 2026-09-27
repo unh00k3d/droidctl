@@ -24,7 +24,7 @@ class Tree(private val svc: AccessibilityService) {
         const val MAX_DEPTH = 120
 
         /** Standard action ids -> names. Anything not here with a label is a custom action. */
-        private val STANDARD: Map<Int, String> = buildMap {
+        val STANDARD: Map<Int, String> = buildMap {
             put(AccessibilityNodeInfo.ACTION_FOCUS, "focus")
             put(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS, "clear_focus")
             put(AccessibilityNodeInfo.ACTION_SELECT, "select")

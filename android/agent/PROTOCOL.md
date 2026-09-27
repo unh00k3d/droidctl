@@ -1,4 +1,4 @@
-# droidctl agent protocol (v1)
+# droidctl agent protocol (v2)
 
 The language-neutral contract between a host and the on-device agent
 (`dev.droidctl.agent`). Any client (the Python host, a future Go client, a test)
@@ -36,7 +36,10 @@ that follows this document can drive the agent.
 - Response: `{"jsonrpc":"2.0","id":<same>,"result":{...}}` or
   `{"jsonrpc":"2.0","id":<same>,"error":{"code":<int>,"message":"<text>"}}`.
 - A request without `id` is a **notification** and gets no reply (not even an error).
-- Server-pushed notifications (events) are reserved for a later version (`subscribe`).
+- Server-pushed notifications: after `subscribe`, the agent writes
+  `{"jsonrpc":"2.0","method":"event","params":<event>}` lines on that connection,
+  interleaved with replies (never inside one: writes are serialized per connection).
+  A client must accept a notification while waiting for a reply.
 
 ### Error codes
 | code | meaning |
@@ -48,6 +51,17 @@ that follows this document can drive the agent.
 | -32603 | internal error; `message` is the exception text. The service itself never crashes |
 | -32001 | unauthorized peer uid |
 | -32002 | stale: the request names a dump that is no longer the latest (handles are only valid for the latest dump) |
+| -32003 | gone: the handle's node no longer exists (`refresh()` failed) |
+| -32004 | disabled: the node is not enabled (bypass with `force`) |
+| -32005 | not visible: the node is not visible to the user (bypass with `force`; scroll/show_on_screen/focus are exempt) |
+| -32006 | unsupported: not available on this API level, or no such (custom) action on the node |
+| -32007 | timeout: a wait (`wait_for`, gesture completion, screenshot) ran out |
+| -32008 | secure window: a FLAG_SECURE window blocks the screenshot |
+| -32009 | cancelled: the system refused or cancelled a gesture |
+
+Host mapping (droidctl `error.kind`): -32002/-32003 → `stale-ref`, -32004 → `disabled`,
+-32005 → `offscreen`, -32006 → `unsupported`, -32007 → `timeout`, -32008 →
+`secure-window`, everything else → `device`.
 
 ## Methods
 
@@ -56,7 +70,7 @@ Params: none (ignored). Result:
 
 | field | type | meaning |
 |---|---|---|
-| `protocol` | int | protocol version; this document is `1` |
+| `protocol` | int | protocol version; this document is `2` |
 | `version` | string | agent `versionName` |
 | `versionCode` | int | agent `versionCode`; the host upgrades the APK when it differs from the bundled one |
 | `sdk` | int | `Build.VERSION.SDK_INT` |
@@ -71,7 +85,7 @@ Params: none (ignored). Result:
 Example (illustrative values):
 ```
 → {"jsonrpc":"2.0","id":1,"method":"ping"}
-← {"jsonrpc":"2.0","id":1,"result":{"protocol":1,"version":"0.1.0","versionCode":1,"sdk":28,"release":"9","manufacturer":"samsung","model":"SM-N950F","device":"greatlte","screen":{"w":1080,"h":2220,"density":420,"rotation":0},"service":{"connected":true},"gen":0,"peer_uid":2000,"uptime_ms":123456789}}
+← {"jsonrpc":"2.0","id":1,"result":{"protocol":2,"version":"0.2.0","versionCode":2,"sdk":28,"release":"9","manufacturer":"samsung","model":"SM-N950F","device":"greatlte","screen":{"w":1080,"h":2220,"density":420,"rotation":0},"service":{"connected":true},"gen":0,"peer_uid":2000,"uptime_ms":123456789}}
 ```
 
 ### `echo`
@@ -166,8 +180,128 @@ Measured (SM-N950F, API 28): 40–70 ms device time for 50–240 nodes steady st
 first dump after the service binds or after an app transition is slower (100–900 ms);
 a Settings app list that was still loading exceeded the 2 s budget once.
 
+
+### Settle (shared by `act`, `gesture`, `global`)
+`settle: {quiet_ms=150, first_ms=600, timeout_ms=2000, tree=true, not_important=false}`.
+Accessibility events reach the agent with a lag, so a quiet window counted from the
+action would end before anything is reported. The agent therefore waits up to
+`first_ms` for the **first event** after the action (none → nothing happened, idle),
+then until no event has arrived for `quiet_ms`; `timeout_ms` caps the whole wait.
+Result fields: `idle` (false = the cap was hit while the screen kept changing),
+`settle_ms`, `t0` (uptime ms when the action started; compare with event `t`), and,
+unless `tree:false`, `tree` (the same object `tree` returns; it is the new latest dump,
+so the previous dump's handles become stale).
+
+Measured on the SM-N950F (API 28, `bench/results/m5-device.json`): the first event
+after a click arrives 75–100 ms later for an in-place change and ~300 ms later for an
+activity launch; a toast-showing button ~200 ms.
+
+### `act`
+`{dump, handle, action | custom, args?, settle?, force?, event_ms=600}` →
+`{performed, action, perform_ms, t0, clicked_event?, available?, idle?, settle_ms?, tree?, events}`
+
+- `action`: a standard name as reported in `tree` (`click`, `long_click`, `focus`,
+  `clear_focus`, `select`, `clear_selection`, `scroll_forward`, `scroll_backward`,
+  `scroll_up/down/left/right`, `scroll_to_position` (`args {row, col}`), `set_text`
+  (`args {text}`), `set_selection` (`args {start, end}`), `set_progress`
+  (`args {value}`), `expand`, `collapse`, `dismiss`, `copy`, `paste`, `cut`,
+  `show_on_screen`, `context_click`, `ime_enter` (API 30+; else -32006), …).
+- `custom`: a custom action's label (case-insensitive) or id.
+- The node is `refresh()`ed first (-32003 if gone), then checked enabled (-32004) and
+  visible (-32005) unless `force`.
+- `performed:false` is a result, not an error, and comes with `available` (the node's
+  action names/labels). No settle happens then.
+- `clicked_event` (click/long_click only): whether a `TYPE_VIEW_CLICKED`
+  (`TYPE_VIEW_LONG_CLICKED`) from **this node** arrived. Without `settle` the agent waits
+  up to `event_ms` for it, returning as soon as it arrives. The host's tap fallback
+  depends on this, so it is matched by node identity, falling back to window id + bounds.
+- `events`: the events seen from the action until the reply (≤ 50).
+
+### `gesture`
+`{type, points:[[x,y],…], ms?, settle?}` → `{performed, type, ms, idle?, settle_ms?, tree?, events}`
+
+Device pixels (the same space as `bounds`, verified under a `wm size` override).
+`tap` (1 point, 60 ms), `long` (1 point, 800 ms), `double` (1 point, 2×50 ms, 100 ms
+apart), `swipe` (2 points, 300 ms), `path` (≥2 points, 500 ms), `pinch` (4 points: two
+simultaneous strokes p0→p1 and p2→p3, 400 ms). Blocks until the system's completion
+callback; cancelled → -32009.
+
+### `global`
+`{name, settle?}` → `{performed, name, idle?, settle_ms?, tree?, events}`. Names:
+`back`, `home`, `recents`, `notifications`, `quick_settings`, `power_dialog`, `split`,
+`lock` (28+), `screenshot` (28+).
+
+### Events
+Every event: `{seq, t (uptime ms), gen, type, pkg?, …}`. Types:
+
+| type | extra fields |
+|---|---|
+| `clicked`, `long_clicked` | `class`, `text`, `desc`, `window`, `bounds` |
+| `focused`, `selected` | `class`, `text`, `desc` |
+| `text_changed` | `class`, `text` (omitted for passwords), `added`, `removed` |
+| `window_state` | `class` (activity or dialog class), `title`, `changes` |
+| `window_content`, `windows_changed`, `scrolled` | compacted: bursts from one package within 250 ms become one event with `n` and `t_last` |
+| `toast` | `text` |
+| `notification` | `text` |
+| `announcement` | `text` |
+| `ime` | `shown` (the input-method window appeared/disappeared) |
+
+The ring keeps the last 500. Compaction mutates the newest entry in place, so a
+client that already read it will not see later `n` increments.
+
+### `events`
+`{since=0, limit?}` → `{events:[…], next}`: events with `seq > since`, oldest first;
+`next` is the latest seq (pass it as `since` next time).
+
+### `subscribe` / `unsubscribe`
+`{events?:[types]}` (absent or empty = all) → `{subscribed, next}`. Matching events are
+pushed as notifications on this connection until `unsubscribe` or disconnect. One
+subscription per connection (a new `subscribe` replaces it). Use a dedicated
+connection for subscriptions so pushed events never delay replies.
+
+### `wait_idle`
+`{quiet_ms=150, timeout_ms=2000}` → `{idle, ms, events}`: returns once no screen-change
+event (`window_content`, `window_state`, `windows_changed`, `scrolled`,
+`text_changed`) has arrived for `quiet_ms`, counting from the last one even if it was
+before the call. ~3 ms when the screen is already idle.
+
+### `wait_for`
+`{text? , id?, desc?, exact=false, gone=false, pkg?, activity?, toast?, window?, since?, timeout_ms=5000}`
+→ `{matched:true, ms, node?, activity?, toast?, window?}`, or -32007.
+
+All given conditions must hold at once. Node conditions: a visible node whose text/desc
+contains the value (case-insensitive; `exact` for equality) and whose resource id equals
+`id` or ends with `:id/<id>`; with `gone` the condition is that no such node exists.
+`activity`: the front activity class equals or ends with the value. `toast`: a toast
+event (text containing the value; `""` = any) with `seq > since` (default: from the
+call). `window`: a window whose title contains the value or whose package equals it.
+The current state is checked first; then the agent re-checks when events arrive (the
+tree at most every 100 ms), and at least every second.
+
+### `current`
+`{}` → `{pkg?, activity?, keyboard, windows:[{id, type, layer, title?, pkg?, active?, focused?}], gen}`.
+`activity` comes from window-state events, remembered per window id, so it stays right
+after `back` (Samsung API 28 sends no window-state event when an existing activity
+returns to the front). It is absent when unknown (e.g. before any event since the
+service started); the host can fall back to `dumpsys activity`.
+
+### `screenshot`
+`{scale=0.5, quality=70, crop?:[l,t,r,b]}` → `{format:"jpeg", w, h, scale, data (base64)}`.
+API 30+ only (`takeScreenshot`); below that -32006 and the host uses
+`adb exec-out screencap -p`. A FLAG_SECURE window → -32008. Retries twice on the
+system's 1-per-333 ms rate limit.
+
+### `clipboard`
+`{set?: text}` → `{previous?, set}`. `previous` is the current primary clip as text when
+readable (API 29+ may deny background reads). Used by the host's paste fallback for
+typing; the host restores `previous` afterwards.
+
 ## Versioning
 - Additive changes (new methods, new result fields) keep `protocol` unchanged; clients
   must ignore unknown fields.
 - Incompatible changes bump `protocol`. The host checks `protocol` and `versionCode`
   from `ping` before anything else.
+- History: **1** (M1) `ping`, `echo`; `gen`, `tree` (M2). **2** (M5) `act`, `gesture`,
+  `global`, events and `subscribe` notifications, `wait_idle`, `wait_for`, `current`,
+  `screenshot`, `clipboard`. Bumped because the host now relies on these methods and
+  on the connection carrying notifications.

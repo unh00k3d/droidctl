@@ -41,10 +41,11 @@ class UserError(RuntimeError):
     can fail alone.
     """
 
-    def __init__(self, message, kind="error", hint=""):
+    def __init__(self, message, kind="error", hint="", data=None):
         super().__init__(message)
         self.kind = kind
         self.hint = hint
+        self.data = data          # structured detail for --json (candidates, what is there now, ...)
 
 
 # The whole `error.kind` vocabulary, in one place. Docs are generated from it
@@ -72,6 +73,7 @@ ERROR_KINDS = {
     "offscreen": "the element is outside the visible area; scroll to it first",
     "disabled": "the element is disabled",
     "no-change": "the action had no visible effect (with --expect-change)",
+    "unsupported": "this device (API level) or element does not support the operation",
     # host daemon
     "no-daemon": "the daemon is not running and auto-start is disabled",
 }
@@ -86,7 +88,7 @@ def emit(a, payload, render=None):
     return payload
 
 
-def die(args, kind, message, hint=""):
+def die(args, kind, message, hint="", data=None):
     """Report a fatal error the way the caller asked for it, then exit 1.
 
     With --json the error is a JSON object on stdout, so an agent parsing stdout
@@ -96,6 +98,8 @@ def die(args, kind, message, hint=""):
         error = {"kind": kind, "message": str(message)}
         if hint:
             error["hint"] = hint
+        if data:
+            error["data"] = data
         out_json({"ok": False, "error": error})
     else:
         err.print(f"{kind}: {message}" + (f"\n{hint}" if hint else ""), markup=False)
