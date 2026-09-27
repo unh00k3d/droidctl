@@ -1,9 +1,7 @@
 {
  "meta": {
   "name": "testapp-partial",
-  "scenario": "partial",
-  "note": "",
-  "captured": "2026-09-27T10:10:57+00:00",
+  "captured": "2026-09-27T11:10:50+00:00",
   "manufacturer": "samsung",
   "model": "SM-N950F",
   "sdk": 28,
@@ -15,20 +13,22 @@
    "rotation": 0
   },
   "agent": {
-   "version": "0.2.0",
-   "versionCode": 2
+   "version": "0.3.0",
+   "versionCode": 3
   },
   "package": "dev.droidctl.testapp",
-  "activity": "dev.droidctl.testapp/.Main",
-  "dump_ms": 53,
+  "activity": "dev.droidctl.testapp/dev.droidctl.testapp.Main",
+  "not_important": false,
+  "settled": true,
+  "dump_ms": 32,
   "nodes": 23,
   "degraded": false
  },
  "tree": {
-  "gen": 915,
-  "dump": 321,
+  "gen": 29,
+  "dump": 2,
   "degraded": false,
-  "ms": 53,
+  "ms": 32,
   "nodes": 23,
   "screen": {
    "w": 1080,
@@ -70,7 +70,7 @@
      ],
      "children": [
       {
-       "handle": 2,
+       "handle": 5,
        "class": "android.widget.FrameLayout",
        "bounds": [
         0,
@@ -89,7 +89,7 @@
        ],
        "children": [
         {
-         "handle": 3,
+         "handle": 11,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/recent_apps",
          "desc": "Recents",
@@ -116,7 +116,7 @@
          ]
         },
         {
-         "handle": 4,
+         "handle": 12,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/back",
          "desc": "Back",
@@ -144,7 +144,7 @@
          ]
         },
         {
-         "handle": 5,
+         "handle": 13,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/home",
          "desc": "Home",
@@ -187,7 +187,7 @@
     ],
     "pkg": "com.samsung.android.app.cocktailbarservice",
     "root": {
-     "handle": 6,
+     "handle": 2,
      "class": "android.widget.FrameLayout",
      "pkg": "com.samsung.android.app.cocktailbarservice",
      "bounds": [
@@ -206,7 +206,7 @@
      ],
      "children": [
       {
-       "handle": 7,
+       "handle": 6,
        "class": "android.widget.FrameLayout",
        "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
        "desc": "Edge panel handle",
@@ -230,7 +230,7 @@
        ]
       },
       {
-       "handle": 8,
+       "handle": 7,
        "class": "android.view.View",
        "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
        "bounds": [
@@ -238,6 +238,10 @@
         470,
         1080,
         899
+       ],
+       "size": [
+        0,
+        429
        ],
        "visible": false,
        "drawingOrder": 1,
@@ -267,7 +271,7 @@
     ],
     "pkg": "com.android.systemui",
     "root": {
-     "handle": 9,
+     "handle": 3,
      "class": "android.widget.FrameLayout",
      "pkg": "com.android.systemui",
      "bounds": [
@@ -286,7 +290,7 @@
      ],
      "children": [
       {
-       "handle": 10,
+       "handle": 8,
        "class": "android.widget.FrameLayout",
        "id": "com.android.systemui:id/status_bar",
        "pane": "Status bar",
@@ -307,11 +311,11 @@
        ],
        "children": [
         {
-         "handle": 11,
+         "handle": 14,
          "class": "android.widget.TextView",
          "id": "com.android.systemui:id/clock",
-         "text": "13:10",
-         "desc": "13:10",
+         "text": "14:10",
+         "desc": "14:10",
          "bounds": [
           55,
           0,
@@ -330,7 +334,7 @@
          ]
         },
         {
-         "handle": 12,
+         "handle": 15,
          "class": "android.widget.ImageView",
          "desc": "Android system notification: Certificate authority installed",
          "bounds": [
@@ -351,7 +355,7 @@
          ]
         },
         {
-         "handle": 13,
+         "handle": 16,
          "class": "android.widget.ImageView",
          "desc": "Ringer silent.",
          "bounds": [
@@ -372,7 +376,7 @@
          ]
         },
         {
-         "handle": 14,
+         "handle": 17,
          "class": "android.widget.FrameLayout",
          "id": "com.android.systemui:id/wifi_combo",
          "desc": "Wi-Fi signal full.",
@@ -394,7 +398,7 @@
          ]
         },
         {
-         "handle": 15,
+         "handle": 18,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/mobile_signal",
          "desc": "Phone signal full.",
@@ -416,7 +420,7 @@
          ]
         },
         {
-         "handle": 16,
+         "handle": 19,
          "class": "android.widget.LinearLayout",
          "id": "com.android.systemui:id/battery",
          "desc": "Battery charging, 100 percent.",
@@ -443,7 +447,7 @@
     }
    },
    {
-    "id": 1286,
+    "id": 1911,
     "type": "application",
     "layer": 0,
     "bounds": [
@@ -457,7 +461,7 @@
     "active": true,
     "focused": true,
     "root": {
-     "handle": 17,
+     "handle": 4,
      "class": "android.widget.FrameLayout",
      "pkg": "dev.droidctl.testapp",
      "bounds": [
@@ -476,7 +480,7 @@
      ],
      "children": [
       {
-       "handle": 18,
+       "handle": 9,
        "class": "android.widget.TextView",
        "text": "Partial visibility",
        "bounds": [
@@ -498,7 +502,7 @@
        ]
       },
       {
-       "handle": 19,
+       "handle": 10,
        "class": "android.widget.ScrollView",
        "id": "dev.droidctl.testapp:id/viewport",
        "bounds": [
@@ -534,6 +538,10 @@
           211,
           1038,
           224
+         ],
+         "size": [
+          996,
+          262
          ],
          "drawingOrder": 1,
          "flags": [
@@ -587,6 +595,10 @@
           1038,
           1261
          ],
+         "size": [
+          996,
+          262
+         ],
          "drawingOrder": 3,
          "flags": [
           "clickable",
@@ -612,6 +624,10 @@
           3899,
           1038,
           1261
+         ],
+         "size": [
+          996,
+          262
          ],
          "visible": false,
          "drawingOrder": 4,

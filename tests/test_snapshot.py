@@ -573,3 +573,68 @@ def test_testapp_fab_sheet_regions():
 def test_testapp_rtl_reading_order_follows_the_screen():
     first = text("testapp-rtl").splitlines()[2]
     assert first.index("share?") < first.index('"Cart (4)"') < first.index('"Back"')
+
+
+# --- degraded dumps (agent protocol 3: partial trees, never the previous screen) ---
+def test_a_partial_tree_is_the_current_screen_and_says_it_is_partial():
+    """huge_tree overruns the 2 s budget: the agent returns what it read of the
+    CURRENT window (breadth-first), marked degraded, never an older tree."""
+    snap = build("testapp-huge_tree")
+    assert snap.title == "s:huge_tree"
+    assert snap.degraded == "timeout" and snap.unread == 1
+    main = next(w for w in snap.windows if w.kind == "main")
+    assert main.id in snap.incomplete
+    assert "degraded=timeout" in S.header(snap)
+    assert any(w.startswith("degraded tree (timeout, 1 subtree unread)") for w in snap.warnings)
+    assert el(snap, "L1.1").role == "text"          # what was read is still listed
+
+
+def test_a_rootless_app_window_is_degraded_no_root():
+    snap = build("testapp-slow_a11y")
+    app = next(w for w in snap.windows if w.type == "application")
+    assert snap.degraded == "no-root" and app.id in snap.incomplete
+    assert any("no tree for app window s:slow_a11y" in w for w in snap.warnings)
+    assert any(w.startswith("degraded tree (no-root)") for w in snap.warnings)
+
+
+def test_complete_trees_have_no_incomplete_windows():
+    for name in ("real-settings-main", "testapp-counter"):
+        snap = build(name)
+        assert snap.degraded is None and not snap.incomplete and snap.unread == 0
+
+
+def test_the_ten_percent_rule_uses_the_views_unclipped_size():
+    """Agent protocol 3 reports a clipped View's full size: TESTAPP `partial`'s
+    "Five" is a 13 px strip of a 262 px button (5%): dropped; "Thirty" (30%) stays."""
+    d = load("testapp-partial")
+    five = next(n for n in _nodes(d["tree"]) if n.get("text") == "Five")
+    assert five.get("size") and five["size"][1] > 10 * (five["bounds"][3] - five["bounds"][1]) / 2
+    snap = build("testapp-partial")
+    labels = [e.label for e in snap.elements]
+    assert "Thirty" in labels and "Five" not in labels
+    frac = {}
+    for root in snap.roots:
+        stack = [root]
+        while stack:
+            n = stack.pop()
+            if n.raw.get("text") in ("Five", "Thirty"):
+                frac[n.raw["text"]] = n.frac
+            stack.extend(n.children)
+    assert frac["Five"] < 0.1 < frac["Thirty"] < 0.5      # measured against the full size, not the strip
+
+
+def test_without_a_size_the_edge_sliver_fallback_still_drops_a_prescrolled_strip():
+    """Older captures (agent < 3) have no size: the scroller-edge heuristic decides."""
+    d = json.loads((ROOT / "fixtures" / "resolve" / "partial-a.json").read_text())
+    assert not any(n.get("size") for n in _nodes(d["tree"]))
+    labels = [e.label for e in S.build(d["tree"]).elements]
+    assert "Thirty" in labels and "Five" not in labels
+
+
+def _nodes(tree):
+    for w in tree["windows"]:
+        stack = [w["root"]] if w.get("root") else []
+        while stack:
+            n = stack.pop()
+            yield n
+            stack.extend(n.get("children", ()))

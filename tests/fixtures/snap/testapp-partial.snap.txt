@@ -1,4 +1,4 @@
-screen dev.droidctl.testapp/.Main  sig=9f51  keyboard=hidden  dialog=no  1080x2220
+screen dev.droidctl.testapp/.Main  sig=84f8  keyboard=hidden  dialog=no  1080x2220
 -- top bar
 [1] heading "Partial visibility"
 -- content

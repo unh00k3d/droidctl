@@ -190,3 +190,41 @@ def test_context_similarity():
     assert R.ctx_sim(["Item 7"], ["item 7"]) == 1.0
     assert R.ctx_sim(["Screen A", "OK"], ["Screen B", "OK"]) == pytest.approx(1 / 3)
     assert R.ctx_compatible([], ["x"]) and not R.ctx_compatible(["Item 7"], ["Item 8"])
+
+
+# --- degraded trees ---------------------------------------------------------
+def _ref_labelled(state, label):
+    return next(k for k, r in state["refs"].items() if r["label"] == label)
+
+
+def test_fast_path_still_acts_on_a_partial_dump():
+    """The handle from a partial dump is the exact node the agent saw: acting on
+    it needs no uniqueness proof, so huge_tree stays actionable."""
+    d = json.loads((TREES / "testapp-huge_tree.json").read_text())
+    state = S.to_state(build(d))
+    ref = _ref_labelled(state, "L1.3")
+    hit = R.fast_path(state, ref, state["dump"], state["gen"])
+    assert hit["tier"] == 0 and hit["handle"] == state["refs"][ref]["handle"]
+
+
+def test_a_partial_tree_never_rematches_in_an_incomplete_window():
+    """After a change, a partial read can't prove a match is unique (the real one
+    may be in the unread part), so re-resolution refuses with a typed error."""
+    d = json.loads((TREES / "testapp-huge_tree.json").read_text())
+    state = S.to_state(build(d))
+    ref = _ref_labelled(state, "L1.3")
+    tree = dict(d["tree"], dump=d["tree"]["dump"] + 1)
+    with pytest.raises(core.UserError) as e:
+        R.resolve_ref(state, ref, tree, d["meta"].get("activity"))
+    assert e.value.kind == "timeout" and e.value.data["reason"] == "degraded"
+
+
+def test_a_degraded_tree_rematches_only_inside_the_refs_complete_window():
+    """Degraded elsewhere (the flag alone), but the ref's window was read in full:
+    matching proceeds, restricted to that window."""
+    d = json.loads((TREES / "real-settings-main.json").read_text())
+    state = S.to_state(build(d))
+    ref = _ref_labelled(state, "Display · Brightness, Blue light filter, Home screen")
+    tree = dict(d["tree"], dump=d["tree"]["dump"] + 1, degraded=True, reason="no-root")
+    res = R.resolve_ref(state, ref, tree, d["meta"].get("activity"))
+    assert res.handle == state["refs"][ref]["handle"] and res.tier == 2

@@ -256,7 +256,9 @@ class Snap:
         self.sig = ""
         self.keyboard = None          # IME rect or None
         self.dialog = False
-        self.degraded = None
+        self.degraded = None          # the agent's reason ("timeout", "truncated", "no-root", ...) or None
+        self.incomplete = set()       # ids of windows whose tree was not read completely
+        self.unread = 0               # subtrees the agent did not read (degraded dumps)
         self.screen = (0, 0, 1, 1)
         self.elements = []            # in ref order (ref = index + 1)
         self.warnings = []
@@ -277,6 +279,12 @@ def build(tree, activity=None, system=False):
         snap.degraded = tree.get("reason") or "yes"
 
     wins = [Win(w, screen) for w in tree.get("windows", ())]
+    for w in wins:
+        root = w.raw.get("root")
+        cut = sum(1 for n in _iter_raw(root) if n.get("truncated"))
+        if cut or (root is None and (w.raw.get("no_root") or w.type == "application")):
+            snap.incomplete.add(w.id)
+        snap.unread += cut
     _classify(wins, snap, system)
     snap.windows = wins
     for w in wins:
@@ -478,9 +486,12 @@ def _visibility(root, keyboard=None):
         n.vis = sp.largest(n.pieces)       # where a tap lands
         n.box = sp.bbox(n.pieces)          # what is shown as the element's bounds
         full = sp.area(n.rect)
+        size = n.raw.get("size")          # the View's unclipped size (agent protocol 3), when clipped
+        if size and len(size) == 2:
+            full = max(full, size[0] * size[1])
         n.frac = sum(sp.area(p) for p in n.pieces) / full if full else 0.0
         sliver = (n.box is not None and min(sp.width(n.box), sp.height(n.box)) <= SLIVER
-                  and min(sp.width(n.rect), sp.height(n.rect)) > SLIVER) or _edge_sliver(n)
+                  and min(sp.width(n.rect), sp.height(n.rect)) > SLIVER) or (not size and _edge_sliver(n))
         tiny = n.rect is not None and min(sp.width(n.rect), sp.height(n.rect)) < TINY
         ok = ((n.raw.get("visible") is not False or n.kb) and n.vis is not None
               and not sliver and not tiny)
@@ -933,6 +944,12 @@ def _infer(elems):
 
 def _warn_tree(wins, main, snap):
     """Say when the app's tree can't be trusted to show what is on screen."""
+    if snap.degraded:
+        part = (f", {snap.unread} subtree{'s' if snap.unread != 1 else ''} unread") if snap.unread else ""
+        snap.warnings.append(f"degraded tree ({snap.degraded}{part}): the device returned what it could "
+                             "read in time, so the screen may hold more than is listed. Refs here act on "
+                             "exactly these elements; after the screen changes they can't be re-matched "
+                             "until a complete read (try: wait, then snapshot)")
     for w in wins:
         if w.type == "application" and not w.raw.get("root") and (main is None or w.layer >= main.layer):
             snap.warnings.append(f"no tree for app window {w.title or w.pkg or w.id} "

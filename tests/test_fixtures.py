@@ -37,14 +37,21 @@ def test_fixture_is_a_well_formed_raw_tree(path):
     for key in ("model", "sdk", "screen", "package", "agent", "captured"):
         assert meta.get(key), f"meta.{key} missing"
     assert "serial" not in json.dumps(meta), "fixtures must not record the device serial"
-    assert tree["degraded"] is False, "a degraded dump may be another screen's tree"
+    if tree["degraded"]:
+        # before agent versionCode 3 a degraded dump was the previous screen's tree;
+        # from 3 on it is a partial read of the current one and says what is missing
+        assert meta["agent"]["versionCode"] >= 3, "a degraded dump from an old agent may be another screen's tree"
+        assert tree.get("reason"), "a degraded dump must say why"
+        missing = [n for n in nodes(tree) if n.get("truncated")] or \
+                  [w for w in tree["windows"] if w.get("no_root")]
+        assert missing, "a degraded dump must mark what it didn't read"
     assert isinstance(tree["dump"], int) and isinstance(tree["gen"], int)
 
     for w in tree["windows"]:
         assert w["type"] in WINDOW_TYPES or w["type"].startswith("type_")
         assert len(w["bounds"]) == 4
     apps = [w for w in tree["windows"] if w["type"] == "application" and "root" in w]
-    if "no root" in meta.get("note", ""):
+    if "no root" in meta.get("note", "") or any(w.get("no_root") for w in tree["windows"]):
         # a real capture of the agent returning an app window without its tree
         # (TESTAPP slow_a11y); kept as the input for the snapshot's warning
         assert not apps

@@ -116,7 +116,6 @@ class Tree(private val svc: AccessibilityService) {
     private val lock = Any()
     private var dump = 0
     private var handles: HashMap<Int, AccessibilityNodeInfo> = HashMap()
-    private var lastGood: JSONObject? = null
 
     /** The node for a handle of the latest dump, or an RpcError (`stale`) for any other dump. */
     fun node(dumpId: Int, handle: Int): AccessibilityNodeInfo = synchronized(lock) {
@@ -124,54 +123,42 @@ class Tree(private val svc: AccessibilityService) {
         handles[handle] ?: throw RpcError(Codes.INVALID_PARAMS, "no handle $handle in dump $dumpId")
     }
 
-    fun dump(notImportant: Boolean, allWindows: Boolean, screen: JSONObject): JSONObject = synchronized(lock) {
+    /**
+     * One dump of the CURRENT windows. Over budget it returns what it has read so
+     * far (breadth-first across all windows, so every window gets its top levels
+     * before any window gets its deep ones), marked degraded. It never substitutes
+     * an older tree: that could be a screen that is gone.
+     */
+    fun dump(notImportant: Boolean, allWindows: Boolean, screen: JSONObject,
+             budgetMs: Long = BUDGET_MS, maxNodes: Int = MAX_NODES): JSONObject = synchronized(lock) {
         setNotImportant(notImportant)
         val t0 = SystemClock.uptimeMillis()
-        val deadline = t0 + BUDGET_MS
         val startGen = gen
-        val walk = Walk(deadline)
+        val walk = Walk(t0 + budgetMs, maxNodes)
         val windows = JSONArray()
-        var roots = collect(allWindows, walk, windows)
-        if (roots == 0) {  // a null root right after a transition is common: retry once
-            SystemClock.sleep(50)
-            walk.release()
-            val w2 = Walk(deadline)
-            windows.clear()
-            roots = collect(allWindows, w2, windows)
-            return@synchronized finish(w2, windows, startGen, t0, screen, roots)
-        }
-        finish(walk, windows, startGen, t0, screen, roots)
-    }
-
-    private fun finish(walk: Walk, windows: JSONArray, startGen: Long, t0: Long,
-                       screen: JSONObject, roots: Int): JSONObject {
+        val missing = collect(allWindows, walk, windows)
+        walk.run()
         val ms = SystemClock.uptimeMillis() - t0
-        val prev = lastGood
-        if ((walk.timedOut || roots == 0) && prev != null) {
-            // keep the previous handles valid: the host may still act on them
-            walk.release()
-            return JSONObject(prev.toString()).put("degraded", true).put("ms", ms)
-                .put("reason", if (walk.timedOut) "timeout" else "no-root")
-        }
+
         for (n in handles.values) recycle(n)
         handles = walk.handles
         dump += 1
+        val reasons = ArrayList<String>()
+        if (walk.timedOut) reasons.add("timeout")
+        if (walk.truncated) reasons.add("truncated")
+        if (missing > 0) reasons.add("no-root")
         val out = JSONObject()
             .put("gen", startGen)
             .put("dump", dump)
-            .put("degraded", walk.timedOut || walk.truncated || roots == 0)
+            .put("degraded", reasons.isNotEmpty())
             .put("ms", ms)
             .put("nodes", walk.handles.size)
             .put("screen", screen)
             .put("windows", windows)
-        if (walk.timedOut) out.put("reason", "timeout")
-        else if (walk.truncated) out.put("reason", "truncated")
-        else if (roots == 0) out.put("reason", "no-root")
-        if (!walk.timedOut && !walk.truncated && roots > 0) lastGood = out
-        return out
+        if (reasons.isNotEmpty()) out.put("reason", reasons.joinToString(","))
+        if (walk.pending > 0) out.put("unread", walk.pending)
+        return@synchronized out
     }
-
-    private fun JSONArray.clear() { while (length() > 0) remove(length() - 1) }
 
     private fun setNotImportant(on: Boolean) {
         val info = svc.serviceInfo ?: return
@@ -183,31 +170,77 @@ class Tree(private val svc: AccessibilityService) {
         }
     }
 
-    /** Fills `out` with one entry per window; returns how many roots were dumped. */
+    /**
+     * Fills `out` with one entry per window and queues each root on the walk.
+     * An application window whose root is null is retried once (a null root right
+     * after a transition is common); if it stays null the window is marked
+     * `no_root`. Returns how many application windows have no root.
+     */
     private fun collect(allWindows: Boolean, walk: Walk, out: JSONArray): Int {
-        var roots = 0
         val list = if (allWindows) try { svc.windows } catch (_: Exception) { emptyList() } else emptyList()
-        if (list.isNotEmpty()) {
-            for (w in list) {
-                val root = try { w.root } catch (_: Exception) { null }
-                val jw = windowJson(w, root)
-                if (root != null) {
-                    jw.put("root", walk.node(root, null, 0))
-                    roots += 1
-                }
-                out.put(jw)
-            }
-            @Suppress("DEPRECATION")
-            if (Build.VERSION.SDK_INT < 33) for (w in list) try { w.recycle() } catch (_: Exception) {}
-        } else {
-            val root = svc.rootInActiveWindow ?: return 0
+        if (list.isEmpty()) {
+            var root = svc.rootInActiveWindow
+            if (root == null && walk.timeLeft() > 100) { SystemClock.sleep(50); root = svc.rootInActiveWindow }
+            if (root == null) return 1
             val jw = JSONObject().put("id", root.windowId).put("type", "application").put("active", true)
             root.packageName?.let { jw.put("pkg", it.toString()) }
-            jw.put("root", walk.node(root, null, 0))
+            jw.put("root", walk.root(root))
             out.put(jw)
-            roots = 1
+            return 0
         }
-        return roots
+        val pending = HashSet<Int>()
+        val roots = fetchRoots(list, list.indices.toList(), walk.timeLeft() * 3 / 4, pending)
+        // retry only a root that came back null; one still pending is a busy app,
+        // and asking again would just queue another request on its UI thread
+        val again = list.indices.filter { roots[it] == null && it !in pending &&
+                                          list[it].type == AccessibilityWindowInfo.TYPE_APPLICATION }
+        if (again.isNotEmpty() && walk.timeLeft() > 150) {
+            SystemClock.sleep(50)
+            val r2 = fetchRoots(list, again, walk.timeLeft() * 3 / 4, pending)
+            for (i in again) roots[i] = r2[i]
+        }
+        var missing = 0
+        for ((i, w) in list.withIndex()) {
+            val root = roots[i]
+            val jw = windowJson(w, root)
+            if (root != null) jw.put("root", walk.root(root))
+            else if (w.type == AccessibilityWindowInfo.TYPE_APPLICATION) { jw.put("no_root", true); missing += 1 }
+            out.put(jw)
+        }
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT < 33) for (w in list) try { w.recycle() } catch (_: Exception) {}
+        return missing
+    }
+
+    /**
+     * getRoot() for the given windows, in parallel, waiting at most `waitMs`.
+     * A window whose app is busy (a slow AccessibilityNodeProvider blocks its UI
+     * thread) would otherwise hold the whole dump for the system's 5 s
+     * interaction timeout. A root that arrives late is recycled, not used.
+     * AccessibilityInteractionClient keeps one instance per thread, so the
+     * fetches don't share state.
+     */
+    private fun fetchRoots(list: List<AccessibilityWindowInfo>, which: List<Int>, waitMs: Long,
+                           pending: MutableSet<Int>): Array<AccessibilityNodeInfo?> {
+        val out = arrayOfNulls<AccessibilityNodeInfo>(list.size)
+        if (which.isEmpty()) return out
+        val latch = java.util.concurrent.CountDownLatch(which.size)
+        val done = HashSet<Int>()
+        var abandoned = false
+        val guard = Any()
+        for (i in which) {
+            pool.execute {
+                val r = try { list[i].root } catch (_: Exception) { null }
+                synchronized(guard) { if (abandoned) r?.let { recycle(it) } else { out[i] = r; done.add(i) } }
+                latch.countDown()
+            }
+        }
+        latch.await(waitMs.coerceAtLeast(1), java.util.concurrent.TimeUnit.MILLISECONDS)
+        return synchronized(guard) { abandoned = true; for (i in which) if (i !in done) pending.add(i); out.copyOf() }
+    }
+
+    private val pool = java.util.concurrent.Executors.newCachedThreadPool { r ->
+        Thread(r, "droidctl-root").apply { isDaemon = true }
     }
 
     private fun windowJson(w: AccessibilityWindowInfo, root: AccessibilityNodeInfo?): JSONObject {
@@ -225,17 +258,54 @@ class Tree(private val svc: AccessibilityService) {
         return o
     }
 
-    /** One traversal: assigns handles and enforces the time and size budgets. */
-    private inner class Walk(val deadline: Long) {
+    /**
+     * One breadth-first traversal: assigns handles and enforces the time and size
+     * budgets. A node whose children were not read carries `truncated: true`.
+     */
+    private inner class Walk(val deadline: Long, val maxNodes: Int) {
         val handles = HashMap<Int, AccessibilityNodeInfo>()
         var timedOut = false
         var truncated = false
+        var pending = 0
         private var next = 1
         private val rect = Rect()
+        private val prect = Rect()
 
-        fun release() { for (n in handles.values) recycle(n); handles.clear() }
+        private inner class Item(val n: AccessibilityNodeInfo, val o: JSONObject, val pkg: String?, val depth: Int)
+        private val queue = java.util.ArrayDeque<Item>()
 
-        fun node(n: AccessibilityNodeInfo, parentPkg: String?, depth: Int): JSONObject {
+        fun timeLeft(): Long = deadline - SystemClock.uptimeMillis()
+
+        fun root(n: AccessibilityNodeInfo): JSONObject {
+            val o = describe(n, null)
+            queue.add(Item(n, o, n.packageName?.toString(), 0))
+            return o
+        }
+
+        fun run() {
+            while (queue.isNotEmpty()) {
+                val it = queue.poll()!!
+                val count = it.n.childCount
+                if (count == 0) continue
+                if (timedOut || truncated) { it.o.put("truncated", true); pending += 1; continue }
+                if (it.depth >= MAX_DEPTH) { it.o.put("truncated", true); truncated = true; continue }
+                val kids = JSONArray()
+                val batch = ArrayList<Item>(count)
+                for (i in 0 until count) {
+                    if (SystemClock.uptimeMillis() > deadline) { timedOut = true; break }
+                    if (handles.size >= maxNodes) { truncated = true; break }
+                    val c = try { it.n.getChild(i) } catch (_: Exception) { null } ?: continue
+                    val co = describe(c, it.pkg)
+                    kids.put(co)
+                    batch.add(Item(c, co, c.packageName?.toString() ?: it.pkg, it.depth + 1))
+                }
+                queue.addAll(batch)
+                if (kids.length() > 0) it.o.put("children", kids)
+                if (kids.length() < count && (timedOut || truncated)) { it.o.put("truncated", true); pending += 1 }
+            }
+        }
+
+        private fun describe(n: AccessibilityNodeInfo, parentPkg: String?): JSONObject {
             val h = next++
             handles[h] = n
             val o = JSONObject().put("handle", h)
@@ -255,6 +325,12 @@ class Tree(private val svc: AccessibilityService) {
             }
             n.getBoundsInScreen(rect)
             o.put("bounds", JSONArray().put(rect.left).put(rect.top).put(rect.right).put(rect.bottom))
+            // boundsInScreen is clipped to the parents; boundsInParent is the View's
+            // drawing rect, i.e. its full size. Reported only when it is clipped, so
+            // the host can tell a 5%-visible button from a small one.
+            @Suppress("DEPRECATION") n.getBoundsInParent(prect)
+            if (prect.width() > rect.width() || prect.height() > rect.height())
+                o.put("size", JSONArray().put(prect.width()).put(prect.height()))
             if (!n.isVisibleToUser) o.put("visible", false)
             if (Build.VERSION.SDK_INT >= 24 && n.drawingOrder != 0) o.put("drawingOrder", n.drawingOrder)
             flags(o, n)
@@ -263,18 +339,6 @@ class Tree(private val svc: AccessibilityService) {
             n.collectionItemInfo?.let { o.put("item", JSONObject().put("row", it.rowIndex).put("col", it.columnIndex)) }
             n.rangeInfo?.let { o.put("range", JSONObject().put("min", it.min.toDouble()).put("max", it.max.toDouble()).put("cur", it.current.toDouble())) }
             if (n.inputType != 0) o.put("inputType", n.inputType)
-
-            val count = n.childCount
-            if (count > 0) {
-                val kids = JSONArray()
-                for (i in 0 until count) {
-                    if (SystemClock.uptimeMillis() > deadline) { timedOut = true; break }
-                    if (handles.size >= MAX_NODES || depth >= MAX_DEPTH) { truncated = true; break }
-                    val c = try { n.getChild(i) } catch (_: Exception) { null } ?: continue
-                    kids.put(node(c, pkg, depth + 1))
-                }
-                if (kids.length() > 0) o.put("children", kids)
-            }
             return o
         }
 

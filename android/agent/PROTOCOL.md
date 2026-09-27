@@ -1,4 +1,4 @@
-# droidctl agent protocol (v2)
+# droidctl agent protocol (v3)
 
 The language-neutral contract between a host and the on-device agent
 (`dev.droidctl.agent`). Any client (the Python host, a future Go client, a test)
@@ -70,7 +70,7 @@ Params: none (ignored). Result:
 
 | field | type | meaning |
 |---|---|---|
-| `protocol` | int | protocol version; this document is `2` |
+| `protocol` | int | protocol version; this document is `3` |
 | `version` | string | agent `versionName` |
 | `versionCode` | int | agent `versionCode`; the host upgrades the APK when it differs from the bundled one |
 | `sdk` | int | `Build.VERSION.SDK_INT` |
@@ -85,7 +85,7 @@ Params: none (ignored). Result:
 Example (illustrative values):
 ```
 → {"jsonrpc":"2.0","id":1,"method":"ping"}
-← {"jsonrpc":"2.0","id":1,"result":{"protocol":2,"version":"0.2.0","versionCode":2,"sdk":28,"release":"9","manufacturer":"samsung","model":"SM-N950F","device":"greatlte","screen":{"w":1080,"h":2220,"density":420,"rotation":0},"service":{"connected":true},"gen":0,"peer_uid":2000,"uptime_ms":123456789}}
+← {"jsonrpc":"2.0","id":1,"result":{"protocol":3,"version":"0.3.0","versionCode":3,"sdk":28,"release":"9","manufacturer":"samsung","model":"SM-N950F","device":"greatlte","screen":{"w":1080,"h":2220,"density":420,"rotation":0},"service":{"connected":true},"gen":0,"peer_uid":2000,"uptime_ms":123456789}}
 ```
 
 ### `echo`
@@ -112,6 +112,8 @@ Params (all optional):
 |---|---|---|
 | `not_important` | `false` | include views not important for accessibility (`FLAG_INCLUDE_NOT_IMPORTANT_VIEWS`). Switching it costs one slow dump (the system's node cache is rebuilt: measured 200–450 ms on the SM-N950F vs 40–70 ms steady), so keep it constant |
 | `windows` | `true` | dump every window from `getWindows()`; `false` dumps only `rootInActiveWindow` |
+| `budget_ms` | `2000` | time budget for the read (clamped to 100–30,000). `dump-fixture` may ask for more; agents should not |
+| `max_nodes` | `10000` | node cap (1–10,000) |
 
 Result:
 
@@ -119,25 +121,38 @@ Result:
 |---|---|
 | `gen` | the `gen` value read **before** the dump started |
 | `dump` | the dump id; it increases by one per successful dump. Handles belong to it |
-| `degraded` | `true` if the dump is not a complete, fresh read (see `reason`) |
-| `reason` | only when degraded: `timeout` (2 s budget exceeded), `truncated` (over 10,000 nodes or 120 levels), `no-root` (no window root, even after one retry 50 ms later) |
+| `degraded` | `true` if the dump is not a complete read of the current windows (see `reason`) |
+| `reason` | only when degraded, comma-separated: `timeout` (budget exceeded), `truncated` (over `max_nodes` or 120 levels), `no-root` (an application window has no root) |
+| `unread` | only when degraded: how many nodes carry `truncated` (subtrees not read) |
 | `ms` | device time spent on this dump |
 | `nodes` | number of nodes (= handles) in the dump |
 | `screen` | as in `ping` |
 | `windows` | window objects, in `getWindows()` order (top of the z-order first on most devices; use `layer`) |
 
-**Degraded dumps.** If the 2 s budget runs out (or no root is found) and a previous
-complete dump exists, the agent returns **that previous tree** (with its own `dump` id
-and handles, which stay valid) plus `degraded:true`, `reason` and the new `ms`. A
-degraded result can therefore describe *the previous screen*: never treat it as the
-current one without checking `gen`/`reason`. Without a previous tree, the partial dump
-is returned with `degraded:true`.
+**Degraded dumps (changed in v3).** A dump is always a read of the **current**
+windows; the agent never substitutes an older tree (v2 returned the previous complete
+tree when the budget ran out, which could be a screen that was gone: measured on
+TESTAPP `huge_tree`, every v2 dump returned the previous scenario's tree).
+- The read is **breadth-first across all windows**, so when the budget or node cap
+  runs out every window has its top levels and the deep parts are what is missing.
+  A node whose children were not read carries `truncated:true`; `unread` counts them.
+- Window roots are fetched in parallel and waited for at most ¾ of the budget. An app
+  whose accessibility provider blocks its UI thread (TESTAPP `slow_a11y`) would
+  otherwise hold the dump for the system's 5 s interaction timeout. Such a window is
+  reported with `no_root:true`, and a late root is discarded. A root that came back
+  **null** (common right after a transition) is retried once after 50 ms; one still
+  pending is not, because asking again would queue another request on the busy app.
+- A degraded dump is a real dump: `dump` increases and its handles are valid, so an
+  element that was read can still be acted on by handle. What a partial read can't
+  do is prove that a match is **unique** (the real one may be in the unread part); the
+  host resolver therefore re-matches refs only inside a window that was read in full.
 
 **Window object:** `id`, `type` (`application`, `input_method`, `system`,
 `accessibility_overlay`, `split_screen_divider`, `magnification_overlay`, or
 `type_<n>` for OEM types: Samsung's Edge panel is `type_-1`), `layer`, `bounds`,
 `title` (if any), `pkg` (the root's package), `active` / `focused` (only when true),
-`root` (a node; absent if the window had no root).
+`root` (a node; absent if the window had no root), `no_root` (`true` for an
+application window whose root could not be read in time: see Degraded dumps).
 
 **Node object.** Fields that are null, empty, `false` or default are **omitted**:
 
@@ -150,6 +165,8 @@ is returned with `degraded:true`.
 | `uid` | `getUniqueId()` (API 33+) |
 | `text`, `desc`, `hint` (26+), `error`, `state` (30+), `tooltip` (28+), `pane` (28+) | strings |
 | `bounds` | `[left, top, right, bottom]` in screen px (logical: they follow `wm size` overrides). **Raw, as Android reports them**: clipped to the window, so a node wholly outside it comes back *inverted* (`left > right` or `top > bottom`) and must be read as empty. Every inverted node in the captured fixtures is also `visible:false` |
+| `size` | `[w, h]`: the View's full, unclipped size (`boundsInParent`, which `View` fills from its drawing rect), present only when it is larger than `bounds`, i.e. the node is clipped. Lets the host apply "under 10% visible" to a button scrolled 5% into view (a 13 px strip of a 262 px button on TESTAPP `partial`) |
+| `truncated` | `true` when the node has children that were not read (degraded dumps only) |
 | `visible` | present only as `false` (`isVisibleToUser`) |
 | `drawingOrder` | int (24+), omitted when 0 |
 | `flags` | the true ones among `clickable`, `longClickable`, `checkable`, `checked`, `focusable`, `focused`, `selected`, `enabled`, `editable`, `password`, `scrollable`, `heading` (28+), `showingHint` (26+) |
@@ -172,13 +189,17 @@ Example (trimmed):
 ```
 
 **Handles.** Handles map to live `AccessibilityNodeInfo`s held by the agent for the
-**latest** dump only; the previous dump's nodes are released when a new complete dump
-succeeds. Methods that act on a node (from M5) take `{dump, handle}` and fail with
+**latest** dump only; the previous dump's nodes are released when a new dump (complete
+or degraded) is made. Methods that act on a node (from M5) take `{dump, handle}` and fail with
 `-32002` if `dump` is not the latest.
 
 Measured (SM-N950F, API 28): 40–70 ms device time for 50–240 nodes steady state; the
 first dump after the service binds or after an app transition is slower (100–900 ms);
-a Settings app list that was still loading exceeded the 2 s budget once.
+a Settings app list that was still loading exceeded the 2 s budget once. TESTAPP
+`huge_tree` (5,000 nodes, 100 levels) is app-bound: ~150 nodes/s on a cold read (each
+fetch walks 100 levels on the app's UI thread; breadth- vs depth-first made no
+difference), ~700–1,400 nodes in the 2 s budget as the system cache warms. TESTAPP
+`slow_a11y`: 1.5–1.9 s (v2: 5 s, the provider's full sleep).
 
 
 ### Settle (shared by `act`, `gesture`, `global`)
@@ -188,9 +209,24 @@ action would end before anything is reported. The agent therefore waits up to
 `first_ms` for the **first event** after the action (none → nothing happened, idle),
 then until no event has arrived for `quiet_ms`; `timeout_ms` caps the whole wait.
 Result fields: `idle` (false = the cap was hit while the screen kept changing),
-`settle_ms`, `t0` (uptime ms when the action started; compare with event `t`), and,
-unless `tree:false`, `tree` (the same object `tree` returns; it is the new latest dump,
-so the previous dump's handles become stale).
+`settle_ms` (until the screen went quiet; excludes the final dump), `t0` (uptime ms
+when the action started; compare with event `t`), `redumps` (when the check below
+fired), and, unless `tree:false`, `tree` (the same object `tree` returns; it is the new
+latest dump, so the previous dump's handles become stale).
+
+**The settled tree is checked too (v3).** Quiet alone is not proof: mid-transition
+Android can stay quiet for longer than `quiet_ms` while an application window has no
+root yet or a root with no children (not drawn yet). After `back` on TESTAPP
+`back_confirm`, `WINDOWS_CHANGED` arrives at ~290 ms and the dialog's `WINDOW_STATE`
+only ~190 ms later, so a 150 ms quiet window could return the frame without the
+dialog. While the settled tree shows such a window, the agent waits for the next event
+(up to `first_ms`) and quiet again, then re-dumps, all within `timeout_ms`. Measured:
+with `quiet_ms=60`, 15/15 `back`s first hit the transitional frame and all 15 were
+recovered (settle median 588 ms, max 1,157); at the default 150 ms, 20/20 settled
+trees contained the dialog. A screen that is already complete pays nothing (tap +
+settle on a static target: 308.7 ms median, 301.5 before). The trade-off: a screen
+that is *really* an empty application window (a root with no children) is only
+reported after `first_ms` without further events, or at `timeout_ms`.
 
 Measured on the SM-N950F (API 28, `bench/results/m5-device.json`): the first event
 after a click arrives 75–100 ms later for an in-place change and ~300 ms later for an
@@ -305,3 +341,9 @@ typing; the host restores `previous` afterwards.
   `global`, events and `subscribe` notifications, `wait_idle`, `wait_for`, `current`,
   `screenshot`, `clipboard`. Bumped because the host now relies on these methods and
   on the connection carrying notifications.
+  **3** `degraded` means a partial read of the *current* windows, never an older tree
+  (v2 could return the previous screen); breadth-first reads with `truncated` nodes and
+  `unread`; `no_root` windows and parallel, bounded root fetches; `tree {budget_ms,
+  max_nodes}`; node `size` (unclipped) when clipped; settle re-checks transitional trees
+  (`redumps`). Bumped because a host that trusted a v2 degraded tree's handles would
+  act on the wrong screen.

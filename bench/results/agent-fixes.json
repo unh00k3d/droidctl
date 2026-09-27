@@ -1,0 +1,148 @@
+{
+  "date": "2026-09-27",
+  "device": "SM-N950F (API 28), USB passthrough into a KVM VM",
+  "agent": {
+    "before": "0.2.0 (protocol 2)",
+    "after": "0.3.0 (protocol 3)"
+  },
+  "huge_tree": {
+    "before": "every dump over the 2 s budget returned the PREVIOUS screen's tree (window title s:snackbar_toast, dump id unchanged) marked degraded",
+    "after": {
+      "dump_ms": [
+        2004,
+        2005,
+        2005
+      ],
+      "nodes_in_2s_budget": [
+        406,
+        700,
+        969
+      ],
+      "title": "s:huge_tree",
+      "degraded": "timeout",
+      "unread": 1
+    },
+    "cold_read_rate_nodes_per_s": 150,
+    "bfs_vs_dfs_nodes_in_5s": {
+      "bfs": [
+        746,
+        1366,
+        724,
+        1118
+      ],
+      "dfs": [
+        723,
+        1113,
+        643,
+        1055
+      ]
+    },
+    "note": "app-bound: each fetch walks 100 levels on the app's UI thread; traversal order makes no difference"
+  },
+  "slow_a11y": {
+    "before": {
+      "dump_ms": 5065,
+      "degraded": true,
+      "reason": "timeout,no-root (other windows 1 node each)"
+    },
+    "v3_sequential_retry": {
+      "dump_ms": 1898
+    },
+    "after": {
+      "dump_ms": [
+        1594,
+        1508
+      ],
+      "reason": "no-root",
+      "other_windows": "complete"
+    }
+  },
+  "back_confirm_settle": {
+    "before_default_quiet": {
+      "n": 6,
+      "dialog_in_settled_tree": 5,
+      "miss": "settle returned at 443 ms on a frame with the app window rootless; dialog WINDOW_STATE at 483 ms"
+    },
+    "after_default_quiet": {
+      "n": 20,
+      "dialog_in_settled_tree": 20,
+      "redumps": 0,
+      "settle_ms_median": 655,
+      "settle_ms_max": 682
+    },
+    "after_quiet_60ms": {
+      "n": 15,
+      "first_dump_transitional": 15,
+      "recovered": 15,
+      "settle_ms_median": 588,
+      "settle_ms_max": 1157
+    }
+  },
+  "tap_settle_static_target": {
+    "before": {
+      "in_process_tap_settle_ms": {
+        "n": 10,
+        "min": 267.5,
+        "median": 301.5,
+        "p95": 313.6,
+        "max": 313.6
+      },
+      "device_settle_ms": {
+        "n": 10,
+        "min": 219,
+        "median": 226.0,
+        "p95": 233,
+        "max": 233
+      },
+      "cold_cli_tap_ms": {
+        "n": 10,
+        "min": 395.6,
+        "median": 413.5,
+        "p95": 460.5,
+        "max": 460.5
+      }
+    },
+    "after": {
+      "in_process_tap_settle_ms": {
+        "n": 20,
+        "min": 281.4,
+        "median": 308.7,
+        "p95": 321.7,
+        "max": 322.1
+      },
+      "device_settle_ms": {
+        "n": 20,
+        "min": 225,
+        "median": 235.0,
+        "p95": 242,
+        "max": 243
+      },
+      "cold_cli_tap_ms": {
+        "n": 20,
+        "min": 363.5,
+        "median": 417.3,
+        "p95": 444.8,
+        "max": 455.4
+      }
+    }
+  },
+  "partial_size": {
+    "Five": {
+      "bounds_h": 13,
+      "size": [
+        996,
+        262
+      ],
+      "visible_frac": 0.05,
+      "listed": false
+    },
+    "Thirty": {
+      "bounds_h": 79,
+      "size": [
+        996,
+        262
+      ],
+      "listed": true
+    }
+  }
+}

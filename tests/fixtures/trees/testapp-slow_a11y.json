@@ -1,9 +1,7 @@
 {
  "meta": {
   "name": "testapp-slow_a11y",
-  "scenario": "slow_a11y",
-  "note": "no root: the agent returned the app window without a tree and without degraded (agent gap; the snapshot warns)",
-  "captured": "2026-09-27T10:10:35+00:00",
+  "captured": "2026-09-27T10:54:56+00:00",
   "manufacturer": "samsung",
   "model": "SM-N950F",
   "sdk": 28,
@@ -15,20 +13,22 @@
    "rotation": 0
   },
   "agent": {
-   "version": "0.2.0",
-   "versionCode": 2
+   "version": "0.3.0",
+   "versionCode": 3
   },
   "package": "dev.droidctl.testapp",
-  "activity": "dev.droidctl.testapp/.Main",
-  "dump_ms": 5033,
+  "activity": "dev.droidctl.testapp/dev.droidctl.testapp.Main",
+  "not_important": false,
+  "settled": true,
+  "dump_ms": 1504,
   "nodes": 16,
-  "degraded": false
+  "degraded": true
  },
  "tree": {
-  "gen": 850,
-  "dump": 258,
-  "degraded": false,
-  "ms": 5033,
+  "gen": 50,
+  "dump": 17,
+  "degraded": true,
+  "ms": 1504,
   "nodes": 16,
   "screen": {
    "w": 1080,
@@ -70,7 +70,7 @@
      ],
      "children": [
       {
-       "handle": 2,
+       "handle": 4,
        "class": "android.widget.FrameLayout",
        "bounds": [
         0,
@@ -89,7 +89,7 @@
        ],
        "children": [
         {
-         "handle": 3,
+         "handle": 8,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/recent_apps",
          "desc": "Recents",
@@ -116,7 +116,7 @@
          ]
         },
         {
-         "handle": 4,
+         "handle": 9,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/back",
          "desc": "Back",
@@ -144,7 +144,7 @@
          ]
         },
         {
-         "handle": 5,
+         "handle": 10,
          "class": "android.widget.ImageView",
          "id": "com.android.systemui:id/home",
          "desc": "Home",
@@ -187,7 +187,7 @@
     ],
     "pkg": "com.samsung.android.app.cocktailbarservice",
     "root": {
-     "handle": 6,
+     "handle": 2,
      "class": "android.widget.FrameLayout",
      "pkg": "com.samsung.android.app.cocktailbarservice",
      "bounds": [
@@ -206,7 +206,7 @@
      ],
      "children": [
       {
-       "handle": 7,
+       "handle": 5,
        "class": "android.widget.FrameLayout",
        "id": "com.samsung.android.app.cocktailbarservice:id/trigger_layout",
        "desc": "Edge panel handle",
@@ -230,7 +230,7 @@
        ]
       },
       {
-       "handle": 8,
+       "handle": 6,
        "class": "android.view.View",
        "id": "com.samsung.android.app.cocktailbarservice:id/out_touch_region_view",
        "bounds": [
@@ -267,7 +267,7 @@
     ],
     "pkg": "com.android.systemui",
     "root": {
-     "handle": 9,
+     "handle": 3,
      "class": "android.widget.FrameLayout",
      "pkg": "com.android.systemui",
      "bounds": [
@@ -286,7 +286,7 @@
      ],
      "children": [
       {
-       "handle": 10,
+       "handle": 7,
        "class": "android.widget.FrameLayout",
        "id": "com.android.systemui:id/status_bar",
        "pane": "Status bar",
@@ -310,8 +310,8 @@
          "handle": 11,
          "class": "android.widget.TextView",
          "id": "com.android.systemui:id/clock",
-         "text": "13:10",
-         "desc": "13:10",
+         "text": "13:54",
+         "desc": "13:54",
          "bounds": [
           55,
           0,
@@ -443,7 +443,7 @@
     }
    },
    {
-    "id": 1272,
+    "id": 1602,
     "type": "application",
     "layer": 0,
     "bounds": [
@@ -454,8 +454,10 @@
     ],
     "title": "s:slow_a11y",
     "active": true,
-    "focused": true
+    "focused": true,
+    "no_root": true
    }
-  ]
+  ],
+  "reason": "no-root"
  }
 }

@@ -19,11 +19,11 @@ PKG = "dev.droidctl.agent"
 SERVICE_CLASS = "dev.droidctl.agent.AgentService"
 COMPONENT = f"{PKG}/.AgentService"            # the short form we write to settings
 REMOTE = "localabstract:droidctl"
-PROTOCOL = 2
+PROTOCOL = 3
 # The versionCode of the APK bundled in droidctl/assets. It has to match the
 # agent's build.gradle.kts (a unit test checks); setup compares it with what
 # the phone reports so an unchanged agent is not reinstalled.
-AGENT_VERSION_CODE = 2
+AGENT_VERSION_CODE = 3
 APK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "droidctl-agent.apk")
 DEVICE_TMP_APK = "/data/local/tmp/droidctl-agent.apk"
 
@@ -354,8 +354,15 @@ class AgentClient:
     def ping(self):
         return self.call("ping")
 
-    def tree(self, not_important=False, timeout=10.0):
-        return self.call("tree", {"not_important": not_important}, timeout=timeout)
+    def tree(self, not_important=False, timeout=None, budget_ms=None, max_nodes=None):
+        params = {"not_important": not_important}
+        if budget_ms:
+            params["budget_ms"] = int(budget_ms)
+        if max_nodes:
+            params["max_nodes"] = int(max_nodes)
+        if timeout is None:
+            timeout = max(10.0, (budget_ms or 2000) / 1000 + 8)
+        return self.call("tree", params, timeout=timeout)
 
     def act(self, dump, handle, action=None, custom=None, args=None, settle=None,
             force=False, event_ms=None):

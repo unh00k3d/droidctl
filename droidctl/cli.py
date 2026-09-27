@@ -323,8 +323,8 @@ def cmd_dump_fixture(a):
                     raise UserError(f"{a.pkg} is not in the foreground (focus: {focus})", "timeout")
                 time.sleep(0.3)
         settled = _wait_quiet(client)
-        # a degraded dump may be the *previous* screen's last good tree: never
-        # save one under this screen's name unless explicitly asked to
+        # a degraded dump is a partial read (agent protocol 3): a fixture should be
+        # complete, so retry, and only keep a partial one when explicitly asked to
         for _ in range(3):
             tree = client.call("tree", {"not_important": a.not_important}, timeout=15)
             if not tree.get("degraded"):
@@ -683,7 +683,7 @@ def build_parser():
     sp.add_argument("--not-important", action="store_true", help="include views not important for accessibility")
     sp.add_argument("--dir", default=FIXTURE_DIR, metavar="DIR", help=f"output directory (default {FIXTURE_DIR})")
     sp.add_argument("--timeout", type=float, default=10.0, metavar="S", help="how long to wait for --pkg")
-    sp.add_argument("--allow-degraded", action="store_true", help="save even a degraded (partial or stale) dump")
+    sp.add_argument("--allow-degraded", action="store_true", help="save even a degraded (partial) dump")
     sp.set_defaults(fn=cmd_dump_fixture, render=render_dump_fixture)
 
     sp = sub.add_parser("snapshot", aliases=["snap"], parents=[jsonopt, devopt],

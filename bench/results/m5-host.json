@@ -4,20 +4,30 @@
   "host": "Linux x86_64 python 3.13.5",
   "target": "testapp counter: tap Increment (static screen, one line changes)",
   "in_process_tap_settle_ms": {
-    "n": 10,
-    "min": 267.5,
-    "median": 301.5,
-    "p95": 313.6,
-    "max": 313.6
+    "n": 20,
+    "min": 281.4,
+    "median": 308.7,
+    "p95": 321.7,
+    "max": 322.1
   },
   "device_settle_ms": {
-    "n": 10,
-    "min": 219,
-    "median": 226.0,
-    "p95": 233,
-    "max": 233
+    "n": 20,
+    "min": 225,
+    "median": 235.0,
+    "p95": 242,
+    "max": 243
   },
   "fast_path_tiers": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
     0,
     0,
     0,
@@ -30,11 +40,11 @@
     0
   ],
   "cold_cli_tap_ms": {
-    "n": 10,
-    "min": 395.6,
-    "median": 413.5,
-    "p95": 460.5,
-    "max": 460.5
+    "n": 20,
+    "min": 363.5,
+    "median": 417.3,
+    "p95": 444.8,
+    "max": 455.4
   },
   "budget": {
     "tap+settle (static target)": "<500 ms"

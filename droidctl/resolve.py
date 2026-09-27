@@ -205,6 +205,23 @@ def resolve_in(old, state, snap, ref=None):
     same_screen = state.get("sig") == snap.sig
     tried = []
 
+    # A partial (degraded) tree can't prove uniqueness: the real match may sit in
+    # a subtree that wasn't read while a look-alike was. Only a window read in
+    # full is searched, and only the ref's own window (ids are stable for a
+    # window's lifetime); identity (uid) still counts anywhere.
+    if snap.degraded:
+        win = old.get("window")
+        if old.get("uid"):
+            hits = [(e, r) for e, r in cands if r.get("uid") == old["uid"]]
+            if len(hits) == 1:
+                return _finish(hits[0][0], snap, old, 1, "uid")
+        if win is None or win in snap.incomplete or not any(w.id == win for w in snap.windows):
+            raise UserError(f"the device returned a partial tree ({snap.degraded}), so ref [{ref}] "
+                            f"({_what(old)}) can't be matched with certainty", "timeout",
+                            hint="wait for the screen to settle, then run: droidctl snapshot",
+                            data={"reason": "degraded", "degraded": snap.degraded, "ref": ref})
+        cands = [(e, r) for e, r in cands if r.get("window") == win]
+
     # tier 1: identity
     for key in ("uid", "vid"):
         if not old.get(key):

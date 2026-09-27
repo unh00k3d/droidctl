@@ -179,16 +179,56 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
         return arr
     }
 
-    /** With `settle`, waits for quiet and puts {idle, settle_ms, tree} into `out`. */
+    /**
+     * With `settle`, waits for quiet and puts {idle, settle_ms, tree} into `out`.
+     *
+     * Quiet alone is not enough: mid-transition Android can go quiet for longer
+     * than the quiet window while an app window has no root yet (a dialog being
+     * added after `back`: WINDOWS_CHANGED, ~190 ms of nothing, then the dialog's
+     * WINDOW_STATE) or a root with no children (a window not drawn yet, e.g. a
+     * cold launch). So the settled tree is checked too: while it shows such a
+     * window, wait for the next event (up to first_ms) and quiet again, then
+     * re-dump, all within timeout_ms. A settled normal screen pays nothing extra.
+     */
     private fun settleInto(out: JSONObject, settle: JSONObject?, t0: Long) {
         if (settle == null) return
         val quiet = settle.optLong("quiet_ms", DEFAULT_QUIET_MS)
         val timeout = settle.optLong("timeout_ms", DEFAULT_SETTLE_TIMEOUT_MS)
         val first = settle.optLong("first_ms", DEFAULT_FIRST_MS)
-        val idle = if (quiet <= 0) true else events.waitSettled(t0, quiet, first, timeout)
-        out.put("idle", idle).put("settle_ms", SystemClock.uptimeMillis() - t0).put("t0", t0)
-        if (settle.optBoolean("tree", true))
-            out.put("tree", tree.dump(settle.optBoolean("not_important", false), true, screen()))
+        var idle = if (quiet <= 0) true else events.waitSettled(t0, quiet, first, timeout)
+        if (!settle.optBoolean("tree", true)) {
+            out.put("idle", idle).put("settle_ms", SystemClock.uptimeMillis() - t0).put("t0", t0)
+            return
+        }
+        val ni = settle.optBoolean("not_important", false)
+        var settledAt = SystemClock.uptimeMillis()     // settle_ms excludes the dump itself
+        var t = tree.dump(ni, true, screen())
+        var redumps = 0
+        while (quiet > 0 && transitional(t)) {
+            val left = t0 + timeout - SystemClock.uptimeMillis()
+            if (left <= 0) { idle = false; break }
+            val mark = SystemClock.uptimeMillis()
+            idle = events.waitSettled(mark, quiet, minOf(first, left), left)
+            settledAt = SystemClock.uptimeMillis()
+            t = tree.dump(ni, true, screen())
+            redumps += 1
+        }
+        out.put("idle", idle).put("settle_ms", settledAt - t0).put("t0", t0)
+        if (redumps > 0) out.put("redumps", redumps)
+        out.put("tree", t)
+    }
+
+    /** An application window with no root, or a root with no children: not drawn yet. */
+    private fun transitional(t: JSONObject): Boolean {
+        val ws = t.optJSONArray("windows") ?: return false
+        for (i in 0 until ws.length()) {
+            val w = ws.getJSONObject(i)
+            if (w.optString("type") != "application") continue
+            if (w.optBoolean("no_root")) return true
+            val root = w.optJSONObject("root") ?: continue
+            if (!root.has("children") && !root.optBoolean("truncated")) return true
+        }
+        return false
     }
 
     private fun toJson(evs: List<Events.Ev>): JSONArray {

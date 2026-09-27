@@ -175,8 +175,36 @@ def test_shot_marks_agree_with_the_screen_under_the_resolution_override(scenario
     del sc
 
 
-def test_back_is_a_global_action(scenario):
-    sc = scenario("back_confirm")
-    r = dc("back")
-    assert r["method"] == "back"
-    assert sc.dta("back")
+def test_back_is_a_global_action_and_its_dialog_is_in_the_diff(scenario):
+    """TESTAPP back_confirm: the dialog is added ~100-200 ms after back with a quiet
+    gap in between; settle must not return on the frame without it. Repeated,
+    because it is a race."""
+    for _ in range(5):
+        sc = scenario("back_confirm")
+        sc.snap()                     # the agent looks first; back's diff is against what it saw
+        r = dc("back")
+        assert r["method"] == "back"
+        assert sc.dta("back")
+        assert any("Exit?" in line or "Stay" in line for line in r["diff"]), r["diff"]
+
+
+def test_a_huge_tree_is_a_partial_read_of_the_current_screen(scenario):
+    """TESTAPP huge_tree (5,000 nodes, 100 deep): over the 2 s budget the agent
+    returns what it read of THIS screen, marked degraded, never an older tree."""
+    scenario("huge_tree")
+    t0 = time.monotonic()
+    s = dc("snapshot", timeout=60)
+    assert time.monotonic() - t0 < 6
+    assert 's:huge_tree' in s["text"] or "Huge tree" in s["text"]
+    assert s.get("degraded") or "degraded=" in s["text"]
+    assert "degraded tree (" in s["text"]
+
+
+def test_a_blocked_accessibility_provider_is_flagged_within_the_budget(scenario):
+    """TESTAPP slow_a11y: the app's provider sleeps 5 s on its UI thread; the dump
+    must not wait for it, and says the app window has no tree."""
+    scenario("slow_a11y")
+    t0 = time.monotonic()
+    s = dc("snapshot", timeout=60)
+    assert time.monotonic() - t0 < 4.5
+    assert "degraded=no-root" in s["text"] and "no tree for app window" in s["text"]

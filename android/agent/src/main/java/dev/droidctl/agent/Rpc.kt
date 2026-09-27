@@ -13,7 +13,7 @@ class Rpc(private val ctx: AgentService, private val tree: Tree, private val eve
     private val actions = Actions(ctx, tree, events) { screen() }
 
     companion object {
-        const val PROTOCOL = 2
+        const val PROTOCOL = 3
     }
 
     fun call(method: String, params: JSONObject, c: Conn): JSONObject = when (method) {
@@ -21,7 +21,9 @@ class Rpc(private val ctx: AgentService, private val tree: Tree, private val eve
         "echo" -> params  // transport-only round trip: no device work (benchmarks, health)
         "gen" -> JSONObject().put("gen", tree.gen)
         "tree" -> tree.dump(params.optBoolean("not_important", false),
-                            params.optBoolean("windows", true), screen())
+                            params.optBoolean("windows", true), screen(),
+                            params.optLong("budget_ms", Tree.BUDGET_MS).coerceIn(100, 30000),
+                            params.optInt("max_nodes", Tree.MAX_NODES).coerceIn(1, Tree.MAX_NODES))
         "act" -> actions.act(params)
         "gesture" -> actions.gesture(params)
         "global" -> actions.global(params)
