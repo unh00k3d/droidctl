@@ -658,3 +658,54 @@ def test_a_window_without_bounds_after_a_rebind_is_the_main_screen():
     s = S.build(load("testapp-buttons-rebound")["tree"])
     assert not s.dialog
     assert [e.label_full for e in s.elements][:2] == ["Buttons", "Save"]
+
+
+def test_a_radio_is_not_unlabeled_because_a_neighbour_extends_its_label():
+    """a banking QA app environment picker: "Test" sat next to "Test Daily" on one
+    row and lost its label, because the repeat check was a substring test."""
+    out = text("real-bank-qa-fakelogin")
+    assert 'radio "Test" checked' in out and 'radio "Prep"' in out
+    assert 'radio "Test Daily"' in out
+
+
+@pytest.mark.parametrize("input_type,secret", [
+    (18, True),      # number | number_password (a banking QA app login, no isPassword flag)
+    (129, True),     # text | password
+    (225, True),     # text | web_password
+    (145, False),    # text | visible_password: shown on screen, not a secret
+    (2, False), (1, False), (3, False), (None, False),
+])
+def test_password_input_types_are_secrets(input_type, secret):
+    raw = {"class": "android.widget.EditText", "text": "654321", "inputType": input_type}
+    assert S.is_password(raw) is secret
+    masked = S.mask_secret(raw)
+    assert (masked["text"] == "•" * 6) is secret
+    assert raw["text"] == "654321"          # the device tree itself is not mutated
+
+
+def test_a_password_hint_is_not_masked():
+    raw = {"text": "Password", "hint": "Password", "inputType": 18, "flags": ["showingHint"]}
+    assert S.mask_secret(raw)["text"] == "Password"
+
+
+def test_a_prompt_in_a_numeric_field_is_a_hint_not_a_secret():
+    raw = {"text": "Enter the code received by SMS", "inputType": 18, "flags": ["editable", "focused"]}
+    m = S.mask_secret(raw)
+    assert m["text"] == raw["text"] and m["hint"] == raw["text"] and "showingHint" in m["flags"]
+    assert S.mask_secret(dict(raw, text="654321"))["text"] == "•" * 6
+
+
+def test_a_saved_ref_remembers_it_is_a_password():
+    """`type REF` on the fast path works from the saved record, which must say
+    the field is secret (else the readback compares bullets to the clear text)."""
+    snap = build("testapp-password")
+    recs = [S.ref_record(e, snap) for e in snap.elements if e.role == "input"]
+    assert any(r["password"] for r in recs) and not all(r["password"] for r in recs)
+
+
+def test_bidi_marks_are_dropped_but_zwj_is_kept():
+    padded = "Use Device Settings ‎‏‎‎‏ OFF"
+    assert S._clean(padded) == "Use Device Settings OFF"
+    assert S._clean("Values \u200b\u200bof") == "Values of"
+    family = "\U0001F468‍\U0001F469‍\U0001F467"
+    assert S._clean(family) == family

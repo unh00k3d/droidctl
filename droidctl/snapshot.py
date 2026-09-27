@@ -57,8 +57,15 @@ def short_class(c):
     return (c or "").rsplit(".", 1)[-1]
 
 
+# Invisible controls: zero-width space, word joiner, LRM/RLM/ALM, bidi
+# embeddings/overrides/isolates, BOM. Some apps pad labels with them (a banking app
+# QA: "Use Device Settings" + 104 marks + "OFF"; "Values \u200b\u200bof").
+# ZWJ/ZWNJ stay: emoji sequences and Persian need them.
+_BIDI = re.compile("[\u200b\u2060\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069\ufeff]")
+
+
 def _clean(s):
-    return re.sub(r"\s+", " ", s).strip() if s else ""
+    return re.sub(r"\s+", " ", _BIDI.sub("", s)).strip() if s else ""
 
 
 def est_tokens(text):
@@ -96,12 +103,62 @@ class Win:
         self.bars = {}            # "top"/"bottom" -> Node
 
 
+# InputType classes and password variations (android.text.InputType)
+_IT_CLASS, _IT_VARIATION = 0x0F, 0xFF0
+_IT_TEXT, _IT_NUMBER = 0x1, 0x2
+_TEXT_PASSWORDS = {0x80, 0xE0}          # TYPE_TEXT_VARIATION_PASSWORD, _WEB_PASSWORD
+_NUMBER_PASSWORD = 0x10                 # TYPE_NUMBER_VARIATION_PASSWORD
+
+
+def is_password(raw):
+    """A secret field: the platform's password flag, or a password inputType.
+
+    Apps with their own masking (a banking QA app: inputType 18, number|password)
+    never set isPassword(), so the platform hands us the clear text."""
+    if "password" in (raw.get("flags") or ()):
+        return True
+    it = raw.get("inputType")
+    if not isinstance(it, int):
+        return False
+    cls, var = it & _IT_CLASS, it & _IT_VARIATION
+    return (cls == _IT_TEXT and var in _TEXT_PASSWORDS) or (cls == _IT_NUMBER and var == _NUMBER_PASSWORD)
+
+
+_IT_PHONE = 0x3
+
+
+def _prompt_in_numeric(raw):
+    """An editable number/phone field whose text has letters is showing a prompt:
+    such a field cannot hold letters. Some apps put the prompt in the text without
+    showingHint (a banking QA app OTP: "Enter the code received by SMS")."""
+    it, t = raw.get("inputType"), raw.get("text")
+    return (isinstance(it, int) and it & _IT_CLASS in (_IT_NUMBER, _IT_PHONE) and t
+            and "editable" in (raw.get("flags") or ()) and any(c.isalpha() for c in t))
+
+
+def mask_secret(raw):
+    """``raw`` with a password's clear text replaced by bullets of the same length
+    (what the platform itself exposes when the flag is set). Leaves hints alone;
+    a prompt shown as text in a numeric field becomes the hint it is."""
+    if _prompt_in_numeric(raw):
+        raw = dict(raw, hint=raw.get("hint") or raw.get("text"),
+                   flags=sorted(set(raw.get("flags") or ()) | {"showingHint"}))
+    if not is_password(raw):
+        return raw
+    out = dict(raw, flags=sorted(set(raw.get("flags") or ()) | {"password"}))
+    t = raw.get("text")
+    if t and "showingHint" not in (raw.get("flags") or ()) and t != raw.get("hint") and set(t) != {"\u2022"}:
+        out["text"] = "\u2022" * len(t)
+    return out
+
+
 class Node:
     __slots__ = ("raw", "win", "parent", "index", "children", "cls", "rect", "clip", "in_scroll",
                  "flags", "actions", "custom", "pieces", "vis", "box", "frac", "shown", "any_shown",
                  "scroll_like", "is_list", "tabstrip", "tab_item", "el", "kb")
 
     def __init__(self, raw, win, parent, index):
+        raw = mask_secret(raw)    # a secret never reaches labels, diffs or saved state
         self.raw, self.win, self.parent, self.index = raw, win, parent, index
         self.children = []
         self.cls = short_class(raw.get("class"))
@@ -1200,7 +1257,9 @@ def _row_part(e, row, snap, opts):
     (a Settings switch labelled like its row)."""
     line = element_line(e, snap, opts, compact=True)
     if e.segments and e.role in ("switch", "checkbox", "toggle", "radio"):
-        others = " ".join(o.label_full.lower() for o in row if o is not e)
+        # whole labels or ` · ` segments only: a radio "Test" next to "Test Daily"
+        # is its own label, not a repeat (a banking QA app environment picker)
+        others = {s.lower() for o in row if o is not e for s in o.segments}
         if e.label_full.lower() in others:
             line = line.replace(f' "{_q(e.label)}"', "", 1)
     return line
@@ -1366,6 +1425,7 @@ def ref_record(e, snap):
         "bounds": list(e.rect) if e.rect else None,
         "tap": list(e.tap) if e.tap else None, "region": e.region,
         "parent": e.container.ref if e.container else None,
+        "password": any("password" in x.flags for x in e.nodes),
     }
 
 

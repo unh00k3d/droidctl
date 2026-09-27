@@ -149,6 +149,8 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--text", metavar="TEXT", help="a visible node whose text/desc contains TEXT")
     sp.add_argument("--id", metavar="ID", help="a visible node with this resource id")
     sp.add_argument("--desc", metavar="DESC", help="a visible node whose desc contains DESC")
+    sp.add_argument("--role", metavar="ROLE",
+                    help="a snapshot element with this role (e.g. --role progress --gone: loading is over)")
     sp.add_argument("--gone", action="store_true", help="wait until the node condition no longer holds")
     sp.add_argument("--exact", action="store_true", help="text/desc must be equal, not contained")
     sp.add_argument("--activity", metavar="CLASS", help="the front activity (class or suffix)")

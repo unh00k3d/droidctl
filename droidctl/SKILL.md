@@ -34,6 +34,7 @@ printf 'it'"'"'s $5\n' | droidctl type 2 --stdin --json   # anything shell-hosti
 droidctl scroll-to --text "Privacy" --json
 droidctl action 4 "Delete" --json            # custom accessibility actions (swipe-to-delete)
 droidctl wait --text "Saved" --timeout 5 --json
+droidctl wait --role progress --gone --json      # after a submit: until the spinner is gone
 droidctl launch com.android.settings --json
 droidctl run --json --step 'launch com.android.settings' --step 'tap --text Display' --step 'snapshot'
 ```

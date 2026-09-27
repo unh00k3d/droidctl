@@ -132,6 +132,22 @@ def tool_specs():
     return specs
 
 
+def first_snapshot_full(argv, seen):
+    """The first snapshot of a device in this MCP session prints everything.
+
+    "unchanged" is relative to the daemon's saved state, which the CLI and other
+    clients share: an agent that never saw the screen must not be told it is
+    unchanged. Later snapshots keep the token-saving form."""
+    if not argv or argv[0] != "snapshot":
+        return argv
+    dev = argv[argv.index("-d") + 1] if "-d" in argv else ""
+    if dev in seen or "--full" in argv or "--diff" in argv:
+        seen.add(dev)
+        return argv
+    seen.add(dev)
+    return argv[:1] + ["--full"] + argv[1:]
+
+
 def build_argv(spec, args):
     """Tool arguments -> a droidctl argv (always --json)."""
     from droidctl.core import UserError
@@ -254,6 +270,7 @@ def build_server(backend=None):
     backend = backend or Backend()
     specs = tool_specs()
     by_name = {s["name"]: s for s in specs}
+    seen = set()                # devices this MCP session has had a full snapshot of
     output_schema = {"type": "object", "additionalProperties": True}
 
     async def list_tools(ctx, params):
@@ -270,6 +287,7 @@ def build_server(backend=None):
             argv = build_argv(spec, params.arguments)
         except UserError as e:
             return types.CallToolResult(content=[types.TextContent(text=f"{e.kind}: {e}")], is_error=True)
+        argv = first_snapshot_full(argv, seen)
         payload, text, code = await anyio.to_thread.run_sync(backend.run, argv)
         blocks, structured, is_error = result_for(spec, payload, text, code)
         content = [types.ImageContent(data=b["data"], mime_type=b["mimeType"]) if b["type"] == "image"

@@ -116,7 +116,10 @@ changed" into the `no-change` error; `--settle MS` sets the quiet window (defaul
 **Typing** tries `ACTION_SET_TEXT` (Unicode, no tap), then a clipboard paste (the clipboard is
 restored, or cleared if it was empty), then `adb input text` (ASCII only), and reads the value
 back (`value` in the result). Password fields never go through the clipboard, and their value is
-never printed: `verified` compares the length only. `--enter` presses the keyboard's action key.
+never printed: `verified` compares the length only. A field counts as a password when the app says
+so *or* its input type is a password variation (some apps mask on their own and expose the clear
+text); snapshots show such values as bullets. A formatter's punctuation is accepted
+(`5551234567` shown as `(555) 123 45 67` is verified). `--enter` presses the keyboard's action key.
 Digits after a locator are text: `type --id otp1 123456`.
 
 **Swipes** drag 0.4 of the box up/down and 0.7 left/right: pages and swipe-to-dismiss rows need
@@ -126,6 +129,7 @@ more than half the width, because accessibility gestures don't register as fling
 
 ```bash
 droidctl wait --text "Saved" --timeout 5         # --id, --desc, --gone, --activity, --toast, --window
+droidctl wait --role progress --gone --timeout 20 # a bare loading spinner (no text/id) is over
 droidctl watch --max 20 --timeout 10             # pushed events: clicks, toasts, windows, IME
 droidctl logs --max 50 --pkg com.example --level W
 ```
@@ -246,7 +250,7 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `notifications` | `--settle MS --expect-change` | open the notification shade |
 | `quick-settings` | `--settle MS --expect-change` | open quick settings |
 | `press` | `<key> --settle MS --expect-change` | press a key via adb (enter, tab, del, search, KEYCODE_*, or a number) |
-| `wait` | `--text TEXT --id ID --desc DESC --gone --exact --activity CLASS --toast TEXT --window TITLE\|PKG --pkg PKG --timeout S` | block on the device until a condition holds (event-driven) |
+| `wait` | `--text TEXT --id ID --desc DESC --role ROLE --gone --exact --activity CLASS --toast TEXT --window TITLE\|PKG --pkg PKG --timeout S` | block on the device until a condition holds (event-driven) |
 | `current` | – | the foreground app/activity and whether the keyboard is shown |
 | `watch` | `--max N --timeout S --events TYPES --all` | pushed device events (clicks, toasts, windows, IME), bounded |
 | `logs` | `--max N --pkg PKG --level {V,D,I,W,E,F}` | recent logcat lines, bounded |

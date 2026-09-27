@@ -186,3 +186,11 @@ def test_install_all_reports_each_client(fake_home):
     r = mcp.install("all", dry_run=True)
     assert [c["client"] for c in r["clients"]] == ["claude", "codex", "cursor"]
     assert not any((fake_home / p).exists() for p in (".claude.json", ".codex", ".cursor"))
+
+
+def test_the_first_snapshot_of_a_session_is_full():
+    seen = set()
+    assert mcp.first_snapshot_full(["snapshot", "--json"], seen) == ["snapshot", "--full", "--json"]
+    assert mcp.first_snapshot_full(["snapshot", "--json"], seen) == ["snapshot", "--json"]
+    assert mcp.first_snapshot_full(["snapshot", "-d", "B", "--json"], seen)[1] == "--full"   # per device
+    assert mcp.first_snapshot_full(["tap", "3", "--json"], set()) == ["tap", "3", "--json"]

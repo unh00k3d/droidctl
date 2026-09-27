@@ -294,6 +294,40 @@ def _toast(events):
     return None
 
 
+CATCH_UP_S = 1.5
+
+
+def _moved_on(events, pre):
+    """The events say another activity came to the front, but the settled tree
+    still shows the old screen: on Android 9 the window list can lag the
+    TYPE_WINDOW_STATE_CHANGED event (a banking QA app: Home tab -> DashboardActivity)."""
+    was = pre.get("activity") or ""
+    for e in events:
+        cls = e.get("class") or ""
+        if e.get("type") == "window_state" and cls.endswith("Activity") and not was.endswith(cls.split(".")[-1]):
+            return True
+    return False
+
+
+def _catch_up(sess, pre, post):
+    """Re-read the tree (bounded, only in the lagging case above) until it changes."""
+    deadline = time.monotonic() + CATCH_UP_S
+    changes, new_screen = [], False
+    while time.monotonic() < deadline:
+        time.sleep(0.15)
+        post = S.build(sess.tree())
+        changes = S.diff(pre, post) if pre.get("lines") else []
+        new_screen = bool(pre.get("sig")) and pre.get("sig") != post.sig
+        if (changes or new_screen) and not _transitional(post):
+            break
+    return post, changes, new_screen
+
+
+def _transitional(snap):
+    """A frame mid-transition: an app window with no root yet, or nothing drawn."""
+    return bool(snap.degraded or getattr(snap, "incomplete", False) or not snap.elements)
+
+
 def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     """Build the post-action snapshot, diff it against `pre`, save it, shape the result."""
     tree = (reply or {}).get("tree") or sess.tree()
@@ -305,6 +339,9 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     changes = S.diff(pre, post) if pre.get("lines") else []
     new_screen = bool(pre.get("sig")) and pre.get("sig") != post.sig
     changed = bool(changes) or new_screen
+    if not changed and _moved_on(events, pre):
+        post, changes, new_screen = _catch_up(sess, pre, post)
+        changed = bool(changes) or new_screen
     sess.save(post)
     opts = S.Opts()
     if new_screen:
@@ -780,7 +817,7 @@ def _want(t):
                 "value": _field_value(n)}
     r = t.rec or {}
     return {"id": r.get("id"), "rect": tuple(r["bounds"]) if r.get("bounds") else None,
-            "password": False, "value": None}
+            "password": bool(r.get("password")), "value": None}
 
 
 def _readback(sess, want, first_tree=None, tries=6):
@@ -801,6 +838,19 @@ def _readback(sess, want, first_tree=None, tries=6):
     return (None if last is object() else last), None, snap
 
 
+_NUMERIC_TYPED = re.compile(r"[\d\s()+\-./]+")
+
+
+def _same_digits(val, target):
+    """A phone/number formatter added punctuation: "(555) 123 45 67" is what the
+    field shows for a typed "5551234567" (a banking QA app login). Only for a typed
+    value that is itself digits and separators."""
+    if not val or not target or not _NUMERIC_TYPED.fullmatch(target):
+        return False
+    digits = lambda x: re.sub(r"\D", "", x)
+    return digits(target) != "" and digits(val) == digits(target) and _NUMERIC_TYPED.fullmatch(val) is not None
+
+
 def _input_text_arg(s):
     """`adb shell input text` escaping: spaces as %s, shell metacharacters quoted."""
     return shlex.quote(s.replace(" ", "%s"))
@@ -813,6 +863,9 @@ def _type(sess, a, t):
     pre = _pre_lines(sess, t)
     want = _want(t)
     force = _keyboard_force(t, "action")
+    if want["password"] and a.append:
+        raise UserError("can't --append to a password field: its current value is hidden",
+                        "bad-args", hint="type the whole value (it replaces the field)")
     current = want.get("value")
     if current is None and t.rec is not None:
         current = t.rec.get("text") or ""
@@ -825,7 +878,7 @@ def _type(sess, a, t):
             # the platform exposes a password as bullets of the same length (measured on
             # API 28: "••••••••"); the length is all we may compare, and all we report
             return val is not None and len(val) == len(target)
-        return val == target
+        return val == target or _same_digits(val, target)
 
     # 1. ACTION_SET_TEXT (no tap, Unicode-safe)
     r = _act(sess, t, action="set_text", args={"text": target}, force=force,
@@ -887,7 +940,7 @@ def _type(sess, a, t):
             raise UserError(f"the password field did not take the text ({n_now} characters, not {n_want})",
                             "no-change", data={"steps": steps, "len": n_now})
         warning = f"the password field holds {n_now} characters, not {n_want} (a length limit?)"
-    elif not want["password"] and val != target:
+    elif not want["password"] and val != target and not _same_digits(val, target):
         if val == before and target != before:
             raise UserError(f"the field did not take the text (it still shows {val!r})", "no-change",
                             data={"steps": steps, "value": val})
@@ -999,8 +1052,47 @@ def cmd_press(a):
 # --------------------------------------------------------------------------
 # wait / current / apps
 # --------------------------------------------------------------------------
+def _wait_role(sess, a):
+    """`wait --role progress --gone`: a condition on the snapshot's roles, which the
+    device can't evaluate (a loading dialog is often a bare spinner with no text or
+    id; a banking QA app login). Snapshots between device idle waits, bounded by
+    --timeout; a rootless or degraded frame is not "gone", it is not loaded yet."""
+    if a.id or a.desc or a.activity or a.window or a.pkg or a.toast is not None:
+        raise UserError("--role combines only with --text and --gone", "bad-args")
+    t0 = time.monotonic()
+    deadline = t0 + a.timeout
+    want = (a.text or "").lower()
+
+    def hit(snap):
+        return any(e.role == a.role and (not want or (want == e.label_full.lower() if a.exact
+                                                      else want in e.label_full.lower()))
+                   for e in snap.elements)
+
+    while True:
+        snap = S.build(sess.tree())
+        present = hit(snap)
+        done = (not present and not _transitional(snap)) if a.gone else present
+        if done:
+            sess.save(snap)
+            ms = round((time.monotonic() - t0) * 1000)
+            what = f"role={a.role!r}" + (f" text={a.text!r}" if a.text else "") + (" gone" if a.gone else "")
+            return {"ok": True, "matched": True, "ms": ms,
+                    "condition": {"role": a.role, "text": a.text, "gone": bool(a.gone)},
+                    "text": f"matched {what} after {ms} ms\n" + S.header(snap, S.Opts())}
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise UserError(f"gave up after {a.timeout:g} s waiting for role={a.role!r}"
+                            + (" to go" if a.gone else ""), "timeout")
+        t = time.monotonic()
+        sess.call("wait_idle", 150, int(min(left, 1.0) * 1000))
+        if time.monotonic() - t < 0.15:        # already quiet: don't spin on an idle spinner
+            time.sleep(min(0.15, max(0.0, deadline - time.monotonic())))
+
+
 def cmd_wait(a):
     sess = session_for(a)
+    if getattr(a, "role", None):
+        return _wait_role(sess, a)
     cond = {"text": a.text, "id": a.id, "desc": a.desc, "activity": a.activity, "window": a.window,
             "pkg": a.pkg}
     if a.pkg and not any(cond[k] for k in ("text", "id", "desc", "activity", "window")) and a.toast is None:
@@ -1011,7 +1103,7 @@ def cmd_wait(a):
     if a.gone:
         cond["gone"] = True
     if not cond or list(cond) == ["gone"]:
-        raise UserError("wait needs --text/--id/--desc/--activity/--toast/--window/--pkg", "bad-args")
+        raise UserError("wait needs --text/--id/--desc/--role/--activity/--toast/--window/--pkg", "bad-args")
     if a.exact:
         cond["exact"] = True
     timeout_ms = int(a.timeout * 1000)

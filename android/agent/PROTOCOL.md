@@ -209,8 +209,18 @@ difference), ~700–1,400 nodes in the 2 s budget as the system cache warms. TES
 `settle: {quiet_ms=150, first_ms=600, timeout_ms=2000, tree=true, not_important=false}`.
 Accessibility events reach the agent with a lag, so a quiet window counted from the
 action would end before anything is reported. The agent therefore waits up to
-`first_ms` for the **first event** after the action (none → nothing happened, idle),
-then until no event has arrived for `quiet_ms`; `timeout_ms` caps the whole wait.
+`first_ms` for the **first screen-changing event** after the action (none → nothing
+happened, idle), then until no event has arrived for `quiet_ms`; `timeout_ms` caps the
+whole wait. A `clicked`/`focused` event alone does not open the quiet window (agent
+0.3.3): it says the click was handled, not that the screen is done changing. Measured
+on a banking app's QA build: Login → `clicked` at once, the next activity ~0.5 s later;
+before this change settle returned on the old screen (3/3), after it 3/3 new screen.
+A click that changes nothing now settles at `first_ms` (600 ms) instead of ~250 ms.
+
+On Android 9 the window list can also lag the new activity's `WINDOW_STATE` event, so
+the settled tree may still show the old screen; the host catches that case (an
+Activity `window_state` in `events` but an unchanged tree) by re-reading the tree for
+up to 1.5 s, skipping rootless frames (`act.py`, `_catch_up`).
 Result fields: `idle` (false = the cap was hit while the screen kept changing),
 `settle_ms` (until the screen went quiet; excludes the final dump), `t0` (uptime ms
 when the action started; compare with event `t`), `redumps` (when the check below

@@ -320,7 +320,8 @@ def test_type_accepts_a_field_that_reformats(home, monkeypatch):
     s._client.act_replies = [{"performed": True, "tree": shown}]
     out = act.cmd_type(type_args(id="message", content="555123"))
     assert out["method"] == "set_text" and out["value"] == "(555) 123"
-    assert out["verified"] is False and "warning" in out
+    # same digits, punctuation added by the field's formatter: verified, no warning
+    assert out["verified"] is True and not out.get("warning")
     assert s._client.count("clipboard") == 0                # changed, so not "ignored": no retyping
 
 
@@ -419,3 +420,87 @@ def test_crash_blocks_pick_the_package_crash_by_its_pid():
     assert len(lines) > 5 and all(" E AndroidRuntime" in x for x in lines)
     assert act.crash_blocks(log, "com.example.other") == []
     assert act.crash_blocks("", "dev.droidctl.testapp") == []
+
+
+@pytest.mark.parametrize("val,target,same", [
+    ("(555) 123 45 67", "5551234567", True),
+    ("+90 555 123 45 67", "+905551234567", True),
+    ("555123456", "5551234567", False),         # a length limit ate a digit
+    ("Ada 5551234567", "5551234567", False),    # letters: not a formatter
+    ("hello", "hello", False),                  # not numeric at all (plain equality handles it)
+])
+def test_formatted_digits_count_as_the_typed_value(val, target, same):
+    assert act._same_digits(val, target) is same
+
+
+def test_an_activity_event_with_a_lagging_window_list_is_caught_up(home, monkeypatch):
+    """Android 9: the new activity's window_state arrives inside the settle, but the
+    settled tree still shows the old screen (a banking QA app: Home tab). The result
+    must report the new screen, not `unchanged`."""
+    s = session(monkeypatch, tree("cart_inc-a"))
+    ev = {"type": "window_state", "class": "com.example.DashboardActivity", "seq": 7}
+    s._client.act_replies = [{"performed": True, "clicked_event": True, "tree": tree("cart_inc-a"),
+                              "events": [ev]}]
+    later = tree("cart_inc-b")
+    real_tree = s._client.tree
+    s._client.tree = lambda **kw: (real_tree(**kw), later)[1]
+    out = act.cmd_tap(args(target=str(plus_ref())))
+    assert out["changed"] and out["method"] == "action"
+
+
+def test_no_catch_up_without_an_activity_event(home, monkeypatch):
+    s = session(monkeypatch, tree("cart_inc-a"))
+    s._client.act_replies = [{"performed": True, "clicked_event": True, "tree": tree("cart_inc-a"),
+                              "events": [{"type": "clicked", "seq": 3}]}]
+    out = act.cmd_tap(args(target=str(plus_ref())))
+    assert not out["changed"] and s._client.count("tree") == 0
+
+
+def test_catch_up_waits_past_a_rootless_frame(home, monkeypatch):
+    """The first re-read can be the new activity with no root yet (degraded):
+    that is a different sig, but not the screen to report."""
+    s = session(monkeypatch, tree("cart_inc-a"))
+    ev = {"type": "window_state", "class": "com.example.DashboardActivity", "seq": 7}
+    s._client.act_replies = [{"performed": True, "clicked_event": True, "tree": tree("cart_inc-a"),
+                              "events": [ev]}]
+    rootless = json.loads((FIX.parent / "trees" / "testapp-slow_a11y.json").read_text())["tree"]
+    frames = [rootless, tree("cart_inc-b")]
+    s._client.tree = lambda **kw: frames.pop(0) if len(frames) > 1 else frames[0]
+    out = act.cmd_tap(args(target=str(plus_ref())))
+    assert out["changed"] and not out.get("screen_warnings")
+
+
+def _wait_args(**kw):
+    base = dict(device="FAKE", json=True, text=None, id=None, desc=None, role="progress", gone=True,
+                exact=False, activity=None, toast=None, window=None, pkg=None, timeout=2.0,
+                no_auto_setup=True)
+    base.update(kw)
+    return argparse.Namespace(**base)
+
+
+def _trees(*names):
+    return [json.loads((FIX.parent / "trees" / f"{n}.json").read_text())["tree"] for n in names]
+
+
+def test_wait_role_gone_passes_a_rootless_frame_and_ends_when_the_spinner_goes(home, monkeypatch):
+    """A bare spinner (no text, no id) is only reachable by role (a banking QA app login)."""
+    frames = _trees("testapp-spinner_forever", "testapp-slow_a11y", "testapp-cart")
+    s = session(monkeypatch, frames[0])
+    s._client.tree = lambda **kw: frames.pop(0) if len(frames) > 1 else frames[0]
+    out = act.cmd_wait(_wait_args())
+    assert out["matched"] and not frames[1:]                  # consumed up to the loaded screen
+    assert s.state["sig"] == S.build(frames[0]).sig           # the next ref resolves against it
+
+
+def test_wait_role_times_out_on_a_spinner_that_never_ends(home, monkeypatch):
+    s = session(monkeypatch, _trees("testapp-spinner_forever")[0])
+    with pytest.raises(UserError) as e:
+        act.cmd_wait(_wait_args(timeout=0.5))
+    assert e.value.kind == "timeout"
+
+
+def test_wait_role_refuses_device_side_conditions(home, monkeypatch):
+    s = session(monkeypatch, _trees("testapp-cart")[0])
+    with pytest.raises(UserError) as e:
+        act.cmd_wait(_wait_args(id="spinner"))
+    assert e.value.kind == "bad-args"

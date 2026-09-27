@@ -204,15 +204,19 @@ class Events(private val svc: AgentService) {
      * Settle after an action taken at `from`. Accessibility events reach us with a lag
      * (150-250 ms after a click on the SM-N950F, measured), so a quiet window counted
      * from the action ends before anything is reported. Instead: wait up to `firstMs`
-     * for the first event after `from` (none -> nothing happened, idle), then until no
-     * event has arrived for `quietMs`. False if `timeoutMs` (from now) ran out first.
+     * for the first screen-changing event after `from` (none -> nothing happened, idle;
+     * a clicked/focus event alone doesn't count), then until no event has arrived for
+     * `quietMs`. False if `timeoutMs` (from now) ran out first.
      */
     fun waitSettled(from: Long, quietMs: Long, firstMs: Long, timeoutMs: Long): Boolean {
         val deadline = SystemClock.uptimeMillis() + timeoutMs
         synchronized(lock) {
             while (true) {
                 val now = SystemClock.uptimeMillis()
-                val target = if (lastEvent <= from) from + firstMs
+                // the first *change* opens the quiet window: a TYPE_VIEW_CLICKED alone
+                // says the click was handled, not that the screen is done changing
+                // (a banking QA app: Login -> clicked, then the next activity ~0.5 s later)
+                val target = if (lastChange <= from) from + firstMs
                              else maxOf(lastEvent, lastChange) + quietMs
                 if (now >= target) return true
                 if (now >= deadline) return false
