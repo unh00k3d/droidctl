@@ -120,7 +120,7 @@ Result:
 | field | meaning |
 |---|---|
 | `gen` | the `gen` value read **before** the dump started |
-| `dump` | the dump id; it increases by one per successful dump. Handles belong to it |
+| `dump` | the dump id: opaque; it starts at a random value per agent process and increases by one per successful dump, so ids are not reused across agent restarts. Handles belong to it |
 | `degraded` | `true` if the dump is not a complete read of the current windows (see `reason`) |
 | `reason` | only when degraded, comma-separated: `timeout` (budget exceeded), `truncated` (over `max_nodes` or 120 levels), `no-root` (an application window has no root) |
 | `unread` | only when degraded: how many nodes carry `truncated` (subtrees not read) |
@@ -351,3 +351,16 @@ typing; the host restores `previous` afterwards.
   (`redumps`). Bumped because a host that trusted a v2 degraded tree's handles would
   act on the wrong screen.
   Agent 0.3.1 (versionCode 4, still protocol 3): the additive `unlisted` window.
+  Agent 0.3.2 (versionCode 5, still protocol 3): `dump` ids start at a random value per
+  agent process, so a ref saved before an agent restart can't match a new dump.
+
+## Connection loss (service unbound)
+
+An external UiAutomation client (`uiautomator dump`, Appium, uiautomator2) makes Android
+unbind accessibility services while it is attached. The agent then stops its server and
+closes every connection (measured on the SM-N950F: the socket closed ~0.7 s into a
+`uiautomator dump`, and the service was bound and listening again ~1.2 s later). Clients
+see EOF with no reply. Hosts must not resend a request that may have acted: the
+reference host retries only read-only methods (`ping echo gen tree events current
+screenshot wait_idle wait_for`) once the agent answers again, and reports anything else
+as `connection` with `maybe_performed`.

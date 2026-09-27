@@ -405,3 +405,17 @@ def test_digits_after_a_locator_are_the_text_not_a_ref(home, monkeypatch):
     assert a.content == "123456" and a.target is None
     sets = [c for c in s._client.calls if c[0] == "act" and c[3] == "set_text"]
     assert sets and sets[0][4]["text"] == "123456"
+
+
+# --- logs: a crashed app's stack comes from the crash buffer ----------------------
+def test_crash_blocks_pick_the_package_crash_by_its_pid():
+    """Captured from the SM-N950F after TESTAPP `crash`: the stack lines don't name
+    the package, only the `Process: <pkg>, PID: N` line does."""
+    import pathlib
+    log = (pathlib.Path(__file__).parent / "fixtures" / "logs" / "crash-buffer.txt").read_text()
+    lines = act.crash_blocks(log, "dev.droidctl.testapp")
+    text = "\n".join(lines)
+    assert "FATAL EXCEPTION" in text and "deliberate crash" in text
+    assert len(lines) > 5 and all(" E AndroidRuntime" in x for x in lines)
+    assert act.crash_blocks(log, "com.example.other") == []
+    assert act.crash_blocks("", "dev.droidctl.testapp") == []

@@ -1158,23 +1158,43 @@ def cmd_install(a):
 LEVELS = ("V", "D", "I", "W", "E", "F")
 
 
+_CRASH_PROC = re.compile(r"\bProcess: (\S+), PID: (\d+)")
+
+
+def crash_blocks(crash_log, pkg):
+    """The crash-buffer lines of ``pkg``'s crashes (FATAL EXCEPTION and its stack).
+
+    A crashed app has no pid any more, and its stack lines don't name the package,
+    so they are found by the PID on the crash's own "Process: <pkg>, PID: N" line."""
+    lines = [x for x in crash_log.splitlines() if x and not x.startswith("--------- beginning")]
+    pids = {m.group(2) for x in lines for m in [_CRASH_PROC.search(x)] if m and m.group(1) == pkg}
+    return [x for x in lines if len(x.split()) > 2 and x.split()[2] in pids]
+
+
 def cmd_logs(a):
     serial = dev.resolve_serial(a.device)
     sess = get_session(serial, auto_setup=False)
     cmd = ["logcat", "-d", "-v", "threadtime", "-t", str(max(1, a.max * (4 if a.pkg else 1)))]
     if a.pkg:
         pid = sess.shell("pidof", a.pkg, check=False).strip().split()
+        # its crashes, from the crash buffer: they survive the process and log noise
+        crash = crash_blocks(sess.adb("logcat", "-d", "-b", "crash", "-v", "threadtime",
+                                      timeout=30), a.pkg)[-a.max:]
         if not pid:
-            # not running (maybe it crashed): fall back to lines that mention the package
+            # not running (maybe it crashed): lines that mention the package, plus its crashes
             cmd += ["*:" + (a.level or "V")]
             lines = [x for x in sess.adb(*cmd, timeout=30).splitlines() if a.pkg in x]
             lines = lines[-a.max:]
-            return {"ok": True, "lines": lines, "pid": None, "text": "\n".join(lines) or "(no lines)"}
+            text = "\n".join(lines + (["-- crash --"] + crash if crash else [])) or "(no lines)"
+            return {"ok": True, "lines": lines, "crash": crash, "pid": None, "text": text}
         cmd += ["--pid", pid[0]]
     if a.level:
         cmd += ["*:" + a.level]
     lines = sess.adb(*cmd, timeout=30).splitlines()
     lines = [x for x in lines if x and not x.startswith("--------- beginning")][-a.max:]
+    if a.pkg:
+        text = "\n".join(lines + (["-- crash --"] + crash if crash else [])) or "(no lines)"
+        return {"ok": True, "lines": lines, "crash": crash, "text": text}
     return {"ok": True, "lines": lines, "text": "\n".join(lines) or "(no lines)"}
 
 

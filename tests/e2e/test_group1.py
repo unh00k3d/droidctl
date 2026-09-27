@@ -136,8 +136,10 @@ def test_crash_is_reported_and_never_followed_by_a_positional_tap(scenario):
             break
         time.sleep(0.3)
     assert cur.get("pkg") != "dev.droidctl.testapp", cur
-    logs = dc("logs", "--max", "400", "--level", "E")
-    assert "deliberate crash" in logs["text"]
+    # TESTAPP: `logs` shows the stack trace. The whole-device E log can be flooded by
+    # other processes, so ask for the app: its crash comes from the crash buffer
+    logs = dc("logs", "--pkg", "dev.droidctl.testapp", "--max", "100")
+    assert "deliberate crash" in logs["text"] and any("FATAL EXCEPTION" in x for x in logs["crash"])
     s = dc("snapshot", "--full")
     if s["screen"]["dialog"]:
         dc("back", ok=None)                      # dismiss the crash dialog only

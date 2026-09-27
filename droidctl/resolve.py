@@ -547,6 +547,26 @@ def _ambiguous(msg, elems, tried=None):
                      data={"candidates": cands, "count": len(elems), "tried": tried or []})
 
 
+def _label_nodes(e):
+    """Every node whose text went into ``e``'s label: its own nodes plus the
+    passive descendants it absorbed (a Compose icon's desc inside a button, the
+    texts of a row). Locators must match what the snapshot shows."""
+    out, seen, stack = [], set(), list(e.nodes)
+    while stack:
+        n = stack.pop()
+        if id(n) in seen:
+            continue
+        seen.add(id(n))
+        if n.el is e or n in e.nodes:
+            out.append(n)
+        stack.extend(n.children)
+    return out
+
+
+def _descs(e):
+    return {norm(n.get("desc")) for n in _label_nodes(e) if n.get("desc")}
+
+
 def _text_fields(e):
     out = [e.label_full, *e.segments]
     for n in e.nodes:
@@ -598,7 +618,7 @@ def find(snap, id=None, text=None, desc=None, cls=None, role=None, index=None,
         elems = [e for e in elems if _match_id(e, id)]
         tried.append(f"id={id}")
     if desc is not None:
-        elems = _match_text(elems, desc, lambda e: {norm(n.get("desc")) for n in e.nodes if n.get("desc")})
+        elems = _match_text(elems, desc, _descs)
         tried.append(f"desc={desc}")
     if text is not None:
         elems = _match_text(elems, text, _text_fields)
@@ -608,21 +628,21 @@ def find(snap, id=None, text=None, desc=None, cls=None, role=None, index=None,
     for key, direction in SPATIAL.items():
         if loc.get(key) is None:
             continue
-        anchor = _anchor(snap, loc[key])
-        elems = [e for e in elems if e is not anchor and sp.RELATIONS[direction](e.rect, anchor.rect)
+        anchor, arect = _anchor(snap, loc[key])
+        elems = [e for e in elems if e is not anchor and sp.RELATIONS[direction](e.rect, arect)
                  and not e.node.is_ancestor_of(anchor.node)]
-        order = sorted(elems, key=lambda e: (max(0, sp.gap(e.rect, anchor.rect, direction)),
-                                              math.dist(sp.center(e.rect), sp.center(anchor.rect))))
+        order = sorted(elems, key=lambda e: (max(0, sp.gap(e.rect, arect, direction)),
+                                              math.dist(sp.center(e.rect), sp.center(arect))))
         tried.append(f"{key.replace('_', '-')}={loc[key]}")
     if near is not None:
-        anchor = _anchor(snap, near)
+        anchor, arect = _anchor(snap, near)
         elems = [e for e in elems if e is not anchor and not e.node.is_ancestor_of(anchor.node)
                  and not anchor.node.is_ancestor_of(e.node)]
-        order = sp.near_to(elems, anchor.rect, key=lambda e: e.rect)
+        order = sp.near_to(elems, arect, key=lambda e: e.rect)
         tried.append(f"near={near}")
         if len(order) >= 2 and index is None:
-            d0 = math.dist(sp.center(order[0].rect), sp.center(anchor.rect))
-            d1 = math.dist(sp.center(order[1].rect), sp.center(anchor.rect))
+            d0 = math.dist(sp.center(order[0].rect), sp.center(arect))
+            d1 = math.dist(sp.center(order[1].rect), sp.center(arect))
             if d1 - d0 > 8:               # --near means "the nearest": unique only if clearly nearest
                 order = order[:1]
 
@@ -652,20 +672,43 @@ def _locator_result(e, snap, via):
 
 
 def _anchor(snap, spec):
-    """A spatial anchor: a ref number (int or "[7]"/"7") or a unique text."""
+    """A spatial anchor -> (element, rect): a ref number (int or "[7]"/"7") or a
+    unique text. A text may be one segment of a merged row label ("Ada Lovelace"
+    of "Ada Lovelace · Lunch tomorrow?"); the rect is then that text's own box,
+    so the star button inside the same row is still "right of" the name."""
     m = re.fullmatch(r"\[?(\d+)\]?", str(spec).strip())
     if m:
         n = int(m.group(1))
         e = next((x for x in snap.elements if x.ref == n and x.rect), None)
         if e is None:
             raise UserError(f"anchor [{n}] is not on the screen", "stale-ref", data={"reason": "gone", "ref": n})
-        return e
+        return e, e.rect
     hits = _match_text([e for e in snap.elements if e.rect], spec, _text_fields)
     if not hits:
         raise UserError(f"anchor {_q(spec)}: nothing matches", "not-found", data={"anchor": spec})
     if len(hits) > 1:
         raise _ambiguous(f"anchor {_q(spec)} matches {len(hits)} elements", hits, [f"anchor={spec}"])
-    return hits[0]
+    return hits[0], _anchor_rect(hits[0], spec)
+
+
+def _anchor_rect(e, spec):
+    """The box of the text in ``e`` that matched ``spec`` (exact before substring,
+    smallest first), or the element's box when the whole label matched."""
+    k = norm(spec)
+    exact, sub = [], []
+    for n in _label_nodes(e):
+        box = n.box or n.rect
+        if not box or not sp.area(box):
+            continue
+        vals = {norm(n.get(f)) for f in ("text", "desc", "hint") if n.get(f)}
+        if k in vals:
+            exact.append((sp.area(box), box))
+        elif any(k in v for v in vals):
+            sub.append((sp.area(box), box))
+    best = sorted(exact) or sorted(sub)
+    if not best or norm(e.label_full) == k:
+        return e.rect
+    return best[0][1]
 
 
 def _node_matches(n, id=None, text=None, desc=None, cls=None):

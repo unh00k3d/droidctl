@@ -57,7 +57,7 @@ ERROR_KINDS = {
     "not-found": "the thing named does not exist (a file, a binary, an element)",
     "timeout": "gave up waiting",
     "missing-dep": "an external tool this command needs is not installed",
-    "connection": "the device agent's socket is unreachable (forward lost, service not running)",
+    "connection": "the device agent's socket is unreachable or was closed (forward lost, service not running, or unbound by Appium/uiautomator); with data.maybe_performed the action may already have run: snapshot before repeating it",
     # device and setup
     "no-device": "no device attached, or none matches -d / ANDROID_SERIAL",
     "adb": "an adb command failed (its own message is passed through)",

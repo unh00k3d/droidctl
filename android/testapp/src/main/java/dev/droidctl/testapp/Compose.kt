@@ -29,6 +29,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -159,10 +160,15 @@ object Cmp {
 
     fun duplicates(s: Sc) = host(s) {
         Title("Items")
+        val items = remember { mutableStateListOf(*(1..20).toList().toTypedArray()) }
         Column(Modifier.verticalScroll(rememberScrollState())) {
-            for (i in 1..20) Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Item $i", Modifier.weight(1f))
-                Button(onClick = { s.dta("delete", "delete", "row" to i) }, Modifier.testTag("delete")) { Text("Delete") }
+            for (i in items) key(i) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Item $i", Modifier.weight(1f))
+                    // the row really goes away, so an agent can see that its delete worked
+                    Button(onClick = { s.dta("delete", "delete", "row" to i); items.remove(i) },
+                        Modifier.testTag("delete")) { Text("Delete") }
+                }
             }
         }
     }

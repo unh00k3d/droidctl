@@ -23,7 +23,7 @@ PROTOCOL = 3
 # The versionCode of the APK bundled in droidctl/assets. It has to match the
 # agent's build.gradle.kts (a unit test checks); setup compares it with what
 # the phone reports so an unchanged agent is not reinstalled.
-AGENT_VERSION_CODE = 4
+AGENT_VERSION_CODE = 5
 APK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "droidctl-agent.apk")
 DEVICE_TMP_APK = "/data/local/tmp/droidctl-agent.apk"
 
@@ -272,19 +272,62 @@ class AgentClient:
     and handed out by `notifications()`.
     """
 
+    # Methods that only read device state, so repeating one is harmless. When the
+    # service is unbound mid-request (an external UiAutomation client such as
+    # `uiautomator dump` or Appium suppresses accessibility services; measured on
+    # the SM-N950F: the socket closes ~0.7 s into a dump and the service is back
+    # ~1.2 s later), these wait for the agent and are retried once. Actions never
+    # are: they may already have been performed.
+    IDEMPOTENT = frozenset({"ping", "echo", "gen", "tree", "events", "current",
+                            "screenshot", "wait_idle", "wait_for"})
+    REBIND_WAIT = 4.0
+
     def __init__(self, port, host="127.0.0.1", timeout=5.0):
-        self.port = port
+        self.port, self.host = port, host
         self._id = 0
         self._notes = collections.deque(maxlen=5000)
+        self._sock = None
+        self._worked = False          # reconnect only after a working link was lost, so a
+        self._open(timeout)           # phone without the agent still fails fast
+
+    def _open(self, timeout):
         try:
-            self._sock = socket.create_connection((host, port), timeout=timeout)
+            self._sock = socket.create_connection((self.host, self.port), timeout=timeout)
         except OSError as e:
-            raise UserError(f"nothing listening on tcp:{port}: {e}", "connection")
+            self._sock = None
+            raise UserError(f"nothing listening on tcp:{self.port}: {e}", "connection")
         self._sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         # our own line buffer, not makefile(): a buffered file is unusable after
         # one read timeout ("cannot read from timed out object"), and bounded
         # waits for pushed events time out by design
         self._buf = bytearray()
+
+    def _drop(self):
+        if self._sock is not None:
+            try:
+                self._sock.close()
+            except OSError:
+                pass
+        self._sock = None
+
+    def _reconnect(self):
+        """Wait for the agent to answer again on a fresh connection (adb accepts
+        the connect even while nothing listens, so only a ping reply counts)."""
+        self._drop()
+        deadline = time.monotonic() + self.REBIND_WAIT
+        last = None
+        while time.monotonic() < deadline:
+            try:
+                self._open(1.0)
+                self._request("ping", None, 1.0)
+                return
+            except UserError as e:
+                last = e
+                self._drop()
+                time.sleep(0.1)
+        raise UserError("the agent's service did not come back within "
+                        f"{self.REBIND_WAIT:g}s ({last})", "connection",
+                        hint="run: droidctl doctor (is Appium/uiautomator attached?)")
 
     def _readline(self):
         while True:
@@ -314,6 +357,27 @@ class AgentClient:
             raise UserError(f"the agent sent invalid JSON: {line[:200]!r}", "device")
 
     def call(self, method, params=None, timeout=10.0):
+        if self._sock is None:                    # dropped by an earlier unbind
+            self._reconnect()
+        try:
+            return self._request(method, params, timeout)
+        except UserError as e:
+            if e.kind != "connection":
+                raise
+            if not self._worked:
+                raise
+            if method not in self.IDEMPOTENT:
+                self._drop()                      # the next call reconnects
+                raise UserError(
+                    f"{method}: the agent's service went away mid-request (an external UiAutomation "
+                    "client such as uiautomator/Appium, or the service being disabled); "
+                    "the action may or may not have been performed", "connection",
+                    hint="run: droidctl snapshot to see the current state before repeating it",
+                    data={"maybe_performed": True, "method": method})
+        self._reconnect()
+        return self._request(method, params, timeout)
+
+    def _request(self, method, params, timeout):
         self._id += 1
         req = {"jsonrpc": "2.0", "id": self._id, "method": method}
         if params is not None:
@@ -328,6 +392,7 @@ class AgentClient:
                     continue
                 if msg["id"] is not None and msg["id"] != self._id:
                     continue                      # a late reply to an older request
+                self._worked = True
                 if "error" in msg:
                     raise error_from(method, msg["error"] or {})
                 return msg.get("result")
@@ -338,6 +403,8 @@ class AgentClient:
 
     def notifications(self, timeout=1.0):
         """Yield pushed notification params until `timeout` passes with none."""
+        if self._sock is None:
+            raise UserError("connection lost (the agent's service was unbound)", "connection")
         while True:
             while self._notes:
                 yield self._notes.popleft().get("params")
@@ -422,10 +489,7 @@ class AgentClient:
         return self.call("unsubscribe")
 
     def close(self):
-        try:
-            self._sock.close()
-        except OSError:
-            pass
+        self._drop()
 
     def __enter__(self):
         return self

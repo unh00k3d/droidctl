@@ -18,6 +18,8 @@ interface; you never need `--help` per command (`droidctl cheat --json` has it a
    (`droidctl tap 4`). Refs are re-resolved against the live screen, never guessed by
    position: if the screen changed they fail with `stale-ref` (re-run `snapshot`),
    `ambiguous` (use a more specific locator), `occluded` or `offscreen` (`scroll-to` it).
+   `connection` with `data.maybe_performed`: the action may already have run, so
+   `snapshot` before repeating it.
 3. **Copy labels verbatim** from the snapshot when you use `--text`/`--desc`; never
    invent them from a screenshot. Prefer refs over text.
 4. **Every action reports what changed** (`changed`, `diff`, `new_screen`, `toast`), so

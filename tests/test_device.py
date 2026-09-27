@@ -4,6 +4,7 @@ import pathlib
 import re
 import socket
 import threading
+import time
 
 import pytest
 
@@ -228,3 +229,86 @@ def test_importing_the_cli_does_not_load_heavy_modules():
             "print(sorted(m for m in ('adbutils','requests','PIL','rich') if m in sys.modules))")
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
     assert out.stdout.strip() == "[]"
+
+
+# --- the service being unbound mid-request (uiautomator/Appium) -----------------
+class RebindingAgent:
+    """Serves connections one after another. `unbind()` makes it drop the live
+    connection at its next request, then accept-and-close `gap` connections (as
+    adb does while nothing listens on the phone) before serving normally again."""
+
+    def __init__(self, gap=3):
+        self.gap, self.pending_unbind, self.refuse = gap, False, 0
+        self.executed = []
+        self.srv = socket.socket()
+        self.srv.bind(("127.0.0.1", 0))
+        self.srv.listen(8)
+        self.port = self.srv.getsockname()[1]
+        threading.Thread(target=self._serve, daemon=True).start()
+
+    def unbind(self):
+        self.pending_unbind = True
+
+    def _serve(self):
+        while True:
+            conn, _ = self.srv.accept()
+            if self.refuse:
+                self.refuse -= 1
+                conn.close()
+                continue
+            r = conn.makefile("rb")
+            with conn:
+                while True:
+                    line = r.readline()
+                    if not line:
+                        break
+                    req = json.loads(line)
+                    self.executed.append(req["method"])
+                    if self.pending_unbind:
+                        self.pending_unbind, self.refuse = False, self.gap
+                        conn.shutdown(socket.SHUT_RDWR)   # like onUnbind closing the socket
+                        break                  # the request ran, but no reply ever comes
+                    conn.sendall((json.dumps({"jsonrpc": "2.0", "id": req["id"],
+                                              "result": {"m": req["method"]}}) + "\n").encode())
+
+
+def test_a_read_survives_the_service_being_unbound():
+    fake = RebindingAgent()
+    with dev.AgentClient(fake.port) as c:
+        assert c.call("ping") == {"m": "ping"}
+        fake.unbind()
+        assert c.call("tree") == {"m": "tree"}          # waited for the agent, then retried once
+        assert fake.executed.count("tree") == 2
+
+
+def test_an_action_is_never_retried_after_an_unbind():
+    fake = RebindingAgent()
+    with dev.AgentClient(fake.port) as c:
+        c.call("ping")
+        fake.unbind()
+        with pytest.raises(UserError) as e:
+            c.call("act", {"dump": 1, "handle": 2, "action": "click"})
+        assert e.value.kind == "connection" and e.value.data["maybe_performed"]
+        assert "snapshot" in e.value.hint
+        assert fake.executed.count("act") == 1           # sent once, never repeated
+        assert c.call("ping") == {"m": "ping"}           # the next call reconnects
+        assert fake.executed.count("act") == 1
+
+
+def test_a_phone_without_the_agent_still_fails_fast():
+    fake = FakeAgent(lambda req: None)
+    t = time.monotonic()
+    with dev.AgentClient(fake.port) as c, pytest.raises(UserError) as e:
+        c.call("ping")
+    assert e.value.kind == "connection" and time.monotonic() - t < 1.0
+
+
+def test_an_agent_that_never_comes_back_is_a_clear_connection_error(monkeypatch):
+    monkeypatch.setattr(dev.AgentClient, "REBIND_WAIT", 0.5)
+    fake = RebindingAgent(gap=10 ** 6)
+    with dev.AgentClient(fake.port) as c:
+        c.call("ping")
+        fake.unbind()
+        with pytest.raises(UserError) as e:
+            c.call("tree")
+        assert e.value.kind == "connection" and "did not come back" in str(e.value)

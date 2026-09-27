@@ -39,6 +39,7 @@ class FakeAgent:
         self.calls = collections.Counter()
         self.lock = threading.Lock()
         self.subscribers = []
+        self._conns = {}
         self.sock = socket.socket()
         self.sock.bind(("127.0.0.1", 0))
         self.sock.listen(16)
@@ -56,6 +57,16 @@ class FakeAgent:
 
     def close(self):
         self.sock.close()
+
+    def drop_subscribers(self):
+        """What an unbind does to the event stream: the connection just closes."""
+        with self.lock:
+            subs = list(self.subscribers)
+        for f in subs:
+            try:
+                self._conns[f].shutdown(socket.SHUT_RDWR)
+            except (OSError, KeyError):
+                pass
 
     # -- protocol
     def _push(self, type, **fields):
@@ -117,6 +128,7 @@ class FakeAgent:
 
     def _conn(self, conn):
         f = conn.makefile("rwb")
+        self._conns[f] = conn
         try:
             for line in f:
                 req = json.loads(line)

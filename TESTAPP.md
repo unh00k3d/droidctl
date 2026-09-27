@@ -84,7 +84,7 @@ Legend for the expected behaviour: **R** = ref resolution, **S** = snapshot, **A
 |---|---|---|
 | `long_list` | RecyclerView of 1,000 rows (+ `list_compose` LazyColumn) | S `list 8/1000 more↓`; `scroll-to --text "Row 734"` works with a cap; the snapshot stays <2k tokens |
 | `list_insert_top` | a new row inserted at the top every N seconds | refs to existing rows heal by identity, never by index (the android_world bug) |
-| `duplicates` | 20 rows each with an identical "Delete" button | tapping the "Delete" in row 7 resolves through the row's label/ancestor; a bare `--text Delete` → E `ambiguous` listing candidates |
+| `duplicates` | 20 rows each with an identical "Delete" button; Delete removes its row (visible feedback) | tapping the "Delete" in row 7 resolves through the row's label/ancestor; a bare `--text Delete` → E `ambiguous` listing candidates |
 | `lookalike_ok` | screen A "OK" → screen B also has "OK" at the same position | a stale ref from A on B → E `stale-ref` (signature changed; tiers 3–4 disabled) |
 | `nested_scroll` | horizontal carousel inside a vertical list | both scrollables listed; `scroll --ref carousel right` moves only the carousel |
 | `infinite` | loads more on reaching the end | `scroll-to` stops at its cap with a clear message |

@@ -13,6 +13,8 @@ surface as data anytime: `droidctl cheat --json`. (Working *on* droidctl itself?
 2. **Look, then act on refs.** `snapshot` gives each element a `[ref]`; actions take the ref.
    Refs are locators, re-resolved against the live screen — never coordinates, never guessed
    by position. When a ref no longer resolves you get a typed error instead of a wrong tap.
+   A `connection` error with `data.maybe_performed` means the action may already have run
+   (Appium/`uiautomator` briefly unbinds the agent): `snapshot` before repeating it.
 3. **Copy labels verbatim** from the snapshot for `--text`/`--desc`. Don't invent them from a
    screenshot. Prefer refs.
 4. **Batch with `run`**: a multi-step flow in one `run --json` is one process and one device
@@ -188,7 +190,7 @@ file with the same generated tables); `droidctl skill print` prints it.
 | `not-found` | the thing named does not exist (a file, a binary, an element) |
 | `timeout` | gave up waiting |
 | `missing-dep` | an external tool this command needs is not installed |
-| `connection` | the device agent's socket is unreachable (forward lost, service not running) |
+| `connection` | the device agent's socket is unreachable or was closed (forward lost, service not running, or unbound by Appium/uiautomator); with data.maybe_performed the action may already have run: snapshot before repeating it |
 | `no-device` | no device attached, or none matches -d / ANDROID_SERIAL |
 | `adb` | an adb command failed (its own message is passed through) |
 | `not-installed` | the droidctl agent is not installed or its service is not enabled (run: droidctl setup) |

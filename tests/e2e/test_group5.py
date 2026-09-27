@@ -48,17 +48,24 @@ def test_duplicates_bare_text_is_ambiguous_and_row_context_resolves(scenario):
     sc = scenario("duplicates")
     p = dc("tap", "--text", "Delete", ok=False)
     assert kind(p) == "ambiguous" and p["error"]["data"]["count"] >= 2
-    dc("tap", "--text", "Delete", "--right-of", "Item 7")
+    r = dc("tap", "--text", "Delete", "--right-of", "Item 7")
     ev = sc.dta("delete", "delete")
     assert len(ev) == 1 and ev[0]["row"] == 7
+    # the row is removed, so the agent can see its delete worked (TESTAPP)
+    assert r["changed"]
+    labels = [e["label"] or "" for e in sc.snap()["elements"]]
+    assert not any(l.startswith("Item 7") for l in labels) and any(l.startswith("Item 8") for l in labels)
 
 
 def test_duplicates_compose_row_context_resolves(scenario):
     sc = scenario("duplicates_compose")
     assert kind(dc("tap", "--text", "Delete", ok=False)) == "ambiguous"
-    dc("tap", "--text", "Delete", "--right-of", "Item 2")
+    r = dc("tap", "--text", "Delete", "--right-of", "Item 2")
     ev = sc.dta("delete", "delete")
     assert len(ev) == 1 and ev[0]["row"] == 2
+    assert r["changed"]
+    labels = [e["label"] or "" for e in sc.snap()["elements"]]
+    assert "Item 2" not in labels and "Item 3" in labels
 
 
 def test_nested_scroll_moves_only_the_carousel(scenario):

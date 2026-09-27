@@ -287,6 +287,28 @@ def test_snapshot_cache_hit_miss_and_invalidation(phones):
     assert dev_a["subscribed"] and dev_a["cache"]["hits"] == 3 and dev_a["cache"]["misses"] == 2
 
 
+def test_the_event_subscription_comes_back_after_an_unbind(phones):
+    """uiautomator/Appium unbind the service for ~1-2 s, which closes the
+    daemon's event stream; it must resubscribe instead of staying degraded."""
+    env, a, _ = phones
+    js(dc(env, "snapshot", "-d", "AAA", "--json"))
+
+    def subscribed():
+        st = js(dc(env, "daemon", "status", "--json"))
+        return next(d for d in st["devices"] if d["serial"] == "AAA")["subscribed"]
+
+    assert subscribed()
+    subs_before = a.calls["subscribe"]
+    a.drop_subscribers()
+    assert _wait(lambda: a.calls["subscribe"] > subs_before, timeout=6.0), "never resubscribed"
+    assert _wait(subscribed, timeout=6.0)
+    a.change()                                  # events flow again: the cache sees the change
+    time.sleep(0.2)
+    trees = a.calls["tree"]
+    js(dc(env, "snapshot", "-d", "AAA", "--json"))
+    assert a.calls["tree"] == trees + 1
+
+
 def test_an_action_primes_the_cache_with_its_settled_tree(phones):
     env, a, _ = phones
     js(dc(env, "snapshot", "-d", "AAA", "--json"))

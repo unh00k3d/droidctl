@@ -1,0 +1,21 @@
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: FATAL EXCEPTION: main
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: Process: dev.droidctl.testapp, PID: 7398
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: java.lang.RuntimeException: droidctl testapp: deliberate crash
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at dev.droidctl.testapp.G1.crash$lambda$31$lambda$30(G1Timing.kt:117)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at dev.droidctl.testapp.G1$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at dev.droidctl.testapp.Sc.button$lambda$16$lambda$15(Sc.kt:134)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at dev.droidctl.testapp.Sc$$ExternalSyntheticLambda4.onClick(D8$$SyntheticClass:0)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.view.View.performClick(View.java:7359)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.widget.TextView.performClick(TextView.java:14230)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.widget.TextView.performAccessibilityActionClick(TextView.java:12476)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.widget.TextView.performAccessibilityActionInternal(TextView.java:12380)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.view.View.performAccessibilityAction(View.java:12926)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.view.AccessibilityInteractionController.performAccessibilityActionUiThread(AccessibilityInteractionController.java:787)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.view.AccessibilityInteractionController.access$500(AccessibilityInteractionController.java:70)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.view.AccessibilityInteractionController$PrivateHandler.handleMessage(AccessibilityInteractionController.java:1415)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:106)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:214)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:7073)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:494)
+09-27 16:53:10.179  7398  7398 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:965)

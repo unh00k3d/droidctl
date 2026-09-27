@@ -34,9 +34,13 @@ object G5 {
         val list = col(title("Items"), pad = 0)
         for (i in 1..20) {
             val label = text("Item $i", "label").apply { layoutParams = lp(0, WRAP, 1f) }
-            list.addView(row(label, button("Delete", "delete").apply {
-                setOnClickListener { dta("delete", "delete", "row" to i) }
-            }).apply { setPadding(dp(16), 0, dp(8), 0) })
+            lateinit var r: View
+            val delete = button("Delete", "delete").apply {
+                // the row really goes away, so an agent can see that its delete worked
+                setOnClickListener { dta("delete", "delete", "row" to i); (r.parent as? ViewGroup)?.removeView(r) }
+            }
+            r = row(label, delete).apply { setPadding(dp(16), 0, dp(8), 0) }
+            list.addView(r)
         }
         scroll(list)
     }

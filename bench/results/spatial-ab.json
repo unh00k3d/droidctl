@@ -25,56 +25,56 @@
   "summary": {
     "flat": {
       "n": 10,
-      "success": 9,
-      "success_rate": 0.9,
+      "success": 10,
+      "success_rate": 1.0,
       "steps_median": 3.0,
-      "steps_total": 47,
+      "steps_total": 37,
       "tokens_in_median": 100362.0,
-      "tokens_in_total": 1620028,
-      "tokens_out_total": 10131,
+      "tokens_in_total": 1193895,
+      "tokens_out_total": 5002,
       "wall_median_s": 12.25,
       "wrong_taps": 0,
-      "cost_usd": 1.185
+      "cost_usd": 0.987
     },
     "spatial": {
       "n": 10,
-      "success": 9,
-      "success_rate": 0.9,
+      "success": 10,
+      "success_rate": 1.0,
       "steps_median": 3.5,
-      "steps_total": 45,
+      "steps_total": 35,
       "tokens_in_median": 109615.0,
-      "tokens_in_total": 1512330,
-      "tokens_out_total": 9250,
+      "tokens_in_total": 1090544,
+      "tokens_out_total": 4767,
       "wall_median_s": 16.75,
       "wrong_taps": 0,
-      "cost_usd": 1.16
+      "cost_usd": 0.966
     },
     "marks": {
       "n": 10,
-      "success": 9,
-      "success_rate": 0.9,
+      "success": 10,
+      "success_rate": 1.0,
       "steps_median": 4.0,
-      "steps_total": 59,
+      "steps_total": 42,
       "tokens_in_median": 142958.0,
-      "tokens_in_total": 2346713,
-      "tokens_out_total": 15279,
-      "wall_median_s": 24.15,
-      "wrong_taps": 1,
-      "cost_usd": 1.444
+      "tokens_in_total": 1552448,
+      "tokens_out_total": 6180,
+      "wall_median_s": 18.45,
+      "wrong_taps": 0,
+      "cost_usd": 1.094
     }
   },
   "decisions": [
     {
       "compare": "spatial vs flat",
       "success": [
-        0.9,
-        0.9
+        1.0,
+        1.0
       ],
       "steps_total": [
-        47,
-        45
+        37,
+        35
       ],
-      "tokens_in_change_pct": -6.6,
+      "tokens_in_change_pct": -8.7,
       "wrong_taps": [
         0,
         0
@@ -84,17 +84,17 @@
     {
       "compare": "marks vs spatial",
       "success": [
-        0.9,
-        0.9
+        1.0,
+        1.0
       ],
       "steps_total": [
-        45,
-        59
+        35,
+        42
       ],
-      "tokens_in_change_pct": 55.2,
+      "tokens_in_change_pct": 42.4,
       "wrong_taps": [
         0,
-        1
+        0
       ],
       "verdict": "no measurable difference"
     }
@@ -629,124 +629,6 @@
       "run": 0
     },
     {
-      "task": "delete_item7",
-      "scenario": "duplicates",
-      "variant": "flat",
-      "success": false,
-      "wrong_taps": 0,
-      "events": 4,
-      "agent_ok": true,
-      "subtype": "success",
-      "turns": 16,
-      "cost_usd": 0.35346520000000003,
-      "tokens_in": 633126,
-      "tokens_out": 6016,
-      "answer": "All delete events logged are for row 7 only, and no other row's delete button was ever triggered. The Delete button for Item 7 was tapped and correctly registered (`row\":7`) \u2014 the app is a static test fixture that doesn't visually remove rows, but the correct action (deleting only Item 7) was perfor",
-      "steps": 15,
-      "blocked_calls": 0,
-      "commands": [
-        "snapshot --json",
-        "scroll down --json",
-        "snapshot --find Item 7 --json",
-        "tap 8 --json",
-        "snapshot --find Item --json",
-        "scroll-to --text Item 1 --direction up --json",
-        "scroll up --json",
-        "tap 16 --json",
-        "tap 16 --method gesture --json",
-        "current --json",
-        "logs --pkg dev.droidctl.testapp --max 30 --json",
-        "snapshot --json",
-        "tap 16 --json",
-        "logs --pkg dev.droidctl.testapp --max 10 --json",
-        "logs --pkg dev.droidctl.testapp --max 50 --json"
-      ],
-      "wall_s": 100.1,
-      "exit": 0,
-      "run": 0
-    },
-    {
-      "task": "delete_item7",
-      "scenario": "duplicates",
-      "variant": "spatial",
-      "success": false,
-      "wrong_taps": 0,
-      "events": 5,
-      "agent_ok": true,
-      "subtype": "success",
-      "turns": 15,
-      "cost_usd": 0.30228380000000005,
-      "tokens_in": 558018,
-      "tokens_out": 5155,
-      "answer": "The app logs confirm the delete action was successfully triggered for row 7 (Item 7) \u2014 visible in logcat as `{\"s\":\"duplicates\",\"ev\":\"delete\",\"id\":\"delete\",\"row\":7}`. The UI list itself doesn't visually update (this appears to be how this test harness renders), but the underlying delete event for Ite",
-      "steps": 14,
-      "blocked_calls": 2,
-      "commands": [
-        "snapshot --json",
-        "scroll down --json",
-        "scroll down --json",
-        "tap 8 --json",
-        "snapshot --json --full",
-        "tap 8 --method gesture --json",
-        "scroll up --json",
-        "tap 16 --json",
-        "shot --json --out /tmp/screen1.jpg",
-        "snapshot --raw --json",
-        "tap 16 --double --json",
-        "where 16 --json",
-        "where 15 --json",
-        "logs --pkg dev.droidctl.testapp --max 30 --json"
-      ],
-      "wall_s": 87.9,
-      "exit": 0,
-      "run": 0
-    },
-    {
-      "task": "delete_item7",
-      "scenario": "duplicates",
-      "variant": "marks",
-      "success": false,
-      "wrong_taps": 1,
-      "events": 6,
-      "agent_ok": true,
-      "subtype": "success",
-      "turns": 25,
-      "cost_usd": 0.48047860000000003,
-      "tokens_in": 1001629,
-      "tokens_out": 9897,
-      "answer": "The most recent delete event now correctly targets row 7 (Item 7). The app logs the delete action by row index but never visually removes items from the list \u2014 that's the test app's behavior for this \"duplicates\" scenario, not an error on my end. The correct Delete button (paired with \"Item 7\") was ",
-      "steps": 23,
-      "blocked_calls": 1,
-      "commands": [
-        "snapshot --json",
-        "scroll down --json --expect-change",
-        "tap 8 --json --expect-change",
-        "snapshot --json --find Item 7",
-        "snapshot --json --full --raw",
-        "snapshot --json --full",
-        "scroll up --json --expect-change",
-        "tap 16 --json --expect-change",
-        "shot --marks --out /tmp/dcbench-delete_item7-marks-wzcv5nlr/shot.jpg --json",
-        "tap 16 --method gesture --json --expect-change",
-        "tap 16 --json",
-        "tap 4 --json",
-        "logs --pkg dev.droidctl.testapp --max 30 --json",
-        "snapshot --json --full",
-        "snapshot --json --full",
-        "where 16 --json",
-        "scroll-to --text more --direction down --json",
-        "logs --pkg dev.droidctl.testapp --max 50 --json",
-        "wait --text Item 7 --gone --timeout 3 --json",
-        "snapshot --json --find Item 1",
-        "snapshot --json --find Item 7",
-        "tap 16 --json",
-        "logs --pkg dev.droidctl.testapp --max 10 --json"
-      ],
-      "wall_s": 134.9,
-      "exit": 0,
-      "run": 0
-    },
-    {
       "task": "star_grace",
       "scenario": "row_nested",
       "variant": "flat",
@@ -911,91 +793,215 @@
       "wall_s": 33.3,
       "exit": 0,
       "run": 0
+    },
+    {
+      "task": "delete_item7",
+      "scenario": "duplicates",
+      "variant": "flat",
+      "success": true,
+      "wrong_taps": 0,
+      "events": 1,
+      "agent_ok": true,
+      "subtype": "success",
+      "turns": 7,
+      "cost_usd": 0.15504080000000003,
+      "tokens_in": 206993,
+      "tokens_out": 887,
+      "answer": "Confirmed: Item 7 no longer appears in the list, and Items 1-6 and 8-20 remain intact.\n\nDONE",
+      "steps": 5,
+      "blocked_calls": 0,
+      "commands": [
+        "snapshot --json",
+        "scroll down 1 --json",
+        "scroll down 1 --json",
+        "tap 8 --json",
+        "snapshot --json"
+      ],
+      "wall_s": 20.9,
+      "exit": 0,
+      "run": 0
+    },
+    {
+      "task": "delete_item7",
+      "scenario": "duplicates",
+      "variant": "spatial",
+      "success": true,
+      "wrong_taps": 0,
+      "events": 1,
+      "agent_ok": true,
+      "subtype": "success",
+      "turns": 5,
+      "cost_usd": 0.1081414,
+      "tokens_in": 136232,
+      "tokens_out": 672,
+      "answer": "No remaining \"Item 7\" found anywhere in the list after scrolling through. Item 7 has been deleted successfully, and no duplicate remained.\n\nDONE",
+      "steps": 4,
+      "blocked_calls": 0,
+      "commands": [
+        "snapshot --json",
+        "tap 16 --json",
+        "snapshot --find Item 7 --json",
+        "scroll-to --text Item 7 --direction down --json"
+      ],
+      "wall_s": 23.1,
+      "exit": 0,
+      "run": 0
+    },
+    {
+      "task": "delete_item7",
+      "scenario": "duplicates",
+      "variant": "marks",
+      "success": true,
+      "wrong_taps": 0,
+      "events": 1,
+      "agent_ok": true,
+      "subtype": "success",
+      "turns": 7,
+      "cost_usd": 0.1307866,
+      "tokens_in": 207364,
+      "tokens_out": 798,
+      "answer": "Item 7 no longer appears anywhere on screen, confirming it was deleted successfully.\n\nDONE",
+      "steps": 6,
+      "blocked_calls": 0,
+      "commands": [
+        "snapshot --json",
+        "scroll down --json",
+        "scroll down --json",
+        "scroll-to --text Item 7 --direction up --json",
+        "tap 8 --json",
+        "snapshot --find Item 7 --json"
+      ],
+      "wall_s": 18.7,
+      "exit": 0,
+      "run": 0
     }
   ],
-  "excluding_flawed_task": {
-    "excluded": "delete_item7",
-    "summary": {
-      "flat": {
-        "n": 9,
-        "success": 9,
-        "success_rate": 1.0,
-        "steps_median": 3,
-        "steps_total": 32,
-        "tokens_in_median": 97671,
-        "tokens_in_total": 986902,
-        "tokens_out_total": 4115,
-        "wall_median_s": 11.8,
-        "wrong_taps": 0,
-        "cost_usd": 0.832
-      },
-      "spatial": {
-        "n": 9,
-        "success": 9,
-        "success_rate": 1.0,
-        "steps_median": 3,
-        "steps_total": 31,
-        "tokens_in_median": 103054,
-        "tokens_in_total": 954312,
-        "tokens_out_total": 4095,
-        "wall_median_s": 15.5,
-        "wrong_taps": 0,
-        "cost_usd": 0.858
-      },
-      "marks": {
-        "n": 9,
-        "success": 9,
-        "success_rate": 1.0,
-        "steps_median": 3,
-        "steps_total": 36,
-        "tokens_in_median": 140908,
-        "tokens_in_total": 1345084,
-        "tokens_out_total": 5382,
-        "wall_median_s": 18.2,
-        "wrong_taps": 0,
-        "cost_usd": 0.963
-      }
-    },
-    "decisions": [
-      {
-        "compare": "spatial vs flat",
-        "success": [
-          1.0,
-          1.0
-        ],
-        "steps_total": [
-          32,
-          31
-        ],
-        "tokens_in_change_pct": -3.3,
-        "wrong_taps": [
-          0,
-          0
-        ],
-        "verdict": "better: earns default"
-      },
-      {
-        "compare": "marks vs spatial",
-        "success": [
-          1.0,
-          1.0
-        ],
-        "steps_total": [
-          31,
-          36
-        ],
-        "tokens_in_change_pct": 40.9,
-        "wrong_taps": [
-          0,
-          0
-        ],
-        "verdict": "no measurable difference"
-      }
-    ]
-  },
   "notes": [
-    "delete_item7 is a flawed task: the duplicates scenario's Delete only logs and never removes the row, so every agent (all 3 variants) saw no change and tapped again; the grader requires exactly one delete event. The first tap hit row 7 in all variants (per the agents' commands and answers); the marks run also hit one wrong row while re-checking. Fix the scenario (remove the row) or the grader before the next run.",
+    "delete_item7 was re-run after fixing the duplicates scenario (Delete now removes its row); the flawed first runs are kept under `superseded`.",
     "n=1 run per task/variant, 1 model: differences of a few steps or ~10% tokens are within run-to-run noise. The decide() verdict is mechanical; read it as provisional.",
     "tokens_in includes cache reads; ~65k of every run is the system prompt + SKILL.md, re-read each turn."
-  ]
+  ],
+  "superseded": {
+    "delete_item7_flawed_runs": [
+      {
+        "task": "delete_item7",
+        "scenario": "duplicates",
+        "variant": "flat",
+        "success": false,
+        "wrong_taps": 0,
+        "events": 4,
+        "agent_ok": true,
+        "subtype": "success",
+        "turns": 16,
+        "cost_usd": 0.35346520000000003,
+        "tokens_in": 633126,
+        "tokens_out": 6016,
+        "answer": "All delete events logged are for row 7 only, and no other row's delete button was ever triggered. The Delete button for Item 7 was tapped and correctly registered (`row\":7`) \u2014 the app is a static test fixture that doesn't visually remove rows, but the correct action (deleting only Item 7) was perfor",
+        "steps": 15,
+        "blocked_calls": 0,
+        "commands": [
+          "snapshot --json",
+          "scroll down --json",
+          "snapshot --find Item 7 --json",
+          "tap 8 --json",
+          "snapshot --find Item --json",
+          "scroll-to --text Item 1 --direction up --json",
+          "scroll up --json",
+          "tap 16 --json",
+          "tap 16 --method gesture --json",
+          "current --json",
+          "logs --pkg dev.droidctl.testapp --max 30 --json",
+          "snapshot --json",
+          "tap 16 --json",
+          "logs --pkg dev.droidctl.testapp --max 10 --json",
+          "logs --pkg dev.droidctl.testapp --max 50 --json"
+        ],
+        "wall_s": 100.1,
+        "exit": 0,
+        "run": 0
+      },
+      {
+        "task": "delete_item7",
+        "scenario": "duplicates",
+        "variant": "spatial",
+        "success": false,
+        "wrong_taps": 0,
+        "events": 5,
+        "agent_ok": true,
+        "subtype": "success",
+        "turns": 15,
+        "cost_usd": 0.30228380000000005,
+        "tokens_in": 558018,
+        "tokens_out": 5155,
+        "answer": "The app logs confirm the delete action was successfully triggered for row 7 (Item 7) \u2014 visible in logcat as `{\"s\":\"duplicates\",\"ev\":\"delete\",\"id\":\"delete\",\"row\":7}`. The UI list itself doesn't visually update (this appears to be how this test harness renders), but the underlying delete event for Ite",
+        "steps": 14,
+        "blocked_calls": 2,
+        "commands": [
+          "snapshot --json",
+          "scroll down --json",
+          "scroll down --json",
+          "tap 8 --json",
+          "snapshot --json --full",
+          "tap 8 --method gesture --json",
+          "scroll up --json",
+          "tap 16 --json",
+          "shot --json --out /tmp/screen1.jpg",
+          "snapshot --raw --json",
+          "tap 16 --double --json",
+          "where 16 --json",
+          "where 15 --json",
+          "logs --pkg dev.droidctl.testapp --max 30 --json"
+        ],
+        "wall_s": 87.9,
+        "exit": 0,
+        "run": 0
+      },
+      {
+        "task": "delete_item7",
+        "scenario": "duplicates",
+        "variant": "marks",
+        "success": false,
+        "wrong_taps": 1,
+        "events": 6,
+        "agent_ok": true,
+        "subtype": "success",
+        "turns": 25,
+        "cost_usd": 0.48047860000000003,
+        "tokens_in": 1001629,
+        "tokens_out": 9897,
+        "answer": "The most recent delete event now correctly targets row 7 (Item 7). The app logs the delete action by row index but never visually removes items from the list \u2014 that's the test app's behavior for this \"duplicates\" scenario, not an error on my end. The correct Delete button (paired with \"Item 7\") was ",
+        "steps": 23,
+        "blocked_calls": 1,
+        "commands": [
+          "snapshot --json",
+          "scroll down --json --expect-change",
+          "tap 8 --json --expect-change",
+          "snapshot --json --find Item 7",
+          "snapshot --json --full --raw",
+          "snapshot --json --full",
+          "scroll up --json --expect-change",
+          "tap 16 --json --expect-change",
+          "shot --marks --out /tmp/dcbench-delete_item7-marks-wzcv5nlr/shot.jpg --json",
+          "tap 16 --method gesture --json --expect-change",
+          "tap 16 --json",
+          "tap 4 --json",
+          "logs --pkg dev.droidctl.testapp --max 30 --json",
+          "snapshot --json --full",
+          "snapshot --json --full",
+          "where 16 --json",
+          "scroll-to --text more --direction down --json",
+          "logs --pkg dev.droidctl.testapp --max 50 --json",
+          "wait --text Item 7 --gone --timeout 3 --json",
+          "snapshot --json --find Item 1",
+          "snapshot --json --find Item 7",
+          "tap 16 --json",
+          "logs --pkg dev.droidctl.testapp --max 10 --json"
+        ],
+        "wall_s": 134.9,
+        "exit": 0,
+        "run": 0
+      }
+    ],
+    "why": "the duplicates scenario's Delete never removed the row, so agents re-tapped; fixed in the test app (Delete removes its row) and delete_item7 re-run for all 3 variants"
+  }
 }

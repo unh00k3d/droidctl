@@ -31,4 +31,5 @@ screen dev.droidctl.testapp/.Main  sig=c07a  keyboard=hidden  dialog=no
   [30] button  "Delete"
   [31] text  "Item 15"
   [32] button  "Delete"
-  [33] button  "Delete"
+  [33] text  "Item 16"
+  [34] button  "Delete"

@@ -114,7 +114,11 @@ class Tree(private val svc: AccessibilityService) {
     @Volatile var gen: Long = 0
 
     private val lock = Any()
-    private var dump = 0
+    // A random start per agent process: dump ids are then never reused after the
+    // agent restarts (crash, reinstall, Android killing it), so a ref saved before
+    // a restart can't collide with a new dump of the same number and act on the
+    // wrong node. The host treats dump ids as opaque.
+    private var dump = java.util.Random().nextInt(1 shl 30)
     private var handles: HashMap<Int, AccessibilityNodeInfo> = HashMap()
 
     /** The node for a handle of the latest dump, or an RpcError (`stale`) for any other dump. */

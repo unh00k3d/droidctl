@@ -181,29 +181,31 @@ Graded by the test app's own `DTA` events (exactly the intended event, nothing e
 | `tap` with locators (`--text/--desc … --right-of/--below`) | 41/52 | 11 | 0 |
 | baseline: `uiautomator dump` + `input tap` at the element's centre (mobile-mcp 1.0.5's Android robot, re-implemented) | 52/52 | 0 | 0 |
 
-- **No method hit a wrong target.** The two `tap REF` misses (a dropped socket mid-tap; a snapshot taken before a grid laid out) both passed 3/3 when rerun.
-- **Locator misses are refusals, and two are droidctl bugs:**
-  - `--desc` doesn't match a description merged from a child (a Compose icon inside a button);
-  - `--right-of`/`--left-of` anchors must equal a whole merged row label (`"Ada Lovelace · Lunch tomorrow?"`), not part of it.
+- **No method hit a wrong target.** The two `tap REF` misses both passed 3/3 when rerun:
+  - A snapshot was taken before a grid laid out.
+  - A socket dropped mid-tap. The later cause: an external UiAutomation client (`uiautomator dump`, also Appium) makes Android unbind accessibility services, which closes every agent connection for ~1–2 s. droidctl now waits and retries **read-only** requests. An action cut off this way returns `connection` with `maybe_performed: true` and is never resent; on the phone the cut-off tap had in fact run.
+- **Locator misses are refusals.** Nine came from two droidctl bugs, fixed after this run and not re-measured:
+  - `--desc` now matches a description merged from a child (a Compose icon inside a button).
+  - `--right-of`/`--left-of` anchors may be one part of a merged row label (`"Ada Lovelace"` of `"Ada Lovelace · Lunch tomorrow?"`).
   - The two `--below` misses are genuinely ambiguous: two Buy buttons sit below in the same column.
 - **Coordinate taps are accurate on static, fully visible targets.** The cases where they go wrong are covered by `tests/e2e` and the resolver's before/after pairs, not by this benchmark: elements occluded by an overlay or the keyboard, moved after a scroll, or on a screen that changed.
 - **mobile-mcp itself was not run.** Its device path needs the separate `mobilecli` binary, which can install an agent on the phone.
-- **`uiautomator dump` suppresses accessibility services while it runs.** droidctl's agent answered again within 0.1 s.
+- **`uiautomator dump` suppresses accessibility services while it runs** (see the dropped socket above). droidctl's agent answered again within 0.1 s after the dump ended.
 
 ### Layout A/B (reduced run, provisional)
 
 `bench/spatial.py`: `claude-sonnet-5` headless (`claude -p`, only `Bash(droidctl:*)`), 10 test-app
-tasks × 3 layout variants × 1 run. Success comes from the app's `DTA` events. Total cost $3.79.
+tasks × 3 layout variants × 1 run. Success comes from the app's `DTA` events. Total cost $4.18.
 
 | variant | success | droidctl calls | input tokens (incl. cache) | wrong taps |
 |---|---|---|---|---|
-| flat | 9/10 | 47 | 1.62M | 0 |
-| spatial (the default) | 9/10 | 45 | 1.51M | 0 |
-| spatial + `shot --marks` | 9/10 | 59 | 2.35M | 1 |
+| flat | 10/10 | 37 | 1.19M | 0 |
+| spatial (the default) | 10/10 | 35 | 1.09M | 0 |
+| spatial + `shot --marks` | 10/10 | 42 | 1.55M | 0 |
 
-- **The one failure is the same task in every variant, and the task is at fault.** In `delete_item7`, the test app's Delete only logs and never removes the row. Every agent saw no change and tapped again, while the task requires exactly one delete.
-- **Without that task, flat and spatial tie:** 9/9 each, 32 vs 31 calls, spatial 3% fewer tokens. `--marks` has the same success with +41% tokens and 5 more calls.
-- **Reading:** spatial stays the default because it costs nothing extra, but this run doesn't show that it helps. `--marks` stays opt-in.
+- **`delete_item7` was re-run after a test-app fix.** In the first run it failed in every variant because the test app's Delete only logged and never removed the row, so every agent saw no change and tapped again. Delete now removes its row; the re-run passed in all three variants. The flawed runs are kept in the results file under `superseded`.
+- **Flat and spatial tie on success:** spatial used 2 fewer calls and 8.7% fewer input tokens. `--marks` has the same success with +42% tokens and 7 more calls.
+- **Reading:** spatial stays the default because it costs no more, but this run doesn't show that it helps. `--marks` stays opt-in.
 - **Caveat:** one run per task and one model is not statistically meaningful.
 
 ### Pending

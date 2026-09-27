@@ -307,6 +307,21 @@ class Session:
             if self.sub_client is sc:
                 self.sub_alive = False
                 log.info("device %s: event subscription ended", self.serial)
+                # an external UiAutomation client (uiautomator dump, Appium) unbinds
+                # the service for ~1-2 s; until we resubscribe, every cache hit pays
+                # a gen check (safe, just slower), so try to get the stream back
+                threading.Thread(target=self._resubscribe, args=(sc,), daemon=True,
+                                 name=f"resub-{self.serial}").start()
+
+    def _resubscribe(self, old, attempts=20, every=1.0):
+        for _ in range(attempts):
+            time.sleep(every)
+            if not self.alive or self.sub_client is not old:
+                return                  # closed, or someone already replaced it
+            self._start_subscription()
+            if self.sub_alive:
+                log.info("device %s: event subscription restored", self.serial)
+                return
 
     def _on_event(self, ev):
         self.ring.append((time.monotonic(), ev))

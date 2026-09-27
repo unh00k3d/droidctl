@@ -535,7 +535,7 @@ Any coordinates we print are always in device pixels.
 | Do the M1 on-device checks hold on a **stock, unrooted** phone? (dev starts on a rooted phone, where custom ROMs and Magisk/LSPosed can change settings, SELinux and a11y behaviour) | re-run the M1 checks on a stock device | before v1.0 |
 | Real socket RTT (USB and wireless), tree-dump time, settle time → settle defaults | `bench` | M1, M5 |
 | Port the thin client to Go? | client boot share of per-step time; distribution needs | M6 / v1.0 |
-| Which spatial layers are on by default? `--map` useful at all? | spatial A/B | M8: **reduced run done 2026-09-27** (claude-sonnet-5, 10 tasks × flat/spatial/marks × 1): flat and spatial tie (9/9 each without the flawed `delete_item7` task; 32 vs 31 calls; spatial −3% tokens), so spatial stays the **provisional** default on cost grounds, not proven benefit; `shot --marks` +41% tokens, no success gain → opt-in. Per-layer ablations, `--geo`, `--map` and a 2nd model still unmeasured (`bench/results/spatial-ab.json`) |
+| Which spatial layers are on by default? `--map` useful at all? | spatial A/B | M8: **reduced run done 2026-09-27** (claude-sonnet-5, 10 tasks × flat/spatial/marks × 1): flat and spatial tie at 10/10 (after fixing the test app's `duplicates` Delete, which never removed its row, and re-running `delete_item7`); spatial 35 vs 37 calls and −8.7% input tokens, so it stays the **provisional** default on cost grounds, not proven benefit; `shot --marks` +42% tokens, no success gain → opt-in. Per-layer ablations, `--geo`, `--map` and a 2nd model still unmeasured (`bench/results/spatial-ab.json`) |
 | Incremental tree mirror worth it? | cache-miss cost after changes | after M8 |
 | ~~`click_no_event` views: acceptable double-trigger risk of the fallback?~~ **No**: measured n=2 on the SM-N950F, so auto never falls back after `performed:true` (see Actions → tap) | TESTAPP `click_no_event` results | M5 |
 | Accessibility-tool flag vs Play policy (only matters if we ever publish to Play) | policy check | before any Play release |
@@ -571,7 +571,7 @@ Any coordinates we print are always in device pixels.
   - raw dump vs snapshot tokens;
   - per-call latency;
   - tap accuracy over ~50 taps across testapp and real apps (rows, icon-with-child-text, Compose, custom views), compared against mobile-mcp;
-    **Measured 2026-09-27** (`bench/results/tap-accuracy.json`, 52 targets): `tap REF` 50/52, locators 41/52 (11 typed refusals, 0 wrong), mobile-mcp-style dump + centre tap 52/52; no method hit a wrong target on these static targets. Two locator bugs found: `--desc` ignores descs merged from a child; spatial anchors must equal the whole merged row label.
+    **Measured 2026-09-27** (`bench/results/tap-accuracy.json`, 52 targets): `tap REF` 50/52, locators 41/52 (11 typed refusals, 0 wrong), mobile-mcp-style dump + centre tap 52/52; no method hit a wrong target on these static targets. Two locator bugs found and fixed afterwards (not re-measured): `--desc` ignored descs merged from a child; spatial anchors had to equal the whole merged row label. One `tap REF` miss was a socket closed by an external UiAutomation client (`uiautomator dump`) unbinding the service; the host now retries read-only requests after such an unbind and reports actions as `connection` + `maybe_performed`, never resending them.
   - the spatial A/B (see Spatial layer), which decides the layout defaults.
 
 ## Prior art (details in research/)

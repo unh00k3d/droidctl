@@ -228,3 +228,33 @@ def test_a_degraded_tree_rematches_only_inside_the_refs_complete_window():
     tree = dict(d["tree"], dump=d["tree"]["dump"] + 1, degraded=True, reason="no-root")
     res = R.resolve_ref(state, ref, tree, d["meta"].get("activity"))
     assert res.handle == state["refs"][ref]["handle"] and res.tier == 2
+
+
+# --- regressions found by the tap-accuracy benchmark ------------------------
+def _fixture_snap(name):
+    return S.build(json.loads((TREES / f"{name}.json").read_text())["tree"])
+
+
+@pytest.mark.parametrize("fixture", ["testapp-row_nested", "testapp-row_nested_compose"])
+@pytest.mark.parametrize("who,ref", [("Ada Lovelace", 3), ("Alan Turing", 5), ("Grace Hopper", 7),
+                                     ("Lunch tomorrow?", 3)])
+def test_spatial_anchor_may_be_one_segment_of_a_merged_row(fixture, who, ref):
+    """The star sits inside the row's box, so "right of the row" was nothing;
+    the anchor is the matched text's own box."""
+    s = _fixture_snap(fixture)
+    assert R.find(s, desc="Star", right_of=who).elem.ref == ref
+    assert R.find(s, text="Star", right_of=who).elem.ref == ref
+
+
+def test_spatial_anchor_segment_must_still_be_unique():
+    s = _fixture_snap("testapp-row_nested")
+    with pytest.raises(core.UserError) as e:
+        R.find(s, role="row", left_of="Star")
+    assert e.value.kind == "ambiguous"
+
+
+def test_desc_matches_a_description_merged_from_a_child():
+    """Compose puts the icon's desc on a child of the clickable button."""
+    s = _fixture_snap("testapp-buttons_compose")
+    assert R.find(s, desc="Settings").elem.ref == 3
+    assert R.find(s, desc="settings").elem.ref == 3

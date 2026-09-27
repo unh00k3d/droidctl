@@ -167,7 +167,7 @@ def add_parsers(sub, jsonopt, devopt):
 
     sp = add("logs", "recent logcat lines, bounded", "cmd_logs")
     sp.add_argument("--max", type=int, default=100, metavar="N", help="at most N lines (100)")
-    sp.add_argument("--pkg", metavar="PKG", help="only this app's process")
+    sp.add_argument("--pkg", metavar="PKG", help="only this app's process, plus its crashes (stack traces) from the crash buffer")
     sp.add_argument("--level", choices=("V", "D", "I", "W", "E", "F"), help="minimum level")
 
     sp = add("shot", "a screenshot (downscaled JPEG), optionally with ref marks", "cmd_shot")
