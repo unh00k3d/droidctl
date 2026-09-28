@@ -1843,7 +1843,7 @@
   ],
   "notes": [
     "2026-09-28 re-run (agent 0.4.2, stable refs, handled-click text): ref 52/52, locator 50/52 (2 genuinely ambiguous 'Buy' below a plan), baseline 52/52; 0 wrong taps. The two locator bugs found on 2026-09-27 are fixed (9 refusals gone).",
-    "Latency: taps that change nothing on screen now take ~750 ms median (was ~360 ms): the device waits its full 600 ms first-change window (settle_ms 600, only a `clicked` event follows). Yesterday's host code measures the same ~910 ms cold on the same tap today, so it is not a host regression; the old agent could not be reinstalled (user build refuses downgrades), so why yesterday's no-change taps settled early is unconfirmed (hypothesis: unrelated system-UI events, e.g. a charging animation, ended the wait). Taps that change the screen (grid, virtual views) are unchanged (~390 ms).",
+    "Latency: taps that change nothing on screen now take ~750 ms median (was ~360 ms): the device waits its full 600 ms first-change window (settle_ms 600, only a `clicked` event follows). This is the deliberate agent 0.3.3 change (PROTOCOL.md, Settle): a `clicked` event alone no longer opens the quiet window, because a banking app's Login reported `clicked` at once and its next activity ~0.5 s later, so settle had returned the old screen. The 2026-09-27 run predates 0.3.3. Taps that change the screen (grid, virtual views) are unchanged (~390 ms).",
     "The 2026-09-27 ref miss 'minus:Laptop Stand' (agent closed the connection mid-request) matches the agent event race fixed in 0.4.2 (ConcurrentModificationException, dropbox); no agent crash during this run."
   ]
 }

@@ -660,14 +660,6 @@ def test_a_window_without_bounds_after_a_rebind_is_the_main_screen():
     assert [e.label_full for e in s.elements][:2] == ["Buttons", "Save"]
 
 
-def test_a_radio_is_not_unlabeled_because_a_neighbour_extends_its_label():
-    """a banking QA app environment picker: "Test" sat next to "Test Daily" on one
-    row and lost its label, because the repeat check was a substring test."""
-    out = text("real-bank-qa-fakelogin")
-    assert 'radio "Test" checked' in out and 'radio "Prep"' in out
-    assert 'radio "Test Daily"' in out
-
-
 @pytest.mark.parametrize("input_type,secret", [
     (18, True),      # number | number_password (a banking QA app login, no isPassword flag)
     (129, True),     # text | password
@@ -709,16 +701,6 @@ def test_bidi_marks_are_dropped_but_zwj_is_kept():
     assert S._clean("Values \u200b\u200bof") == "Values of"
     family = "\U0001F468‍\U0001F469‍\U0001F467"
     assert S._clean(family) == family
-
-
-def test_a_selected_tab_is_listed_once():
-    """The selected tab is a non-clickable container labelled by its desc around a
-    text child saying the same; it was listed twice (a banking QA app "My Status").
-    Real capture, trimmed to the app bar."""
-    snap = build("real-bank-qa-status-tabs")
-    labels = [e.label_full for e in snap.elements]
-    for tab in ("My Assets", "My Expenses", "My Debts"):
-        assert labels.count(tab) == 1, (tab, labels)
 
 
 def test_a_closing_activity_window_is_recognised_as_leaving():

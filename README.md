@@ -230,8 +230,9 @@ Measured 2026-09-28 on agent 0.4.2 (`bench/results/tap-accuracy.json`; the 2026-
   (`"Ada Lovelace"` of `"Ada Lovelace · Lunch tomorrow?"`); and an agent crash (an event
   race, see PLAN.md) that had closed a connection mid-tap.
 - **Time per tap (median, warm daemon):** ~750 ms for droidctl when the tap changes nothing on
-  screen (it waits up to 600 ms for a first change, so a slow screen isn't reported as done),
-  ~390 ms when it does; the baseline takes ~2.6 s (`uiautomator dump` plus the tap, with no
+  screen (it waits up to 600 ms for a first change, so a screen that changes late isn't
+  reported as done; the first run, before agent 0.3.3, stopped at the click event and took
+  ~360 ms), ~390 ms when it does; the baseline takes ~2.6 s (`uiautomator dump` plus the tap, with no
   check of what happened).
 - An external UiAutomation client (`uiautomator dump`, Appium) makes Android unbind
   accessibility services while it runs, closing every agent connection for ~1–2 s. droidctl

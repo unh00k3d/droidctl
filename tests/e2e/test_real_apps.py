@@ -2,6 +2,7 @@
 snapshot, navigate and go back; never type, log in, take photos, open documents
 or touch account areas. Every test ends on the home screen. A test skips when
 its package isn't installed."""
+import os
 import time
 
 import pytest
@@ -87,13 +88,15 @@ def test_open_camera_snapshot_and_back(app):
     dc("back", ok=None)                     # also declines a permission prompt, never grants it
 
 
-def test_bank_refusal_is_handled_gracefully(app):
-    """A banking app refuses to run on this rooted phone (its app shield kills it at
-    start, with or without our service). droidctl must report that cleanly: a typed
-    error or a result, never a hang or a crash, and the app is not left in front.
-    Nothing is ever typed or tapped in it."""
+@pytest.mark.skipif(not os.environ.get("DROIDCTL_E2E_REFUSING_PKG"),
+                    reason="set DROIDCTL_E2E_REFUSING_PKG to an installed app that refuses rooted phones")
+def test_an_app_that_refuses_a_rooted_phone_is_handled_gracefully(app):
+    """Some apps (banking apps with an app shield) kill themselves at start on a
+    rooted phone, with or without our service. droidctl must report that cleanly: a
+    typed error or a result, never a hang or a crash, and the app is not left in
+    front. Nothing is ever typed or tapped in it."""
     from droidctl.core import ERROR_KINDS
-    pkg = app("com.example.bank")
+    pkg = app(os.environ["DROIDCTL_E2E_REFUSING_PKG"])
     t0 = time.time()
     r = dc("launch", pkg, "--timeout", "15", ok=None, timeout=90)
     assert time.time() - t0 < 60
