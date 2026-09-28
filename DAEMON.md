@@ -49,6 +49,11 @@ don't hold off the idle exit.
 | `cache` | `{hits, misses, hit_rate}` over all devices |
 | `devices` | per device: `serial`, `port`, `connected`, `subscribed`, `agent`, `cache {hits, misses, gen_checks, primed, hit_rate}`, `events_seen`, `idle_s` |
 
+Surfaced in the CLI three ways: `droidctl daemon status` (this object, rendered),
+`droidctl doctor` (a `daemon` check — running/pid/uptime/version/devices/cache,
+or "not running (starts automatically on the first command)"; never a failure on
+its own), and every `--json` result's `"mode": "daemon" | "inprocess"`.
+
 ### `shutdown`
 `{}` → `{ok, stopping}`. The daemon stops accepting connections, waits up to 30 s for
 commands in flight, closes device connections and removes its socket and pidfile.

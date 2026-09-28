@@ -473,3 +473,23 @@ def test_relative_paths_resolve_against_the_clients_cwd(home, tmp_path):
                        env=env, cwd=str(work), capture_output=True, text=True, timeout=30)
     p = js(r)
     assert p["ok"] and p["results"][0]["result"]["screen"]["pkg"] == "com.android.settings"
+
+
+def test_doctor_reports_daemon_state_when_none_is_running(tmp_path, monkeypatch):
+    """doctor gains a daemon check that runs before the device checks and never
+    fails on its own: not-running is a normal state (the first call starts it)."""
+    import argparse
+    monkeypatch.setenv("DROIDCTL_HOME", str(tmp_path))
+    from droidctl import cli
+    from droidctl import device as dev
+
+    def no_adb(*a, **k):
+        raise cli.UserError("no adb server", "adb")
+    monkeypatch.setattr(dev, "_adb_host_query", no_adb)
+
+    payload = cli.cmd_doctor(argparse.Namespace(device=None, json=True))
+    names = [c["name"] for c in payload["checks"]]
+    assert names[0] == "daemon", "daemon check should run first, before the device checks"
+    daemon_c = payload["checks"][0]
+    assert daemon_c["ok"] is True
+    assert "not running" in daemon_c["detail"]

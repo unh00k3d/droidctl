@@ -191,6 +191,25 @@ def cmd_doctor(a):
     def skip(*names):
         checks.extend({"name": n, "ok": None, "detail": "skipped"} for n in names)
 
+    # daemon health first: it is a host concern, independent of the device, and
+    # not-running is a fine state (the first command auto-starts it). Never a
+    # failure on its own; a stale/broken socket is the only FAIL here.
+    def daemon_check():
+        from droidctl import daemon as _d
+        st = _d.status()
+        if not st.get("running"):
+            return True, "not running (starts automatically on the first command)"
+        cache = st.get("cache") or {}
+        hits, misses = cache.get("hits", 0), cache.get("misses", 0)
+        rate = cache.get("hit_rate")
+        rate = f"{rate * 100:.0f}%" if rate is not None else "n/a"
+        secs = st.get("uptime_s", 0)
+        up = f"{secs / 60:.0f}m" if secs >= 60 else f"{secs:.0f}s"
+        return True, (f"running pid {st.get('pid')}  up {up}  v{st.get('version')}"
+                      f"  devices {len(st.get('devices') or [])}"
+                      f"  cache {hits}/{hits + misses} ({rate})")
+    check("daemon", daemon_check)
+
     later = ["apk", "service", "uiautomation", "socket", "peer-uid", "protocol", "rtt"]
     if not check("adb", lambda: (True, f"server version {int(dev._adb_host_query('host:version'), 16)}")):
         skip("device", *later)
