@@ -72,8 +72,7 @@ droidctl's own service keep running beside it (verified on API 28).
 
 ## Install
 
-Requires Python 3.10+, `adb` (Android platform-tools) and a phone with USB debugging on
-(Android 8 / API 26 or newer).
+Requires Python 3.10+ and a phone with USB debugging on (Android 8 / API 26 or newer).
 
 **Tested on one phone so far:** a Samsung Galaxy Note 8 on Android 9 (API 28). Code paths
 that need Android 11+ are implemented but **unverified**: on-device screenshots
@@ -82,14 +81,28 @@ that need Android 11+ are implemented but **unverified**: on-device screenshots
 enabling the service under Android 13+ "restricted settings", and API 34
 `accessibilityDataSensitive`. Testing them on an emulator is planned but deferred.
 
-droidctl is not on PyPI yet. Build the wheel (it bundles the agent APK) from a checkout; that
-needs the Android SDK (`ANDROID_HOME`) and a JDK 17+ for the APK:
+Install straight from the repo with pipx, then let `setup` put the agent on the phone:
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -e '.[test,mcp]'
-make apk                        # builds android/agent -> droidctl/assets/droidctl-agent.apk
-make dist                       # APK + wheel + sdist in dist/
-pip install 'dist/droidctl-0.1.0.dev0-py3-none-any.whl[mcp]'   # anywhere else
+pipx install git+https://github.com/unh00k3d/droidctl.git
+# or, from a local clone:  pipx install .
+droidctl setup        # installs the agent APK on the phone and enables its service
+droidctl doctor       # checks adb, the agent, the socket and latency
+```
+
+pipx puts `droidctl` on your PATH in an isolated env and pulls everything it needs:
+`adbutils` (which also brings an `adb` binary, used when you have no Android
+platform-tools), `rich`, Pillow (screenshots on Android < 11, `shot --marks`) and the MCP SDK
+(`droidctl mcp`). The prebuilt agent APK ships inside the package, so no Android SDK or JDK is
+needed. Heavy libraries are imported lazily, so commands stay fast. If no adb server is
+running, droidctl starts one.
+
+To work on droidctl itself:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -e '.[test]'
+make apk          # rebuild the agent (needs ANDROID_HOME and JDK 17+); commit the APK it writes
+make dist         # wheel + sdist in dist/
 ```
 
 ## Quick start

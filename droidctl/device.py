@@ -134,7 +134,7 @@ def remove_service(entries):
 # --------------------------------------------------------------------------
 # adb host protocol (stdlib): devices and forwards without importing adbutils
 # --------------------------------------------------------------------------
-def _adb_host_query(service, timeout=3.0):
+def _adb_host_query(service, timeout=3.0, _started=False):
     port = int(os.environ.get("ANDROID_ADB_SERVER_PORT", "5037"))
     try:
         with socket.create_connection(("127.0.0.1", port), timeout=timeout) as s:
@@ -144,6 +144,10 @@ def _adb_host_query(service, timeout=3.0):
             size = f.read(4)
             body = f.read(int(size, 16)).decode() if len(size) == 4 else ""
     except OSError as e:
+        # nothing listening: start a server once (the SDK's adb, the one on PATH, or
+        # the one adbutils ships), as `adb devices` would, then ask again
+        if not _started and start_adb_server():
+            return _adb_host_query(service, timeout, _started=True)
         raise UserError(f"cannot reach the adb server on port {port}: {e}", "adb",
                         hint="start it with: adb start-server")
     if status != b"OKAY":
@@ -616,10 +620,40 @@ def screencap_jpeg(serial, scale=0.5, quality=70, crop=None):
 
 
 def adb_path():
-    """The SDK's adb when ANDROID_HOME points at one, else whatever is on PATH."""
+    """The SDK's adb when ANDROID_HOME points at one, else the one on PATH, else the
+    binary adbutils ships (so a plain `pipx install droidctl` needs no platform-tools)."""
+    import shutil
     home = os.environ.get("ANDROID_HOME") or os.path.expanduser("~/Android/Sdk")
     cand = os.path.join(home, "platform-tools", "adb")
-    return cand if os.path.exists(cand) else "adb"
+    if os.path.exists(cand):
+        return cand
+    found = shutil.which("adb")
+    if found:
+        return found
+    bundled = _bundled_adb()
+    return bundled or "adb"
+
+
+def _bundled_adb():
+    """adbutils' own adb binary, located without importing adbutils (~150 ms)."""
+    import importlib.util
+    spec = importlib.util.find_spec("adbutils")
+    for loc in (spec.submodule_search_locations or []) if spec else []:
+        for name in ("adb", "adb.exe"):
+            p = os.path.join(loc, "binaries", name)
+            if os.path.isfile(p):
+                return p
+    return None
+
+
+def start_adb_server():
+    """`adb start-server` with adb_path(); True if it ran. Only when none answers,
+    so an existing server (whatever its version) is never replaced."""
+    import subprocess
+    try:
+        return subprocess.run([adb_path(), "start-server"], capture_output=True, timeout=20).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
 
 
 def diagnose(serial):

@@ -11,16 +11,21 @@ requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Enes Bayram" }]
+# Everything a `pipx install` needs, so `droidctl setup` is the only other step:
+# adbutils also brings an `adb` binary for machines without platform-tools, Pillow
+# is for screenshots on Android < 11 and `shot --marks`, mcp for `droidctl mcp`.
 dependencies = [
     "adbutils>=2.8",
     "rich>=13",
+    "pillow>=10",
+    "mcp>=2.2",
 ]
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
 dev = ["build", "pytest>=7"]
-# `droidctl mcp`: the official MCP SDK (a resident process, so its import cost is paid once)
-mcp = ["mcp>=2.2"]
+# kept so `pip install 'droidctl[mcp]'` still works; the MCP SDK is a regular dependency now
+mcp = []
 
 [project.scripts]
 droidctl = "droidctl.client:entry"
@@ -29,7 +34,7 @@ droidctl = "droidctl.client:entry"
 packages = ["droidctl", "droidctl.assets"]
 
 [tool.setuptools.package-data]
-# the agent APK is built by `make apk` (not committed) and shipped inside the wheel
+# the agent APK (built by `make apk`, committed) ships inside the wheel
 droidctl = ["SKILL.md"]
 "droidctl.assets" = ["*.apk"]
 

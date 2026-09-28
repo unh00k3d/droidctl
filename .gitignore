@@ -21,4 +21,3 @@ bench/results/*.tmp
 *.log
 
 # built agent APK: not committed; `make apk` builds it, `make dist` ships it in the wheel
-droidctl/assets/*.apk
