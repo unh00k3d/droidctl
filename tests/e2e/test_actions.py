@@ -208,3 +208,17 @@ def test_a_blocked_accessibility_provider_is_flagged_within_the_budget(scenario)
     s = dc("snapshot", timeout=60)
     assert time.monotonic() - t0 < 4.5
     assert "degraded=no-root" in s["text"] and "no tree for app window" in s["text"]
+
+
+def test_a_ref_from_before_a_scroll_still_means_its_row(scenario):
+    """Spatial A/B failure (2026-09-28): snapshot, scroll, then `tap N` with the
+    pre-scroll N deleted a different row. Refs are now stable on one screen."""
+    sc = scenario("duplicates")
+    s = sc.snap()
+    item7 = next(e for e in s["elements"] if e["label"] == "Item 7")
+    delete7 = min((e for e in s["elements"] if e["label"] == "Delete"),
+                  key=lambda e: abs(e["tap"][1] - item7["tap"][1]))["ref"]
+    dc("scroll", "down")
+    dc("tap", delete7)
+    deletes = sc.dta("delete")
+    assert len(deletes) == 1 and deletes[0]["row"] == 7, deletes

@@ -15,6 +15,31 @@ that follows this document can drive the agent.
 - If the name is still held by a previous instance, the service retries the bind 5
   times with a growing backoff (200 ms × attempt), then gives up and logs.
 
+### Backend B: the same protocol over UiAutomation
+The same agent code can run without being installed or enabled (PLAN.md "Device
+backends"). The host pushes the agent APK to `/data/local/tmp/droidctl-ua.apk` and runs
+
+    CLASSPATH=/data/local/tmp/droidctl-ua.apk setsid app_process /system/bin \
+        dev.droidctl.agent.ShellMain [--idle-ms N] [--suppress] </dev/null >/data/local/tmp/droidctl-ua.log 2>&1 &
+
+as the shell user. It connects a `UiAutomation` (by default with
+`FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`, so TalkBack and backend A keep running;
+`--suppress` drops the flag) and listens on the abstract socket **`droidctl_ua`**, so it
+never contends with backend A for a name. Everything below applies unchanged, except:
+- `ping.backend` is `"uiautomation"` (backend A: `"a11y"`); `ping.version` and
+  `versionCode` are read from the pushed APK.
+- `gesture` injects touchscreen `MotionEvent`s (sampled every 10 ms along each stroke,
+  constant speed, several strokes = several pointers) instead of `dispatchGesture`.
+- `screenshot` is always -32006 (the host uses `screencap`, which detects FLAG_SECURE).
+- `clipboard` uses the clipboard as package `com.android.shell`.
+- `shutdown` (below) exists; the process also exits after `--idle-ms` (default 600000)
+  with no connection open, and on reboot.
+
+The log's first status line tells the host how the start went: `I ready pid=… sdk=…`,
+or `E busy: …` (another UiAutomation client, e.g. uiautomator or Appium, is registered:
+exit 3), `E socket: …` (another instance holds `droidctl_ua`: exit 4), `E failed: …`
+(exit 5).
+
 ## Authentication
 - On accept the agent reads the peer's credentials (`SO_PEERCRED`). Only **uid 2000**
   (shell, i.e. adbd on production builds) and **uid 0** (root: adbd after `adb root`,
@@ -76,8 +101,9 @@ Params: none (ignored). Result:
 | `sdk` | int | `Build.VERSION.SDK_INT` |
 | `release` | string | `Build.VERSION.RELEASE` |
 | `manufacturer`, `model`, `device` | string | `Build.*` |
-| `screen` | object | `{w, h, density, rotation}`: the real logical display size in px (it reflects `wm size` / `wm density` overrides), `densityDpi`, and `Surface.ROTATION_*` (0–3) |
+| `screen` | object | `{w, h, density, rotation, on, locked}`: the real logical display size in px (it reflects `wm size` / `wm density` overrides), `densityDpi`, `Surface.ROTATION_*` (0–3), `PowerManager.isInteractive` and `KeyguardManager.isKeyguardLocked` (0.4.1+; accessibility actions are not user activity, so a long session of node actions lets the screen time out). The same object is in every `tree` result |
 | `service` | object | `{connected: true}` |
+| `backend` | string | `"a11y"` (the accessibility service) or `"uiautomation"` (backend B); absent before agent 0.4.0 means `"a11y"` |
 | `gen` | int | content-generation counter (see `gen`) |
 | `peer_uid` | int | the uid this connection was accepted as (2000 or 0) |
 | `uptime_ms` | int | device `SystemClock.uptimeMillis()` |
@@ -345,6 +371,10 @@ system's 1-per-333 ms rate limit.
 readable (API 29+ may deny background reads). Used by the host's paste fallback for
 typing; the host restores `previous` afterwards.
 
+### `shutdown`
+Backend B only: `{}` → `{stopping: true}`, then the agent releases its UiAutomation and
+exits ~100 ms later. Backend A answers -32006 (it stops when its service is disabled).
+
 ## Versioning
 - Additive changes (new methods, new result fields) keep `protocol` unchanged; clients
   must ignore unknown fields.
@@ -363,6 +393,12 @@ typing; the host restores `previous` afterwards.
   Agent 0.3.1 (versionCode 4, still protocol 3): the additive `unlisted` window.
   Agent 0.3.2 (versionCode 5, still protocol 3): `dump` ids start at a random value per
   agent process, so a ref saved before an agent restart can't match a new dump.
+  Agent 0.4.0 (versionCode 8, still protocol 3): backend B (`ShellMain`, socket
+  `droidctl_ua`), `ping.backend`, `shutdown`.
+  Agent 0.4.1 (versionCode 9, still protocol 3): `screen.on`, `screen.locked`.
+  Agent 0.4.2 (versionCode 10, still protocol 3): published events are immutable (compaction
+  replaces the entry; mutating one mid-serialization crashed the agent), and an exception
+  on an agent thread no longer takes the process down.
 
 ## Connection loss (service unbound)
 

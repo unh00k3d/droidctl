@@ -75,7 +75,8 @@ def _shim(tmp_path, variant, *argv):
     bindir = tmp_path / "bin"
     spatial.write_shim(str(bindir))
     calls = tmp_path / "calls.jsonl"
-    env = dict(os.environ, BENCH_CALLS=str(calls), BENCH_VARIANT=variant, BENCH_REAL_DROIDCTL="DRY")
+    env = dict(os.environ, BENCH_CALLS=str(calls), BENCH_VARIANT=variant, BENCH_REAL_DROIDCTL="DRY",
+               BENCH_LAYOUT=spatial.LAYOUT_ENV[variant])
     r = subprocess.run([str(bindir / "droidctl"), *argv], env=env, capture_output=True, text=True)
     return r, [json.loads(line) for line in calls.read_text().splitlines()]
 
@@ -87,9 +88,29 @@ def test_shim_forces_the_layout_and_logs_every_call(tmp_path):
     assert calls[0]["cmd"] == "snapshot" and calls[0]["blocked"] is None
 
 
+@pytest.mark.parametrize("variant,layout", [
+    ("no-rows", "spatial,no-rows"), ("geo", "spatial,geo"), ("marks", "spatial"), ("spatial", "spatial")])
+def test_shim_pins_ablations_and_opt_ins_through_the_env(tmp_path, variant, layout):
+    r, _ = _shim(tmp_path, variant, "tap", "3", "--geo" if variant == "geo" else "--no-grids")
+    out = json.loads(r.stdout)
+    assert out["layout"] == layout and out["argv"] == ["tap", "3"]
+
+
+def test_every_variant_has_a_layout_and_decisions_cover_them():
+    from droidctl import snapshot as S
+    assert set(spatial.LAYOUT_ENV) == set(spatial.VARIANTS)
+    for v in spatial.VARIANTS:
+        S.Opts.from_env(spatial.LAYOUT_ENV[v], strict=True)
+    agg = spatial.aggregate([_rec(v, True, 3, 1000) for v in spatial.VARIANTS])
+    compared = {d["compare"] for d in spatial.decisions(agg)}
+    assert compared == {"spatial vs flat", "spatial vs no-regions", "spatial vs no-rows", "spatial vs no-grids",
+                        "spatial vs no-infer", "geo vs spatial", "map vs spatial", "marks vs spatial"}
+
+
 @pytest.mark.parametrize("variant,argv,blocked", [
     ("spatial", ["shot", "--marks"], True), ("flat", ["shot"], True), ("marks", ["shot", "--marks"], False),
     ("marks", ["snapshot", "--raw"], True), ("spatial", ["snapshot", "--map"], True),
+    ("map", ["snapshot", "--map"], False), ("map", ["snapshot", "--geo"], True), ("geo", ["snapshot", "--geo"], False),
 ])
 def test_shim_refuses_what_the_variant_does_not_allow(tmp_path, variant, argv, blocked):
     r, calls = _shim(tmp_path, variant, *argv)

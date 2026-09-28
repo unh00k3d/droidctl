@@ -1,22 +1,28 @@
 """Spatial-layer A/B: real LLM agents doing test-app tasks under layout variants.
 
-    .venv/bin/python bench/spatial.py -d SERIAL [--variants flat,spatial,marks]
+    .venv/bin/python bench/spatial.py -d SERIAL [--variants flat,spatial,...]
         [--tasks all|name,...] [--runs 1] [--model claude-sonnet-5] [--budget-usd 1.0]
         [--out bench/results/spatial-ab.json]
     .venv/bin/python bench/spatial.py --dry-run      # scripted fake agent + fake phone
 
-PLAN.md "Spatial layer → Evaluation protocol", reduced run (user decision
-2026-09-27): 1 model × 3 variants × 10 tasks × 1 run.
+PLAN.md "Spatial layer → Evaluation protocol". Variants:
 
-  flat     snapshot --layout flat        (the baseline)
-  spatial  snapshot --layout spatial     (regions, rows, grids, inferred labels)
-  marks    spatial + `shot --marks` allowed (the agent may look at pixels)
+  flat        DROIDCTL_LAYOUT=flat        (the baseline)
+  spatial     DROIDCTL_LAYOUT=spatial     (regions, rows, grids, inferred labels)
+  no-regions, no-rows, no-grids, no-infer
+              spatial minus one layer (ablation: does that layer earn its place?)
+  geo, map    spatial plus --geo / --map on every printed screen
+  marks       spatial + `shot --marks` allowed (the agent may look at pixels)
+
+The variant holds for every screen droidctl prints (snapshot, action results,
+wait), not just `snapshot`: the shim sets DROIDCTL_LAYOUT, which all of them read.
 
 Each run starts the scenario fresh, then runs `claude -p` headless with only
 Bash(droidctl:*) (and Read for `marks`, to view the screenshot). A shim
 `droidctl` first on PATH logs every call and pins the variant: it forces
-DROIDCTL_LAYOUT, strips --layout/--no-* flags, and refuses --raw/--geo/--map,
-and `shot` outside the marks variant. Success and wrong-target taps come only
+DROIDCTL_LAYOUT, strips --layout/--no-* flags (and --geo/--map where the variant
+has them already), and refuses --raw, --geo/--map outside their variant, and
+`shot` outside the marks variant. Success and wrong-target taps come only
 from the test app's DTA logcat events, never from what the agent says.
 Token counts come from the CLI's JSON result (input includes cache reads).
 """
@@ -37,7 +43,9 @@ sys.path.insert(0, HERE)
 
 import testapp as T  # noqa: E402
 
-VARIANTS = ("flat", "spatial", "marks")
+VARIANTS = ("flat", "spatial", "no-regions", "no-rows", "no-grids", "no-infer", "geo", "map", "marks")
+LAYOUT_ENV = {"flat": "flat", "spatial": "spatial", "marks": "spatial",   # → DROIDCTL_LAYOUT
+              **{v: "spatial," + v for v in ("no-regions", "no-rows", "no-grids", "no-infer", "geo", "map")}}
 DEFAULT_MODEL = "claude-sonnet-5"
 CLAUDE = shutil.which("claude") or os.path.expanduser("~/.local/bin/claude")
 
@@ -139,11 +147,13 @@ SHIM = r'''#!/usr/bin/env python3
 """bench shim: log every droidctl call and pin the layout variant."""
 import json, os, sys, time
 LOG, VARIANT, REAL = os.environ["BENCH_CALLS"], os.environ["BENCH_VARIANT"], os.environ["BENCH_REAL_DROIDCTL"]
+LAYOUT = os.environ["BENCH_LAYOUT"]
 argv = sys.argv[1:]
 cmd = next((a for a in argv if not a.startswith("-")), "")
 blocked = None
-if any(a in ("--raw", "--geo", "--map") for a in argv):
-    blocked = "--raw, --geo and --map are not available in this run"
+given = [f for f in ("geo", "map") if f in LAYOUT.split(",")]
+if "--raw" in argv or any(a in ("--geo", "--map") and a[2:] not in given for a in argv):
+    blocked = "--raw" + "".join(", --" + f for f in ("geo", "map") if f not in given) + " not available in this run"
 elif cmd == "shot" and VARIANT != "marks":
     blocked = "shot is not available in this run"
 clean, skip = [], False
@@ -154,7 +164,7 @@ for a in argv:
     if a == "--layout":
         skip = True
         continue
-    if a.startswith("--layout=") or a in ("--no-regions", "--no-rows", "--no-grids", "--no-infer"):
+    if a.startswith("--layout=") or a in ("--no-regions", "--no-rows", "--no-grids", "--no-infer", "--geo", "--map"):
         continue
     clean.append(a)
 with open(LOG, "a") as f:
@@ -162,7 +172,7 @@ with open(LOG, "a") as f:
 if blocked:
     print("droidctl: " + blocked, file=sys.stderr)
     sys.exit(2)
-env = dict(os.environ, DROIDCTL_LAYOUT="flat" if VARIANT == "flat" else "spatial")
+env = dict(os.environ, DROIDCTL_LAYOUT=LAYOUT)
 if REAL == "DRY":
     print(json.dumps({"ok": True, "dry": True, "argv": clean, "layout": env["DROIDCTL_LAYOUT"]}))
     sys.exit(0)
@@ -269,7 +279,7 @@ def run_one(task, variant, phone, *, model, budget_usd, system, dry, serial, hom
     bindir = os.path.join(work, "bin")
     write_shim(bindir)
     calls = os.path.join(work, "calls.jsonl")
-    env = dict(os.environ, BENCH_CALLS=calls, BENCH_VARIANT=variant, BENCH_BIN=bindir,
+    env = dict(os.environ, BENCH_CALLS=calls, BENCH_VARIANT=variant, BENCH_BIN=bindir, BENCH_LAYOUT=LAYOUT_ENV[variant],
                BENCH_REAL_DROIDCTL="DRY" if dry else T.VENV_DROIDCTL,
                PATH=bindir + os.pathsep + os.environ.get("PATH", ""), DROIDCTL_HOME=home)
     env.pop("DROIDCTL_LAYOUT", None)
@@ -341,6 +351,14 @@ def decide(agg, base, cand, token_budget=0.15):
             "wrong_taps": [b["wrong_taps"], c["wrong_taps"]], "verdict": verdict}
 
 
+def decisions(agg):
+    """flat → spatial; each layer: spatial vs spatial-without-it (the layer earns
+    its place only if spatial beats the ablation); opt-ins: spatial → +geo/+map/+marks."""
+    return ([decide(agg, "flat", "spatial")]
+            + [decide(agg, v, "spatial") for v in ("no-regions", "no-rows", "no-grids", "no-infer")]
+            + [decide(agg, "spatial", v) for v in ("geo", "map", "marks")])
+
+
 def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("-d", "--device", default=os.environ.get("ANDROID_SERIAL"))
@@ -382,8 +400,9 @@ def main(argv=None):
               "model": None if a.dry_run else a.model, "runs": a.runs, "variants": variants,
               "tasks": [t.name for t in tasks], "device": a.device and "SM-N950F (API 28)",
               "host": platform.platform(), "summary": agg,
-              "decisions": [decide(agg, "flat", "spatial"), decide(agg, "spatial", "marks")],
-              "note": "reduced run (1 model, 1 run per task/variant): provisional, not statistically meaningful",
+              "decisions": decisions(agg),
+              "note": f"{a.runs} run(s) per task/variant, 1 model ({a.model}): "
+                      + ("provisional, not statistically meaningful" if a.runs < 3 else "the protocol's run count, one model"),
               "records": records}
     if a.out:
         os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)

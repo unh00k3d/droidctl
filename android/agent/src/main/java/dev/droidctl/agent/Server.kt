@@ -48,9 +48,10 @@ class Conn(val uid: Int, private val out: OutputStream) {
  * One thread accepts; each connection gets its own thread and is served in
  * order. Only peers with uid 2000 (shell, i.e. adb) or 0 (root) are accepted.
  */
-class Server(private val rpc: Rpc) {
+class Server(private val rpc: Rpc, private val socketName: String) {
     companion object {
-        const val SOCKET_NAME = "droidctl"
+        const val SOCKET_NAME = "droidctl"          // backend A
+        const val SHELL_SOCKET_NAME = "droidctl_ua" // backend B: its own name, so the two never fight over one
         const val MAX_LINE = 1 shl 20
         val ALLOWED_UIDS = setOf(2000, 0)
 
@@ -69,6 +70,11 @@ class Server(private val rpc: Rpc) {
     @Volatile private var stopping = false
     @Volatile private var listener: LocalServerSocket? = null
     private val clients: MutableSet<LocalSocket> = Collections.synchronizedSet(HashSet())
+    /** Backend B exits when it can't own its socket name (another instance holds it). */
+    @Volatile var onBindFailed: (() -> Unit)? = null
+    /** Uptime of the last time the connection count fell to zero, or 0 while any is open. */
+    @Volatile var idleSince: Long = android.os.SystemClock.uptimeMillis()
+        private set
 
     fun start() {
         Thread({ acceptLoop() }, "droidctl-accept").apply { isDaemon = true }.start()
@@ -93,13 +99,14 @@ class Server(private val rpc: Rpc) {
         for (attempt in 1..5) {
             if (stopping) return null
             try {
-                return LocalServerSocket(SOCKET_NAME)
+                return LocalServerSocket(socketName)
             } catch (e: IOException) {
-                Log.w(TAG, "bind @$SOCKET_NAME failed (attempt $attempt): ${e.message}")
+                Log.w(TAG, "bind @$socketName failed (attempt $attempt): ${e.message}")
                 try { Thread.sleep(200L * attempt) } catch (_: InterruptedException) { return null }
             }
         }
-        Log.e(TAG, "giving up binding @$SOCKET_NAME")
+        Log.e(TAG, "giving up binding @$socketName")
+        onBindFailed?.invoke()
         return null
     }
 
@@ -107,7 +114,7 @@ class Server(private val rpc: Rpc) {
         val s = bind() ?: return
         listener = s
         if (stopping) { stop(); return }
-        Log.i(TAG, "listening on @$SOCKET_NAME")
+        Log.i(TAG, "listening on @$socketName")
         while (!stopping) {
             val sock = try { s.accept() } catch (e: IOException) {
                 if (!stopping) Log.w(TAG, "accept failed: ${e.message}")
@@ -119,6 +126,7 @@ class Server(private val rpc: Rpc) {
 
     private fun serve(sock: LocalSocket) {
         clients.add(sock)
+        idleSince = 0
         var conn: Conn? = null
         try {
             val uid = sock.peerCredentials.uid
@@ -146,6 +154,7 @@ class Server(private val rpc: Rpc) {
         } finally {
             conn?.let { rpc.closed(it) }
             clients.remove(sock)
+            if (clients.isEmpty()) idleSince = android.os.SystemClock.uptimeMillis()
             try { sock.close() } catch (_: Exception) {}
         }
     }

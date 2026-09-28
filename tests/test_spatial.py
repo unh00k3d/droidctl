@@ -1,4 +1,5 @@
 """The pure geometry under the snapshot's spatial layer (no UI trees involved)."""
+from droidctl import snapshot as S
 from droidctl import spatial as sp
 
 
@@ -91,3 +92,29 @@ def test_render_map_has_the_asked_size_and_draws_labels():
     assert all(len(line) == 48 + 2 for line in lines)
     body = "\n".join(lines)
     assert "1" in body and "22" in body
+
+
+# --- DROIDCTL_LAYOUT: one setting for every printed screen -------------------
+def test_layout_env_parses_layout_and_layer_switches():
+    o = S.Opts.from_env("spatial,no-rows,geo")
+    assert o.spatial and not o.rows and o.regions and o.geo and not o.map
+    assert S.Opts.from_env("flat").layout == "flat"
+    assert S.Opts.from_env("").spatial and S.Opts.from_env("no-infer").infer is False
+    assert S.Opts.from_env("flat", layout="spatial", geo=None).layout == "spatial"   # flags win, None = unset
+
+
+def test_layout_env_is_strict_only_for_snapshot():
+    import pytest
+    with pytest.raises(ValueError):
+        S.Opts.from_env("spatial,nope", strict=True)
+    assert S.Opts.from_env("spatial,nope").spatial      # action results: ignore, don't fail
+
+
+def test_action_results_follow_the_layout_env(monkeypatch):
+    """Action results render new screens with DROIDCTL_LAYOUT, not the spatial default
+    (the first spatial A/B showed its flat agents spatial screens after each tap)."""
+    import inspect
+    from droidctl import act
+    assert "S.Opts()" not in inspect.getsource(act)
+    monkeypatch.setenv("DROIDCTL_LAYOUT", "flat")
+    assert S.Opts.from_env().layout == "flat"

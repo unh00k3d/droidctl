@@ -147,6 +147,20 @@ def test_silent_click_is_never_tapped_again(home, monkeypatch):
     assert s._client.count("act") == 1
 
 
+def test_a_handled_click_with_no_visible_effect_says_so(home, monkeypatch):
+    """Spatial A/B: agents read a bare "unchanged" as a miss and tapped again (12 of 13
+    failures). A click the app received must read as done."""
+    s = session(monkeypatch, tree("cart_inc-a"))
+    s._client.act_replies = [{"performed": True, "clicked_event": True, "tree": tree("cart_inc-a")}]
+    out = act.cmd_tap(args(target=str(plus_ref())))
+    assert out["handled"] is True and not out["changed"] and "warning" not in out
+    assert "do not tap again" in out["text"] and "\nunchanged\n" not in out["text"] + "\n"
+    silent = session(monkeypatch, tree("cart_inc-a"))
+    silent._client.act_replies = [{"performed": True, "clicked_event": False, "tree": tree("cart_inc-a")}]
+    out = act.cmd_tap(args(target=str(plus_ref())))
+    assert "handled" not in out and out["text"].endswith("unchanged")
+
+
 def test_not_performed_falls_back_once(home, monkeypatch):
     s = session(monkeypatch, tree("cart_inc-a"))
     s._client.act_replies = [{"performed": False, "available": []}]
@@ -606,3 +620,21 @@ def test_wait_role_refuses_device_side_conditions(home, monkeypatch):
     with pytest.raises(UserError) as e:
         act.cmd_wait(_wait_args(id="spinner"))
     assert e.value.kind == "bad-args"
+
+
+def test_an_off_screen_is_screen_off_not_not_found(home, monkeypatch):
+    """Node actions aren't user activity; a long session lets the screen time out
+    (tap-accuracy bench, SM-N950F). Every locator then 'found nothing'."""
+    off = copy.deepcopy(tree("cart_inc-a"))
+    off["screen"]["on"] = False
+    s = session(monkeypatch, off)
+    with pytest.raises(UserError) as e:
+        act.cmd_tap(args(text="Checkout"))
+    assert e.value.kind == "screen-off" and "KEYCODE_WAKEUP" in e.value.hint
+    locked = copy.deepcopy(tree("cart_inc-a"))
+    locked["screen"]["locked"] = True
+    s = session(monkeypatch, locked)
+    with pytest.raises(UserError) as e:
+        act.cmd_tap(args(text="No such thing"))
+    assert e.value.kind == "screen-off" and "locked" in str(e.value)
+    assert "screen=locked" in S.header(S.build(locked))

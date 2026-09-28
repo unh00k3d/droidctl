@@ -63,9 +63,10 @@ class Session:
         try:
             self._client, self.info = dev.connect(self.serial)
         except UserError as e:
-            if e.kind != "not-installed" or not self.auto_setup:
+            not_bound = e.kind == "connection" and (e.data or {}).get("reason") == "not-bound"
+            if not (e.kind == "not-installed" or not_bound) or not self.auto_setup:
                 raise
-            self._setup()
+            self._setup()                       # installs/enables, or rebinds a dead service
             self._client, self.info = dev.connect(self.serial)
             return
         # an older agent than the one we bundle: upgrade in place (install -r keeps it enabled)
@@ -114,6 +115,7 @@ class Session:
         return self._state
 
     def save(self, snap):
+        S.carry_refs(self.state, snap)          # same screen: the agent's numbers stay valid
         self._state = S.to_state(snap, self.serial)
         self._state_loaded = True
         S.save_state(self.serial, self._state)
@@ -256,12 +258,38 @@ def resolve_target(sess, a, fast=True):
             if rec is not None:
                 return Target(handle=rec["handle"], click=rec.get("click"), dump=rec["dump"],
                               tap=rec.get("tap"), tier=0, via="fast-path", rec=dict(rec, ref=ref))
-        res = R.resolve_ref(state, ref, sess.tree())
+        tree = sess.tree()
+        _awake(S.build(tree))
+        try:
+            res = R.resolve_ref(state, ref, tree)
+        except UserError as e:
+            raise _locked(e, S.build(tree))
     else:
         snap = sess.snap()
-        res = R.find(snap, index=getattr(a, "index", None), **loc)
+        _awake(snap)
+        try:
+            res = R.find(snap, index=getattr(a, "index", None), **loc)
+        except UserError as e:
+            raise _locked(e, snap)
     return Target(handle=res.handle, click=res.click, dump=res.snap.dump, tap=res.tap, res=res,
                   pre=res.snap, tier=res.tier, via=res.via)
+
+
+WAKE_HINT = "wake it: droidctl press KEYCODE_WAKEUP (then unlock the phone if it asks)"
+
+
+def _awake(snap):
+    """Node actions are not user activity: a session of them lets the screen time out,
+    and then nothing matches. Say so instead of not-found."""
+    if snap.off:
+        raise UserError("the screen is off", "screen-off", hint=WAKE_HINT)
+
+
+def _locked(err, snap):
+    """A failed match while the keyguard is up is about the lock screen, not the app."""
+    if snap.locked and err.kind in ("not-found", "stale-ref", "ambiguous"):
+        return UserError(f"the phone is locked ({err})", "screen-off", hint=WAKE_HINT, data=err.data)
+    return err
 
 
 def _settle(a):
@@ -343,6 +371,10 @@ def _transitional(snap):
                 or getattr(snap, "leaving", False))
 
 
+HANDLED_NO_CHANGE = ("unchanged, but the app received the click (click event): it was handled; "
+                     "do not tap again. Its effect may not be visible here (logged, background work)")
+
+
 def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     """Build the post-action snapshot, diff it against `pre`, save it, shape the result."""
     tree = (reply or {}).get("tree")
@@ -379,13 +411,20 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
         post, changes, new_screen = _catch_up(sess, pre, post)
         changed = bool(changes) or new_screen
     sess.save(post)
-    opts = S.Opts()
+    # The app received the click, but nothing on screen shows it (a click that only
+    # logs, starts work in the background, or opens a share sheet later). A bare
+    # "unchanged" read as "missed" to agents: in the spatial A/B 12 of 13 failures
+    # were a correct tap followed by a second one (`--method gesture`) to be sure.
+    handled = bool((reply or {}).get("clicked_event")) or any(
+        e.get("type") in ("clicked", "long_clicked") for e in events)
+    opts = S.Opts.from_env()
     if new_screen:
         text = S.render(post, opts)
     else:
         lines = changes[:DIFF_MAX]
         more = len(changes) - len(lines)
-        text = "\n".join([S.header(post, opts)] + (lines or ["unchanged"])
+        quiet = [HANDLED_NO_CHANGE if handled and method != "gesture-fallback" else "unchanged"]
+        text = "\n".join([S.header(post, opts)] + (lines or quiet)
                          + ([f"… {more} more changed lines (snapshot --diff shows them all)"] if more > 0 else []))
     out = {
         "ok": True, "changed": changed, "method": method,
@@ -401,6 +440,8 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
         for k in ("performed", "clicked_event", "idle", "settle_ms"):
             if k in reply:
                 out[k] = reply[k]
+    if handled and not changed:
+        out["handled"] = True             # delivered; don't repeat it
     if t is not None:
         out["target"] = t.describe()
     if warning:
@@ -779,7 +820,7 @@ def cmd_scroll_to(a):
                 return {"ok": True, "found": True, "scrolls": scrolls, "ref": elem.ref,
                         "changed": snap.sig != pre["sig"] or S.flat_lines(snap) != pre["lines"],
                         "element": R._describe(elem),
-                        "text": S.header(snap, S.Opts()) + "\n" + S.element_line(elem, snap, S.Opts())}
+                        "text": S.header(snap, S.Opts.from_env()) + "\n" + S.element_line(elem, snap, S.Opts.from_env())}
         except UserError as e:
             if e.kind not in ("not-found", "offscreen", "occluded"):
                 raise
@@ -1157,7 +1198,7 @@ def _wait_role(sess, a):
                     # the whole screen, not just its header: the state saved above is
                     # what the next `snapshot` compares against, so an agent that was
                     # only shown a header would get "unchanged" for a screen it never saw
-                    "text": f"matched {what} after {ms} ms\n" + S.render(snap, S.Opts())}
+                    "text": f"matched {what} after {ms} ms\n" + S.render(snap, S.Opts.from_env())}
         left = deadline - time.monotonic()
         if left <= 0:
             raise UserError(f"gave up after {a.timeout:g} s waiting for role={a.role!r}"
@@ -1247,7 +1288,7 @@ def _after_launch(sess, a, pkg, pre, t0):
                  extra={"pkg": pkg, "launch_ms": round((time.monotonic() - t0) * 1000),
                         "wait_ms": w.get("ms")})
     # a launch always shows the new screen in full
-    snap_text = S.render(S.build(sess.tree()), S.Opts()) if not out["new_screen"] else out["text"]
+    snap_text = S.render(S.build(sess.tree()), S.Opts.from_env()) if not out["new_screen"] else out["text"]
     out["text"] = snap_text
     return out
 

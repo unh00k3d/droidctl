@@ -1,12 +1,9 @@
 package dev.droidctl.agent
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.GestureDescription
 import android.annotation.TargetApi
 import android.content.ClipData
-import android.content.ClipboardManager
 import android.graphics.Bitmap
-import android.graphics.Path
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -29,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference
  * wait_idle, wait_for, plus current, screenshot and clipboard.
  * Waits are event-driven (Events.lock), never polling sleeps.
  */
-class Actions(private val svc: AgentService, private val tree: Tree, private val events: Events,
+class Actions(private val svc: Host, private val tree: Tree, private val events: Events,
               private val screen: () -> JSONObject) {
     companion object {
         const val DEFAULT_QUIET_MS = 150L
@@ -123,7 +120,7 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
 
     /** The front activity: the one owning the active application window, else the last window-state event's. */
     private fun frontActivity(): String? {
-        val ws = try { svc.windows } catch (_: Exception) { emptyList() }
+        val ws = try { svc.windows() } catch (_: Exception) { emptyList() }
         val active = ws.firstOrNull { it.isActive && it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
             ?: ws.firstOrNull { it.isFocused && it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
         return active?.let { events.activityOf(it.id) } ?: events.curActivity
@@ -242,46 +239,31 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
         val type = p.optString("type", "tap")
         val pts = points(p.optJSONArray("points"))
         fun need(n: Int) { if (pts.size < n) throw RpcError(Codes.INVALID_PARAMS, "$type needs at least $n points") }
-        val b = GestureDescription.Builder()
-        val total: Long
-        when (type) {
+        val strokes = when (type) {
             "tap", "long" -> {
                 need(1)
-                val ms = p.optLong("ms", if (type == "tap") 60 else 800)
-                b.addStroke(GestureDescription.StrokeDescription(dot(pts[0]), 0, ms)); total = ms
+                listOf(Stroke(pts.subList(0, 1), 0, p.optLong("ms", if (type == "tap") 60 else 800)))
             }
             "double" -> {
                 need(1)
                 val ms = p.optLong("ms", 50)
-                b.addStroke(GestureDescription.StrokeDescription(dot(pts[0]), 0, ms))
-                b.addStroke(GestureDescription.StrokeDescription(dot(pts[0]), ms + 100, ms)); total = 2 * ms + 100
+                listOf(Stroke(pts.subList(0, 1), 0, ms), Stroke(pts.subList(0, 1), ms + 100, ms))
             }
             "swipe", "path" -> {
                 need(2)
-                val ms = p.optLong("ms", if (type == "swipe") 300 else 500)
-                b.addStroke(GestureDescription.StrokeDescription(line(pts), 0, ms)); total = ms
+                listOf(Stroke(pts, 0, p.optLong("ms", if (type == "swipe") 300 else 500)))
             }
             "pinch" -> {
                 need(4)
                 val ms = p.optLong("ms", 400)
-                b.addStroke(GestureDescription.StrokeDescription(line(pts.subList(0, 2)), 0, ms))
-                b.addStroke(GestureDescription.StrokeDescription(line(pts.subList(2, 4)), 0, ms)); total = ms
+                listOf(Stroke(pts.subList(0, 2), 0, ms), Stroke(pts.subList(2, 4), 0, ms))
             }
             else -> throw RpcError(Codes.INVALID_PARAMS, "unknown gesture type '$type' (tap|long|double|swipe|path|pinch)")
         }
+        val total = strokes.maxOf { it.startMs + it.durationMs }
         val startSeq = events.nextSeq - 1
         val t0 = SystemClock.uptimeMillis()
-        val done = CountDownLatch(1)
-        val result = AtomicReference<Boolean>(null)
-        val cb = object : AccessibilityService.GestureResultCallback() {
-            override fun onCompleted(d: GestureDescription?) { result.set(true); done.countDown() }
-            override fun onCancelled(d: GestureDescription?) { result.set(false); done.countDown() }
-        }
-        if (!svc.dispatchGesture(b.build(), cb, null))
-            throw RpcError(Codes.CANCELLED, "the system refused the gesture")
-        if (!done.await(total + 3000, TimeUnit.MILLISECONDS))
-            throw RpcError(Codes.TIMEOUT, "no gesture completion callback within ${total + 3000} ms")
-        if (result.get() != true) throw RpcError(Codes.CANCELLED, "the gesture was cancelled (another gesture or a touch interrupted it)")
+        if (!svc.runGesture(strokes, total + 3000)) throw RpcError(Codes.CANCELLED, "the gesture was cancelled (another gesture or a touch interrupted it)")
         val out = JSONObject().put("performed", true).put("type", type).put("ms", SystemClock.uptimeMillis() - t0)
         settleInto(out, p.optJSONObject("settle"), t0)
         out.put("events", toJson(events.since(startSeq, MAX_EVENTS)))
@@ -300,12 +282,6 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
         }
     }
 
-    private fun dot(p: FloatArray) = Path().apply { moveTo(p[0], p[1]) }
-    private fun line(pts: List<FloatArray>) = Path().apply {
-        moveTo(pts[0][0], pts[0][1])
-        for (i in 1 until pts.size) lineTo(pts[i][0], pts[i][1])
-    }
-
     // ------------------------------------------------------------------ global
     fun global(p: JSONObject): JSONObject {
         val name = p.optString("name", "")
@@ -314,7 +290,7 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
         if (Build.VERSION.SDK_INT < min) throw RpcError(Codes.UNSUPPORTED, "global $name needs API $min")
         val startSeq = events.nextSeq - 1
         val t0 = SystemClock.uptimeMillis()
-        val performed = svc.performGlobalAction(id)
+        val performed = svc.global(id)
         val out = JSONObject().put("performed", performed).put("name", name)
         if (performed) settleInto(out, p.optJSONObject("settle"), t0)
         out.put("events", toJson(events.since(startSeq, MAX_EVENTS)))
@@ -433,14 +409,14 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
     }
 
     private fun roots(): List<AccessibilityNodeInfo> {
-        val ws = try { svc.windows } catch (_: Exception) { emptyList() }
+        val ws = try { svc.windows() } catch (_: Exception) { emptyList() }
         val out = ws.mapNotNull { try { it.root } catch (_: Exception) { null } }
         if (out.isNotEmpty()) return out
-        return listOfNotNull(svc.rootInActiveWindow)
+        return listOfNotNull(svc.activeRoot())
     }
 
     private fun findWindow(want: String): JSONObject? {
-        for (w in try { svc.windows } catch (_: Exception) { emptyList() }) {
+        for (w in try { svc.windows() } catch (_: Exception) { emptyList() }) {
             val title = if (Build.VERSION.SDK_INT >= 24) w.title?.toString() else null
             val pkg = try { w.root?.packageName?.toString() } catch (_: Exception) { null }
             if ((title != null && title.contains(want, ignoreCase = true)) || pkg == want)
@@ -460,7 +436,7 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
 
     // ------------------------------------------------------------------ current
     fun current(): JSONObject {
-        val ws = try { svc.windows } catch (_: Exception) { emptyList() }
+        val ws = try { svc.windows() } catch (_: Exception) { emptyList() }
         val arr = JSONArray()
         var activePkg: String? = null
         var keyboard = false
@@ -470,7 +446,7 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
             if (w.isActive && w.type == AccessibilityWindowInfo.TYPE_APPLICATION) activePkg = pkg
             arr.put(windowSummary(w, pkg))
         }
-        if (activePkg == null) activePkg = svc.rootInActiveWindow?.packageName?.toString()
+        if (activePkg == null) activePkg = svc.activeRoot()?.packageName?.toString()
         val o = JSONObject().put("keyboard", keyboard).put("windows", arr).put("gen", tree.gen)
         activePkg?.let { o.put("pkg", it) }
         // the activity is only known from window-state events; report it only if it belongs to the front package
@@ -482,11 +458,15 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
     fun screenshot(p: JSONObject): JSONObject {
         if (Build.VERSION.SDK_INT < 30)
             throw RpcError(Codes.UNSUPPORTED, "takeScreenshot needs API 30 (this is ${Build.VERSION.SDK_INT}); use screencap")
-        return screenshot30(p)
+        // UiAutomation's capture differs in how it treats FLAG_SECURE windows; the host's
+        // screencap path detects those, so backend B uses it rather than guessing
+        val a11y = (svc as? ServiceHost)?.service
+            ?: throw RpcError(Codes.UNSUPPORTED, "the ${svc.backend} backend has no screenshot; use screencap")
+        return screenshot30(a11y, p)
     }
 
     @TargetApi(30)
-    private fun screenshot30(p: JSONObject): JSONObject {
+    private fun screenshot30(svc: AgentService, p: JSONObject): JSONObject {
         val scale = p.optDouble("scale", 0.5).coerceIn(0.05, 1.0)
         val quality = p.optInt("quality", 70).coerceIn(1, 100)
         var lastErr = 0
@@ -541,8 +521,8 @@ class Actions(private val svc: AgentService, private val tree: Tree, private val
         val err = AtomicReference<Exception?>(null)
         Handler(Looper.getMainLooper()).post {
             try {
-                val cm = svc.getSystemService(ClipboardManager::class.java)
-                val prev = try { cm.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(svc)?.toString() }
+                val cm = svc.clipboard()
+                val prev = try { cm.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(svc.context)?.toString() }
                            catch (_: Exception) { null }
                 if (prev != null) out.put("previous", prev)
                 if (p.has("set")) {

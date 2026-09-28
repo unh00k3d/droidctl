@@ -19,7 +19,10 @@ interface; you never need `--help` per command (`droidctl cheat --json` has it a
    position: if the screen changed they fail with `stale-ref` (re-run `snapshot`),
    `ambiguous` (use a more specific locator), `occluded` or `offscreen` (`scroll-to` it).
    `connection` with `data.maybe_performed`: the action may already have run, so
-   `snapshot` before repeating it.
+   `snapshot` before repeating it. **On one screen a ref keeps its number** across
+   snapshots and action results (after a scroll, a deleted row, a changed counter);
+   new elements get new numbers, and a number whose element went away is never
+   reused. On a new screen numbering starts again at 1.
 3. **Copy labels verbatim** from the snapshot when you use `--text`/`--desc`; never
    invent them from a screenshot. Prefer refs over text.
 4. **Every action reports what changed** (`changed`, `diff`, `new_screen`, `toast`), so
@@ -42,6 +45,9 @@ droidctl run --json --step 'launch com.android.settings' --step 'tap --text Disp
 ## Tapping: what the result means
 
 - `method:"action"` — the element's `ACTION_CLICK` ran (the normal case).
+- `handled:true` / "unchanged, but the app received the click" — the tap **worked**; the
+  app just shows nothing for it on this screen. **Don't tap again** (not even with
+  `--method gesture`): that clicks twice.
 - A `warning` saying the click was performed but nothing happened: droidctl does **not**
   tap a second time, because the app may already have handled it (a second tap could
   submit twice). Check the screen; if nothing happened, retry with `--method gesture`.
@@ -59,6 +65,10 @@ droidctl run --json --step 'launch com.android.settings' --step 'tap --text Disp
   that happened between your calls (toasts, new windows) arrive on the next result under
   `between_calls`. `DROIDCTL_NO_DAEMON=1` (or `--no-daemon`) runs in-process instead.
 - Several phones: `-d SERIAL` (or `ANDROID_SERIAL`).
+- `screen-off` (header `screen=off|locked`): the phone slept; node taps don't keep it
+  awake. `droidctl press KEYCODE_WAKEUP`, then carry on.
+- A phone set up with `setup --backend uiautomation` runs the agent over adb with nothing
+  installed or enabled; everything else works the same (`doctor` shows the backend).
 - Banking and other secure apps: screenshots of `FLAG_SECURE` windows fail with
   `secure-window` (the snapshot still works); some apps refuse to run on rooted phones.
 

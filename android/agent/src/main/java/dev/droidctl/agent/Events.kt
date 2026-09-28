@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
  * mutation happens under `lock` and ends in notifyAll(), so waiters (settle,
  * wait_idle, wait_for) are woken by events instead of polling.
  */
-class Events(private val svc: AgentService) {
+class Events(private val svc: Host) {
     companion object {
         const val CAP = 500
         /** Bursts of the same noisy event from one package within this window are compacted. */
@@ -142,7 +142,7 @@ class Events(private val svc: AgentService) {
         if (cls == null) return
         val key = "$pkg/$cls"
         val act = isActivity.getOrPut(key) {
-            try { svc.packageManager.getActivityInfo(ComponentName(pkg, cls), 0); true } catch (_: Exception) { false }
+            try { svc.context.packageManager.getActivityInfo(ComponentName(pkg, cls), 0); true } catch (_: Exception) { false }
         }
         if (act) {
             curActivity = cls
@@ -160,7 +160,7 @@ class Events(private val svc: AgentService) {
     }
 
     fun imeWindowPresent(): Boolean = try {
-        svc.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
+        svc.windows().any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
     } catch (_: Exception) { false }
 
     private fun add(type: String, o: JSONObject, gen: Long, source: AccessibilityNodeInfo?) {
@@ -174,7 +174,15 @@ class Events(private val svc: AgentService) {
             if (type in COMPACTABLE && last != null && last.type == type &&
                 last.json.optString("pkg") == o.optString("pkg") &&
                 now - last.json.optLong("t_last", last.t) <= COMPACT_MS) {
-                last.json.put("n", last.json.optInt("n", 1) + 1).put("t_last", now).put("gen", gen)
+                // A published event's JSON is never mutated: subscriber threads and
+                // replies serialize it outside this lock, and changing it under them
+                // threw ConcurrentModificationException, which killed the agent process
+                // on a subscriber thread (dropbox, SM-N950F, agents 0.2.0-0.4.1). The
+                // compacted event replaces it as a copy.
+                val copy = JSONObject(last.json.toString())
+                    .put("n", last.json.optInt("n", 1) + 1).put("t_last", now).put("gen", gen)
+                ring.removeLast()
+                ring.addLast(Ev(last.seq, last.t, last.type, copy, last.source))
             } else {
                 seq++
                 o.put("seq", seq).put("t", now).put("gen", gen).put("type", type)
@@ -280,6 +288,8 @@ class Events(private val svc: AgentService) {
                     if (!conn.notify("event", ev)) break
                 }
             } catch (_: InterruptedException) {
+            } catch (e: Exception) {
+                Log.w(TAG, "subscription writer failed; dropping it", e)   // never the whole agent
             } finally {
                 s.alive = false
                 subs.remove(s)

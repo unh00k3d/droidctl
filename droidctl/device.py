@@ -20,10 +20,26 @@ SERVICE_CLASS = "dev.droidctl.agent.AgentService"
 COMPONENT = f"{PKG}/.AgentService"            # the short form we write to settings
 REMOTE = "localabstract:droidctl"
 PROTOCOL = 3
+
+# Device backends (PLAN.md "Device backends"). Both speak the same PROTOCOL.md:
+#   a11y          our accessibility service, installed and enabled by `setup` (default)
+#   uiautomation  the same agent code run by `app_process` from a pushed (not
+#                 installed) APK, holding a UiAutomation; nothing is enabled
+# The choice is explicit (`setup --backend`, or DROIDCTL_BACKEND per call) and
+# never switched silently.
+BACKENDS = ("a11y", "uiautomation")
+REMOTES = {"a11y": REMOTE, "uiautomation": "localabstract:droidctl_ua"}
+UA_MAIN = "dev.droidctl.agent.ShellMain"
+# for pgrep/pkill -f: the bracket keeps the pattern from matching the shell running it
+UA_PATTERN = "'dev.droidctl.agent.[S]hellMain'"
+UA_APK = "/data/local/tmp/droidctl-ua.apk"      # not DEVICE_TMP_APK: setup deletes that one
+UA_LOG = "/data/local/tmp/droidctl-ua.log"
+UA_IDLE_MS = 600_000                            # it exits after 10 min without a client
+UA_EXIT = {3: "busy", 4: "socket", 5: "failed"}
 # The versionCode of the APK bundled in droidctl/assets. It has to match the
 # agent's build.gradle.kts (a unit test checks); setup compares it with what
 # the phone reports so an unchanged agent is not reinstalled.
-AGENT_VERSION_CODE = 7
+AGENT_VERSION_CODE = 10
 APK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "droidctl-agent.apk")
 DEVICE_TMP_APK = "/data/local/tmp/droidctl-agent.apk"
 
@@ -174,12 +190,20 @@ def resolve_serial(requested):
     return select_serial(requested, list_devices())
 
 
-def find_forward(serial, forwards_text=None):
-    """The local tcp port of an existing `tcp:N localabstract:droidctl` forward, or None."""
+def backend_for(serial):
+    """DROIDCTL_BACKEND, else the backend `setup --backend` recorded for this phone, else a11y."""
+    b = os.environ.get("DROIDCTL_BACKEND") or device_state(serial).get("backend") or "a11y"
+    if b not in BACKENDS:
+        raise UserError(f"backend {b!r}: use one of {', '.join(BACKENDS)}", "bad-args")
+    return b
+
+
+def find_forward(serial, forwards_text=None, remote=REMOTE):
+    """The local tcp port of an existing `tcp:N <remote>` forward, or None."""
     text = _adb_host_query("host:list-forward") if forwards_text is None else forwards_text
     for line in text.splitlines():
         parts = line.split()
-        if len(parts) == 3 and parts[0] == serial and parts[2] == REMOTE \
+        if len(parts) == 3 and parts[0] == serial and parts[2] == remote \
                 and parts[1].startswith("tcp:"):
             return int(parts[1][4:])
     return None
@@ -208,21 +232,21 @@ def _free_port():
         return s.getsockname()[1]
 
 
-def ensure_forward(serial):
-    port = find_forward(serial)
+def ensure_forward(serial, remote=REMOTE):
+    port = find_forward(serial, remote=remote)
     if port:
         return port
     import adbutils
     port = _free_port()
     try:
-        adb_device(serial).forward(f"tcp:{port}", REMOTE)
+        adb_device(serial).forward(f"tcp:{port}", remote)
     except (adbutils.AdbError, OSError) as e:
         raise UserError(f"adb forward failed: {e}", "adb")
     return port
 
 
-def remove_forward(serial):
-    port = find_forward(serial)
+def remove_forward(serial, remote=REMOTE):
+    port = find_forward(serial, remote=remote)
     if port:
         import adbutils
         try:
@@ -611,8 +635,10 @@ def diagnose(serial):
         raise UserError("the agent's service is listed but accessibility_enabled is 0",
                         "not-installed", hint="run: droidctl setup")
     raise UserError("the agent's service is enabled but its socket does not answer "
-                    "(Android may not have bound it yet, or Appium/uiautomator2 is suppressing it)",
-                    "connection", hint="run: droidctl doctor")
+                    "(Android may not have bound it yet, stopped restarting it after crashes, "
+                    "or Appium/uiautomator2 is suppressing it)",
+                    "connection", hint="run: droidctl setup (rebinds it), or droidctl doctor",
+                    data={"reason": "not-bound"})
 
 
 # Set by the daemon: connect() then hands out the device's warm, shared session
@@ -634,13 +660,22 @@ def connect(serial, timeout=5.0):
 
 
 def _connect(serial, timeout=5.0):
+    backend = backend_for(serial)
+    if backend == "uiautomation":
+        return _connect_ua(serial, timeout)
+    return _connect_remote(serial, REMOTE, timeout) or diagnose(serial)
+
+
+def _connect_remote(serial, remote, timeout):
+    """(client, ping) over the forward to `remote`, re-creating the forward once;
+    None when nothing answers (and then no forward is left behind)."""
     for attempt in (0, 1):
-        port = find_forward(serial) if attempt == 0 else None
+        port = find_forward(serial, remote=remote) if attempt == 0 else None
         if port is None:
             if attempt == 0:
                 continue
-            remove_forward(serial)
-            port = ensure_forward(serial)
+            remove_forward(serial, remote)
+            port = ensure_forward(serial, remote)
         try:
             c = AgentClient(port, timeout=timeout)
             try:
@@ -652,8 +687,123 @@ def _connect(serial, timeout=5.0):
             if e.kind != "connection":
                 raise
     # the forward we just made leads nowhere; don't leave it behind
-    remove_forward(serial)
-    diagnose(serial)
+    remove_forward(serial, remote)
+    return None
+
+
+def _connect_ua(serial, timeout):
+    """Backend B: connect, (re)launching the agent process if it isn't running (it
+    dies on reboot, when killed, and after its idle timeout) or is older than ours."""
+    remote = REMOTES["uiautomation"]
+    got = _connect_remote(serial, remote, timeout)
+    if got and (got[1].get("versionCode") or 0) >= AGENT_VERSION_CODE:
+        return got
+    if got:
+        got[0].close()
+        stop_ua(serial, remove=False)
+    launch_ua(serial)
+    got = _connect_remote(serial, remote, timeout)
+    if not got:
+        raise UserError("the uiautomation agent started but its socket does not answer", "connection",
+                        hint=f"see: adb shell cat {UA_LOG}")
+    return got
+
+
+# --------------------------------------------------------------------------
+# backend B's process: push, launch, stop, status
+# --------------------------------------------------------------------------
+def ua_command(idle_ms=UA_IDLE_MS):
+    """The shell line that starts backend B, detached (its own session, so it
+    outlives this adb shell) with its output in UA_LOG. PURE.
+
+    `setsid` runs in the foreground: it is then not a process-group leader, so it
+    calls setsid() itself before exec'ing the `sh -c` that backgrounds the agent,
+    and the adb shell returns only once the new session exists. Backgrounding
+    `setsid` instead raced adbd, which kills the shell's process group on exit:
+    measured on the SM-N950F, the agent died before detaching in 4 of 4 launches
+    through adbutils; foreground setsid survived 5 of 5 (~120 ms)."""
+    return (f"CLASSPATH={UA_APK} setsid sh -c 'app_process /system/bin {UA_MAIN} --idle-ms {int(idle_ms)} "
+            f"</dev/null >{UA_LOG} 2>&1 &'")
+
+
+def parse_ua_log(text):
+    """-> ("ready"|"busy"|"socket"|"failed"|None, message). The agent writes one
+    status line: `I ready …` or `E <reason>: …`. PURE."""
+    for line in (text or "").splitlines():
+        line = line.strip()
+        if line.startswith("I ready"):
+            return "ready", line[2:]
+        if line.startswith("E "):
+            reason, _, msg = line[2:].partition(":")
+            return reason.strip(), msg.strip() or line
+    return None, ""
+
+
+def _local_md5(path):
+    import hashlib
+    with open(path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+
+def launch_ua(serial, idle_ms=UA_IDLE_MS, wait_s=6.0):
+    """Push the agent APK (not installed) and start backend B. Raises `suppressed`
+    when another UiAutomation client (Appium, uiautomator2) holds the one slot."""
+    if not os.path.exists(APK_PATH):
+        raise UserError(f"the agent APK is not bundled ({APK_PATH})", "missing-dep", hint="run: make apk")
+    d = adb_device(serial)
+    if sh(d, f"md5sum {UA_APK} 2>/dev/null").split(" ")[0] != _local_md5(APK_PATH):
+        d.sync.push(APK_PATH, UA_APK)
+    sh(d, f"rm -f {UA_LOG}; " + ua_command(idle_ms))
+    deadline = time.monotonic() + wait_s
+    while time.monotonic() < deadline:
+        state, msg = parse_ua_log(sh(d, f"cat {UA_LOG} 2>/dev/null"))
+        if state == "ready":
+            return msg
+        if state == "busy":
+            raise UserError(f"another UiAutomation client holds the device: {msg}", "suppressed",
+                            hint="stop uiautomator/Appium first (only one UiAutomation at a time)")
+        if state == "socket":
+            return msg                        # another instance already serves the socket
+        if state is not None:
+            raise UserError(f"the uiautomation agent failed to start: {msg}", "device",
+                            hint=f"see: adb shell cat {UA_LOG}")
+        time.sleep(0.1)
+    raise UserError(f"the uiautomation agent did not start within {wait_s:g}s", "timeout",
+                    hint=f"see: adb shell cat {UA_LOG}")
+
+
+def ua_pids(d):
+    out = sh(d, f"pgrep -f {UA_PATTERN} 2>/dev/null")
+    return [int(p) for p in out.split() if p.isdigit()]
+
+
+def stop_ua(serial, remove=True):
+    """Stop backend B (politely: `shutdown` releases the UiAutomation; then any
+    leftover is killed) and, with `remove`, delete its files and forward.
+    -> {"stopped": bool, "removed": bool}"""
+    stopped = False
+    port = find_forward(serial, remote=REMOTES["uiautomation"])
+    if port:
+        try:
+            with AgentClient(port, timeout=1.0) as c:
+                c.call("shutdown", timeout=2.0)
+                stopped = True
+        except UserError:
+            pass
+    d = adb_device(serial)
+    for _ in range(20):
+        if not ua_pids(d):
+            break
+        time.sleep(0.1)
+    if ua_pids(d):
+        sh(d, f"pkill -f {UA_PATTERN}")
+        stopped = True
+    removed = False
+    if remove:
+        removed = bool(sh(d, f"ls {UA_APK} 2>/dev/null"))
+        sh(d, f"rm -f {UA_APK} {UA_LOG}")
+        remove_forward(serial, REMOTES["uiautomation"])
+    return {"stopped": stopped, "removed": removed}
 
 
 def median(xs):

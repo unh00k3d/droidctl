@@ -255,6 +255,7 @@ class Session:
         self.info = {}
         self.port = None
         self.alive = False
+        self.backend = None
         self.entry = None
         self.max_gen = -1                    # highest `gen` seen on a pushed event
         self.last_seq = 0
@@ -272,6 +273,7 @@ class Session:
     def open(self):
         from droidctl import device as dev
         self.close()
+        self.backend = dev.backend_for(self.serial)
         client, info = dev._connect(self.serial)
         self.client, self.info, self.port = client, info, client.port
         self.entry, self.alive = None, True
@@ -454,7 +456,7 @@ class Session:
     def describe(self):
         st = self.stats
         served = st["hits"] + st["misses"]
-        return {"serial": self.serial, "port": self.port, "connected": self.alive,
+        return {"serial": self.serial, "backend": self.backend, "port": self.port, "connected": self.alive,
                 "subscribed": self.sub_alive, "agent": self.info.get("version"),
                 "cache": {"hits": st["hits"], "misses": st["misses"], "gen_checks": st["gen_checks"],
                           "primed": st["primed"],
@@ -472,8 +474,10 @@ class Pool:
             s = self.sessions.get(serial)
             if s is None:
                 s = self.sessions[serial] = Session(serial)
+        from droidctl import device as dev
         with s.open_lock:                     # connecting phone A never blocks phone B
-            if not s.alive:
+            # a different backend chosen since (setup --backend, DROIDCTL_BACKEND): reconnect
+            if not s.alive or s.backend != dev.backend_for(serial):
                 s.open()
         return s
 

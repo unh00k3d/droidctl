@@ -8,7 +8,11 @@ An agent-first Android automation CLI: a compact UI snapshot with refs, element-
 - `research/`: prior-art reports (Artemis, droidrun/mobilerun, mobile-use, mobile-mcp, uiautomator2, android_world, Maestro, agent-device, …) with file:line references. Consult them before re-inventing a heuristic.
 
 ## Status
-- **M1–M7 done 2026-09-27** (M7 minus toasts in the snapshot header); M8 docs and packaging done, while the spatial A/B, tap accuracy vs mobile-mcp, test-app group 7 and the scenario coverage gate are pending. Numbers in PLAN.md "Milestones" and `bench/results/`.
+- **M1–M8 done** (2026-09-27/28). The full Sonnet A/B (`bench/results/spatial-ab-full-2.json`) found no layout difference at ceiling; spatial stays the provisional default (user decision). Numbers in PLAN.md "Milestones" and `bench/results/`.
+- **Backend B (UiAutomation over adb) built 2026-09-28** (agent 0.4.x): same APK pushed to `/data/local/tmp` and run by `app_process` (`ShellMain.kt`), `setup --backend uiautomation`, `DROIDCTL_BACKEND`. e2e: `tests/e2e/test_backend_b.py`. Don't leave a Backend B process running during benchmarks or `uiautomator dump`: it holds the one UiAutomation (`teardown --backend uiautomation`).
+- **Refs are stable on one screen** (`snapshot.carry_refs`); layout code must order by `e.order`, never by `e.ref`.
+- **Agent crashes are recorded in the phone's dropbox** (`adb shell dumpsys dropbox --print data_app_crash`); the bench clears logcat, so look there. After repeated crashes Android stops restarting the service; `droidctl setup` rebinds it.
+- **Process patterns:** `pgrep/pkill -f` match their own shell's command line; use a bracket pattern (`'dev.droidctl.agent.[S]hellMain'`, `'bench/[t]ap_accuracy.py'`).
 - **Verified on the SM-N950F (API 28) only.** API 30+ paths (device `takeScreenshot`, `ime_enter`, `stateDescription`, `getUniqueId`, Android 13+ restricted settings, API 34 `accessibilityDataSensitive`) are implemented but UNVERIFIED; don't claim they work.
 - Docs are generated: after changing a command or `ERROR_KINDS`, regenerate the AGENTS.md tables (`_command_table`, `_error_kind_table` in cli.py); `tests/test_docs.py` fails when they drift. `make dist` builds the APK and a wheel that carries it (the APK is not committed).
 - Build the APK with `make apk` (Gradle 9.8 wrapper, AGP 9.4.1; build-tools 36.0.0 was auto-installed by AGP). Python: `.venv/bin/pytest`; on-device e2e with `DROIDCTL_SERIAL=<serial>`.

@@ -172,6 +172,10 @@ def fast_path(state, ref, device_dump, device_gen):
 def _saved(state, ref):
     rec = (state or {}).get("refs", {}).get(str(ref))
     if rec is None:
+        # an element that went away on this screen: its number is never reused, and
+        # it resolves by its fingerprint (back in view: acts; else stale-ref/offscreen)
+        rec = (state or {}).get("retired", {}).get(str(ref))
+    if rec is None:
         known = sorted((state or {}).get("refs", {}), key=int)
         raise UserError(f"no ref [{ref}] in the last snapshot"
                         + (f" (refs 1-{known[-1]})" if known else ""), "stale-ref",

@@ -260,6 +260,7 @@ class Elem:
         self.ann = []                 # ordered annotation strings
         self.region = "content"
         self.ref = None
+        self.order = None             # reading-order position (refs may not be, see carry_refs)
         self.covered = False
         self.tap = None
         self.inferred = None          # label guessed from the id
@@ -322,7 +323,11 @@ class Snap:
         self.leaving = set()          # ids of activity windows mid-transition (see leaving_windows)
         self.unread = 0               # subtrees the agent did not read (degraded dumps)
         self.screen = (0, 0, 1, 1)
-        self.elements = []            # in ref order (ref = index + 1)
+        self.elements = []            # in reading order; refs are 1..n unless carry_refs kept older ones
+        self.retired = {}             # ref -> saved record of elements gone from this screen (carry_refs)
+        self.next_ref = None          # the next unused ref number on this screen
+        self.carried = False
+        self.off = self.locked = False  # the screen is off / the keyguard is up
         self.warnings = []
         self.dump = self.gen = None
         self.windows = []
@@ -363,6 +368,8 @@ def build(tree, activity=None, system=False):
     screen = (0, 0, W, H)
     snap = Snap()
     snap.screen = screen
+    snap.off = scr.get("on") is False            # agent 0.4.1+: PowerManager.isInteractive
+    snap.locked = scr.get("locked") is True      # KeyguardManager.isKeyguardLocked
     snap.dump, snap.gen = tree.get("dump"), tree.get("gen")
     if tree.get("degraded"):
         snap.degraded = tree.get("reason") or "yes"
@@ -404,7 +411,7 @@ def build(tree, activity=None, system=False):
     _covered(elems)
     ordered = _order(elems)
     for i, e in enumerate(ordered, 1):
-        e.ref = i
+        e.ref = e.order = i
     _infer(ordered)
     _warn_overlaps(ordered, snap)
     snap.elements = ordered
@@ -1127,6 +1134,36 @@ class Opts:
     def spatial(self):
         return self.layout == "spatial"
 
+    @classmethod
+    def from_env(cls, value=None, strict=False, **kw):
+        """Opts from `DROIDCTL_LAYOUT` = `flat` | `spatial`, optionally followed by
+        `,no-regions,no-rows,no-grids,no-infer,geo,map`. Every screen droidctl prints
+        (snapshot, action results, wait) uses it, so a layout variant holds throughout.
+        Keyword arguments override it. An unknown token is ValueError when `strict`
+        (snapshot reports it), else ignored (an action already performed must still
+        report its result)."""
+        value = os.environ.get("DROIDCTL_LAYOUT", "") if value is None else value
+        toks = [t.strip() for t in value.split(",") if t.strip()]
+        base = {}
+        if toks and toks[0] in LAYOUT_NAMES:
+            base["layout"] = toks.pop(0)
+        for t in toks:
+            if t not in LAYOUT_FLAGS:
+                if not strict:
+                    continue
+                raise ValueError(f"DROIDCTL_LAYOUT={value!r}: unknown {t!r} (use flat|spatial"
+                                 f"[,{','.join(LAYOUT_FLAGS)}])")
+            k, v = LAYOUT_FLAGS[t]
+            base[k] = v
+        base.update({k: v for k, v in kw.items() if v is not None})
+        return cls(**base)
+
+
+LAYOUT_NAMES = ("spatial", "flat")
+LAYOUT_FLAGS = {"no-regions": ("regions", False), "no-rows": ("rows", False),
+                "no-grids": ("grids", False), "no-infer": ("infer", False),
+                "geo": ("geo", True), "map": ("map", True)}
+
 
 def short_activity(activity):
     if not activity or "/" not in activity:
@@ -1143,6 +1180,8 @@ def header(snap, opts=None):
              f"dialog={'yes' if snap.dialog else 'no'}"]
     if opts is not None and opts.spatial:
         parts.append(f"{snap.screen[2]}x{snap.screen[3]}")
+    if snap.off or snap.locked:
+        parts.append("screen=" + ("off" if snap.off else "locked"))
     if snap.degraded:
         parts.append(f"degraded={snap.degraded}")
     if snap.toast:
@@ -1272,7 +1311,7 @@ def _level_lines(items, snap, opts, depth, keep):
     else:
         rows = [[e] for e in plain]
     rows += [[e] for e in lists]
-    rows.sort(key=lambda row: min(e.ref for e in row))
+    rows.sort(key=lambda row: min(e.order for e in row))
     # grids: consecutive multi-element rows with aligned columns render as a table
     k = 0
     while k < len(rows):
@@ -1496,11 +1535,128 @@ def to_state(snap, serial=None):
          "evseq": last agent event seq already reported (toast header), or null}
     """
     refs = {str(e.ref): ref_record(e, snap) for e in snap.elements}
-    return {"version": 1, "serial": serial, "created": round(time.time(), 3), "dump": snap.dump,
+    return {"version": 1, "retired": snap.retired,
+            "next_ref": snap.next_ref or max((e.ref for e in snap.elements), default=0) + 1, "serial": serial, "created": round(time.time(), 3), "dump": snap.dump,
             "gen": snap.gen, "sig": snap.sig, "pkg": snap.pkg, "activity": snap.activity,
             "title": snap.title, "screen": list(snap.screen),
             "keyboard": list(snap.keyboard) if snap.keyboard else None,
             "lines": flat_lines(snap), "refs": refs, "evseq": snap.evseq}
+
+
+# --------------------------------------------------------------------------
+# stable refs
+# --------------------------------------------------------------------------
+REF_RESET = 1000        # past this, a changed screen starts again at 1
+RETIRED_MAX = 400       # retired records kept per screen (their numbers stay used)
+MATCH_KEYS = ("role", "label", "text", "desc", "hint", "id", "class")
+
+
+def same_screen(prev, snap):
+    """The previous state and this snapshot show one screen: the same signature, or the
+    same package, activity and window title (a scroll or a deleted row changes the
+    signature's skeleton but not the screen)."""
+    if not prev:
+        return False
+    if prev.get("sig") == snap.sig:
+        return True
+    return (prev.get("pkg") == snap.pkg and (prev.get("activity") or None) == (snap.activity or None)
+            and (prev.get("title") or None) == (snap.title or None))
+
+
+def _ctx_sim(a, b):
+    A, B = {x.lower() for x in a or ()}, {x.lower() for x in b or ()}
+    return 1.0 if not A and not B else len(A & B) / len(A | B)
+
+
+def match_refs(old, new):
+    """Pair saved records with new ones: {old ref -> new index}. `old` is {ref: record},
+    `new` a list of records. Identity (uid, view id) first, then the exact fingerprint,
+    telling repeated ones ("Delete" in every row) apart by their row context, then a
+    unique resource id (a counter whose text changed). Never by position: what can't be
+    paired uniquely is not paired."""
+    pairs, used = {}, set()
+
+    def take(cands_old, cands_new, key):
+        groups = {}
+        for r, o in cands_old:
+            k = key(o)
+            if k is not None:
+                groups.setdefault(k, ([], []))[0].append((r, o))
+        for j, n in cands_new:
+            k = key(n)
+            if k in groups:
+                groups[k][1].append((j, n))
+        for os_, ns in groups.values():
+            if len(os_) == 1 and len(ns) == 1:
+                (r, o), (j, n) = os_[0], ns[0]
+                if not o.get("ctx") or not n.get("ctx") or _ctx_sim(o["ctx"], n["ctx"]) > 0:
+                    pairs[r] = j
+                    used.add(j)
+                continue
+            # several alike: pair only mutual, strictly best row contexts
+            best_new = {}
+            for r, o in os_:
+                sims = sorted(((_ctx_sim(o.get("ctx"), n.get("ctx")), j) for j, n in ns), reverse=True)
+                if sims and sims[0][0] > 0 and (len(sims) == 1 or sims[0][0] > sims[1][0]):
+                    best_new[r] = sims[0][1]
+            for r, j in best_new.items():
+                rivals = [r2 for r2, j2 in best_new.items() if j2 == j]
+                if len(rivals) == 1 and j not in used:
+                    pairs[r] = j
+                    used.add(j)
+
+    def left():
+        return ([(r, o) for r, o in old.items() if r not in pairs],
+                [(j, n) for j, n in enumerate(new) if j not in used])
+
+    for ident in ("uid", "vid"):
+        take(*left(), key=lambda x, k=ident: (x.get(k), x.get("window")) if x.get(k) else None)
+    take(*left(), key=lambda x: tuple(x.get(k) for k in MATCH_KEYS))
+    # a changed text on a unique id (a counter) counts only on a screen already proven
+    # the same by the passes above: "Screen A" -> "Screen B" in the same title slot of
+    # the next page (TESTAPP lookalike_ok, same activity and signature) is not one element
+    if pairs:
+        take(*left(), key=lambda x: (x.get("role"), x.get("id"), x.get("window")) if x.get("id") else None)
+    return pairs
+
+
+def carry_refs(prev, snap):
+    """Keep ref numbers stable on one screen. An element that was in `prev` (the saved
+    state the agent last saw) keeps its number; new elements get numbers never used on
+    this screen; elements that went away are `retired`, so their numbers are never
+    reused and still resolve by fingerprint (an element scrolled back into view acts;
+    one that is gone fails as stale-ref/offscreen, never as a different element).
+
+    Measured need (spatial A/B, 2026-09-28): after `scroll`, refs were renumbered and
+    agents that reused a number from their earlier snapshot deleted the wrong row.
+    A different screen starts again at 1, as before. Mutates `snap`; idempotent."""
+    if snap.carried:
+        return snap
+    snap.carried = True
+    n = len(snap.elements)
+    if not same_screen(prev, snap) or (prev.get("next_ref") or 0) > REF_RESET:
+        snap.retired, snap.next_ref = {}, n + 1
+        return snap
+    old = {int(k): v for k, v in (prev.get("refs") or {}).items()}
+    old.update({int(k): v for k, v in (prev.get("retired") or {}).items()})
+    new = [ref_record(e, snap) for e in snap.elements]
+    pairs = match_refs(old, new)
+    if not pairs:                        # nothing in common: a new screen after all
+        snap.retired, snap.next_ref = {}, n + 1
+        return snap
+    nxt = max([prev.get("next_ref") or 0, *(r + 1 for r in old)])
+    by_new = {j: r for r, j in pairs.items()}
+    for j, e in enumerate(snap.elements):
+        if j in by_new:
+            e.ref = by_new[j]
+        else:
+            e.ref, nxt = nxt, nxt + 1
+    retired = {r: o for r, o in old.items() if r not in pairs}
+    for r in sorted(retired)[:max(0, len(retired) - RETIRED_MAX)]:    # oldest numbers first
+        retired.pop(r)
+    snap.retired = {str(r): dict(o, retired=True) for r, o in retired.items()}
+    snap.next_ref = nxt
+    return snap
 
 
 TOAST_FRESH_MS = 3500   # Toast.LENGTH_LONG: a toast this recent may still be on screen

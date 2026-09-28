@@ -47,7 +47,7 @@ don't hold off the idle exit.
 | `socket`, `log`, `pidfile` | paths |
 | `idle_exit_s`, `inflight`, `subscribers` | lifecycle |
 | `cache` | `{hits, misses, hit_rate}` over all devices |
-| `devices` | per device: `serial`, `port`, `connected`, `subscribed`, `agent`, `cache {hits, misses, gen_checks, primed, hit_rate}`, `events_seen`, `idle_s` |
+| `devices` | per device: `serial`, `backend` (`a11y`/`uiautomation`; the session reconnects when the phone's backend changes), `port`, `connected`, `subscribed`, `agent`, `cache {hits, misses, gen_checks, primed, hit_rate}`, `events_seen`, `idle_s` |
 
 Surfaced in the CLI three ways: `droidctl daemon status` (this object, rendered),
 `droidctl doctor` (a `daemon` check — running/pid/uptime/version/devices/cache,

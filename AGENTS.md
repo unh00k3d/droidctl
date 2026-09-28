@@ -37,6 +37,19 @@ droidctl teardown                # remove only our service, restore settings, un
   never switches the keyboard (IME) and never touches other apps' settings.
 - If Appium/uiautomator2 is attached, Android suppresses accessibility services:
   `doctor` reports it and commands fail with `suppressed`.
+- **Screen off or locked:** accessibility actions don't count as user activity, so a long
+  session can let the screen time out. The snapshot header then says `screen=off` or
+  `screen=locked`, and actions fail with `screen-off` (wake it: `droidctl press KEYCODE_WAKEUP`).
+
+**Two backends.** By default droidctl runs as an accessibility service (`setup` installs
+and enables it). `droidctl setup --backend uiautomation` runs the same agent over adb
+instead: nothing is installed or enabled, the agent is pushed to `/data/local/tmp` and
+started with `app_process`, holding a UiAutomation. Use it where an accessibility service
+can't be enabled, or for apps that hide their UI while one is on. The choice is remembered
+per phone (`DROIDCTL_BACKEND` overrides it per call) and never switched silently. It stops
+after 10 min idle, on reboot or on `teardown`, and the next command starts it again. Only
+one UiAutomation client can run at a time: with uiautomator/Appium attached it fails with
+`suppressed`. Screenshots use `screencap`. `doctor` shows which backend answers.
 
 ## Look: `snapshot`
 
@@ -98,8 +111,12 @@ droidctl gesture --path '540,1800 540,600' --ms 400   # raw finger path (escape 
 
 **Every action verifies itself.** The result has `changed`, `new_screen`, `diff` (the changed
 snapshot lines, ≤80), `toast`, `events`, `method`, the new `screen` header, and `text` (the diff,
-or the whole new screen when `new_screen`). The refs in it refer to the **updated** screen, so
-you can usually act again without another `snapshot`. `--expect-change` turns "nothing
+or the whole new screen when `new_screen`), so you can usually act again without another
+`snapshot`. **Refs are stable on one screen:** an element keeps its number across snapshots
+and results (a scroll, a deleted or inserted row, a changed counter); new elements get
+numbers not used before on that screen, so numbers can be out of order after a scroll; a
+number whose element went away is never reused and fails as `offscreen`/`stale-ref` (or acts
+again if the element came back). A different screen starts again at 1. `--expect-change` turns "nothing
 changed" into the `no-change` error; `--settle MS` sets the quiet window (default 150 ms,
 `0` = don't wait).
 
@@ -107,6 +124,9 @@ changed" into the `no-change` error; `--settle MS` sets the quiet window (defaul
 - `ACTION_CLICK` on the element (or its clickable ancestor) → `method:"action"`.
 - If the element refuses the click, one gesture tap at the centre of its visible area →
   `method:"gesture-fallback"` with a `warning`.
+- If the app received the click (a click event) but nothing on screen changed, the result
+  says so (`handled:true`, text "unchanged, but the app received the click"). The tap
+  **worked**; don't repeat it, not even with `--method gesture` (that clicks twice).
 - If the click was performed but produced no click event and no visible change, droidctl
   does **not** tap again — the app may already have handled it, and a second tap could submit
   twice. You get `method:"action"` plus a `warning`; if nothing happened, retry with
@@ -199,7 +219,7 @@ file with the same generated tables); `droidctl skill print` prints it.
 | `adb` | an adb command failed (its own message is passed through) |
 | `not-installed` | the droidctl agent is not installed or its service is not enabled (run: droidctl setup) |
 | `device` | the device agent rejected the request (its own message is passed through) |
-| `suppressed` | another UiAutomation client (Appium/uiautomator2) is suppressing accessibility services |
+| `suppressed` | another UiAutomation client (Appium/uiautomator2) is suppressing accessibility services, or (uiautomation backend) holds the one UiAutomation |
 | `screen-off` | the screen is off or locked |
 | `secure-window` | the window is FLAG_SECURE, so it cannot be captured |
 | `stale-ref` | the ref no longer resolves (gone, shifted or occupied); re-run snapshot |
@@ -224,8 +244,8 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `cheat` | – | every command and its options, on one screen |
 | `skill` | `<{print,install}> --dir DIR --force` | print the agent skill (SKILL.md), or install it for Claude Code |
 | `devices` | – | list attached devices and whether droidctl is set up |
-| `setup` | `--reinstall` | install the agent APK and append its accessibility service (keeps the others) |
-| `teardown` | `--keep-apk` | remove only our service, restore the a11y settings, uninstall the agent |
+| `setup` | `--reinstall --backend {a11y,uiautomation}` | install the agent APK and append its accessibility service (keeps the others) |
+| `teardown` | `--keep-apk --backend {a11y,uiautomation,all}` | remove only our service, restore the a11y settings, uninstall the agent |
 | `doctor` | – | check adb, APK, service, socket, peer UID and round-trip latency |
 | `ping` | `--count N` | round trip to the on-device agent |
 | `dump-fixture` | `<name> --pkg PKG --not-important --dir DIR --timeout S --allow-degraded` | save the current screen's raw tree as a test fixture (dev) |

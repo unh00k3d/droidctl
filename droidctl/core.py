@@ -63,7 +63,7 @@ ERROR_KINDS = {
     "adb": "an adb command failed (its own message is passed through)",
     "not-installed": "the droidctl agent is not installed or its service is not enabled (run: droidctl setup)",
     "device": "the device agent rejected the request (its own message is passed through)",
-    "suppressed": "another UiAutomation client (Appium/uiautomator2) is suppressing accessibility services",
+    "suppressed": "another UiAutomation client (Appium/uiautomator2) is suppressing accessibility services, or (uiautomation backend) holds the one UiAutomation",
     "screen-off": "the screen is off or locked",
     "secure-window": "the window is FLAG_SECURE, so it cannot be captured",
     # resolving and acting

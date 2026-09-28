@@ -1,14 +1,34 @@
 {
-  "date": "2026-09-27T16:08:39",
+  "date": "2026-09-28T15:50:17",
   "device": "SM-N950F (API 28)",
   "baseline": "mobile-mcp-style re-implementation (mobile-mcp 1.0.5 lib/android.js), not mobile-mcp itself",
   "summary": {
     "ref": {
+      "correct": 52,
+      "total": 52,
+      "accuracy": 1.0,
+      "refused": 0,
+      "wrong_or_no_effect": 0,
+      "by_category": {
+        "button": "1/1",
+        "compose": "9/9",
+        "duplicates": "14/14",
+        "grid": "7/7",
+        "icon": "1/1",
+        "real app": "6/6",
+        "repeated icon in a row": "5/5",
+        "row (text inside a clickable row)": "5/5",
+        "unlabeled icon": "2/2",
+        "virtual views": "2/2"
+      },
+      "failures": []
+    },
+    "locator": {
       "correct": 50,
       "total": 52,
       "accuracy": 0.962,
-      "refused": 1,
-      "wrong_or_no_effect": 1,
+      "refused": 2,
+      "wrong_or_no_effect": 0,
       "by_category": {
         "button": "1/1",
         "compose": "9/9",
@@ -22,40 +42,8 @@
         "virtual views": "2/2"
       },
       "failures": [
-        "minus:Laptop Stand: connection: the agent closed the connection before replying (service not running?)",
-        "buy:Basic: no element with that label"
-      ]
-    },
-    "locator": {
-      "correct": 41,
-      "total": 52,
-      "accuracy": 0.788,
-      "refused": 11,
-      "wrong_or_no_effect": 0,
-      "by_category": {
-        "button": "1/1",
-        "compose": "5/9",
-        "duplicates": "12/14",
-        "grid": "7/7",
-        "icon": "1/1",
-        "real app": "6/6",
-        "repeated icon in a row": "0/5",
-        "row (text inside a clickable row)": "5/5",
-        "unlabeled icon": "2/2",
-        "virtual views": "2/2"
-      },
-      "failures": [
-        "star:Ada Lovelace: not-found: nothing matches desc=Star right-of=Ada Lovelace",
-        "star:Alan Turing: not-found: nothing matches desc=Star right-of=Alan Turing",
-        "star:Grace Hopper: not-found: nothing matches desc=Star right-of=Grace Hopper",
-        "star:Edsger Dijkstra: not-found: nothing matches desc=Star right-of=Edsger Dijkstra",
-        "star:Barbara Liskov: not-found: nothing matches desc=Star right-of=Barbara Liskov",
-        "cstar:Ada Lovelace: not-found: nothing matches desc=Star right-of=Ada Lovelace",
-        "cstar:Alan Turing: not-found: nothing matches desc=Star right-of=Alan Turing",
-        "cstar:Grace Hopper: not-found: nothing matches desc=Star right-of=Grace Hopper",
         "buy:Basic: ambiguous: text=Buy below=Basic matches 2 elements: [6] button \"Buy\", [12] button \"Buy\"",
-        "buy:Standard: ambiguous: text=Buy below=Standard matches 2 elements: [7] button \"Buy\", [13] button \"Buy\"",
-        "csettings-icon: not-found: nothing matches desc=Settings"
+        "buy:Standard: ambiguous: text=Buy below=Standard matches 2 elements: [7] button \"Buy\", [13] button \"Buy\""
       ]
     },
     "baseline": {
@@ -87,22 +75,594 @@
     {
       "target": "row:Ada Lovelace",
       "cat": "row (text inside a clickable row)",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 778,
+      "pick": "unique"
+    },
+    {
+      "target": "star:Ada Lovelace",
+      "cat": "repeated icon in a row",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 770,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "row:Alan Turing",
+      "cat": "row (text inside a clickable row)",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 766,
+      "pick": "unique"
+    },
+    {
+      "target": "star:Alan Turing",
+      "cat": "repeated icon in a row",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 761,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "row:Grace Hopper",
+      "cat": "row (text inside a clickable row)",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 788,
+      "pick": "unique"
+    },
+    {
+      "target": "star:Grace Hopper",
+      "cat": "repeated icon in a row",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 757,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "row:Edsger Dijkstra",
+      "cat": "row (text inside a clickable row)",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 793,
+      "pick": "unique"
+    },
+    {
+      "target": "star:Edsger Dijkstra",
+      "cat": "repeated icon in a row",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 767,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "row:Barbara Liskov",
+      "cat": "row (text inside a clickable row)",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 751,
+      "pick": "unique"
+    },
+    {
+      "target": "star:Barbara Liskov",
+      "cat": "repeated icon in a row",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 751,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "crow:Ada Lovelace",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 776,
+      "pick": "unique"
+    },
+    {
+      "target": "cstar:Ada Lovelace",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 768,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "crow:Alan Turing",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 755,
+      "pick": "unique"
+    },
+    {
+      "target": "cstar:Alan Turing",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 753,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "crow:Grace Hopper",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 776,
+      "pick": "unique"
+    },
+    {
+      "target": "cstar:Grace Hopper",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 752,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "delete:Item 1",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 509,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "delete:Item 3",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 498,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "delete:Item 5",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 521,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "delete:Item 7",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 515,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "plus:Wireless Mouse",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 379,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "minus:Wireless Mouse",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 385,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "plus:USB-C Cable",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 380,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "minus:USB-C Cable",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 386,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "plus:Laptop Stand",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 375,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "minus:Laptop Stand",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 382,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "buy:Basic",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 744,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "buy:Standard",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 747,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "buy:Premium",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 747,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "buy:Enterprise",
+      "cat": "duplicates",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 749,
+      "pick": "nearest to anchor"
+    },
+    {
+      "target": "day:3",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 769,
+      "pick": "unique"
+    },
+    {
+      "target": "day:14",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 762,
+      "pick": "unique"
+    },
+    {
+      "target": "day:27",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 764,
+      "pick": "unique"
+    },
+    {
+      "target": "vday:5",
+      "cat": "virtual views",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 400,
+      "pick": "unique"
+    },
+    {
+      "target": "vday:20",
+      "cat": "virtual views",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 388,
+      "pick": "unique"
+    },
+    {
+      "target": "key:1",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 370,
+      "pick": "unique"
+    },
+    {
+      "target": "key:5",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 376,
+      "pick": "unique"
+    },
+    {
+      "target": "key:9",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 389,
+      "pick": "unique"
+    },
+    {
+      "target": "key:0",
+      "cat": "grid",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 369,
+      "pick": "unique"
+    },
+    {
+      "target": "save",
+      "cat": "button",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 773,
+      "pick": "unique"
+    },
+    {
+      "target": "settings-icon",
+      "cat": "icon",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 926,
+      "pick": "unique"
+    },
+    {
+      "target": "csave",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 752,
+      "pick": "unique"
+    },
+    {
+      "target": "csettings-icon",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 742,
+      "pick": "unique"
+    },
+    {
+      "target": "cincrement",
+      "cat": "compose",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 509,
+      "pick": "unique"
+    },
+    {
+      "target": "share-icon",
+      "cat": "unlabeled icon",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 744,
+      "pick": "unique"
+    },
+    {
+      "target": "delete-icon",
+      "cat": "unlabeled icon",
+      "method": "ref",
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 743,
+      "pick": "unique"
+    },
+    {
+      "target": "settings:Display",
+      "cat": "real app",
+      "method": "ref",
+      "ok": true,
+      "why": "top has 'DisplaySettings'",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 905,
+      "pick": "unique"
+    },
+    {
+      "target": "settings:Notifications",
+      "cat": "real app",
+      "method": "ref",
+      "ok": true,
+      "why": "top has 'Notification'",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 768,
+      "pick": "unique"
+    },
+    {
+      "target": "settings:Sounds and vibration",
+      "cat": "real app",
+      "method": "ref",
+      "ok": true,
+      "why": "top has 'Sound'",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 697,
+      "pick": "unique"
+    },
+    {
+      "target": "settings:Connections",
+      "cat": "real app",
+      "method": "ref",
+      "ok": true,
+      "why": "top has 'Connections'",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 802,
+      "pick": "unique"
+    },
+    {
+      "target": "launcher:Play Store",
+      "cat": "real app",
+      "method": "ref",
+      "ok": true,
+      "why": "mCurrentFocus=Window{33733ba u0 com.android.vending/com.android.vending.AssetBrowserActivity}",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 648,
+      "pick": "unique"
+    },
+    {
+      "target": "launcher:Camera",
+      "cat": "real app",
+      "method": "ref",
+      "ok": true,
+      "why": "mCurrentFocus=Window{1211da8 u0 com.sec.android.app.camera/com.sec.android.app.camera.Camera}",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 1628,
+      "pick": "unique"
+    },
+    {
+      "target": "row:Ada Lovelace",
+      "cat": "row (text inside a clickable row)",
       "method": "locator",
       "ok": true,
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 369
+      "ms": 739
     },
     {
       "target": "star:Ada Lovelace",
       "cat": "repeated icon in a row",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Ada Lovelace",
-      "refused": true,
-      "tap_method": null,
-      "ms": 55
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 755
     },
     {
       "target": "row:Alan Turing",
@@ -112,17 +672,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 347
+      "ms": 758
     },
     {
       "target": "star:Alan Turing",
       "cat": "repeated icon in a row",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Alan Turing",
-      "refused": true,
-      "tap_method": null,
-      "ms": 49
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 728
     },
     {
       "target": "row:Grace Hopper",
@@ -132,17 +692,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 330
+      "ms": 744
     },
     {
       "target": "star:Grace Hopper",
       "cat": "repeated icon in a row",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Grace Hopper",
-      "refused": true,
-      "tap_method": null,
-      "ms": 48
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 736
     },
     {
       "target": "row:Edsger Dijkstra",
@@ -152,17 +712,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 365
+      "ms": 755
     },
     {
       "target": "star:Edsger Dijkstra",
       "cat": "repeated icon in a row",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Edsger Dijkstra",
-      "refused": true,
-      "tap_method": null,
-      "ms": 56
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 746
     },
     {
       "target": "row:Barbara Liskov",
@@ -172,17 +732,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 332
+      "ms": 771
     },
     {
       "target": "star:Barbara Liskov",
       "cat": "repeated icon in a row",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Barbara Liskov",
-      "refused": true,
-      "tap_method": null,
-      "ms": 60
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 741
     },
     {
       "target": "crow:Ada Lovelace",
@@ -192,17 +752,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 351
+      "ms": 760
     },
     {
       "target": "cstar:Ada Lovelace",
       "cat": "compose",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Ada Lovelace",
-      "refused": true,
-      "tap_method": null,
-      "ms": 51
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 767
     },
     {
       "target": "crow:Alan Turing",
@@ -212,17 +772,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 374
+      "ms": 757
     },
     {
       "target": "cstar:Alan Turing",
       "cat": "compose",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Alan Turing",
-      "refused": true,
-      "tap_method": null,
-      "ms": 50
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 770
     },
     {
       "target": "crow:Grace Hopper",
@@ -232,17 +792,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 328
+      "ms": 777
     },
     {
       "target": "cstar:Grace Hopper",
       "cat": "compose",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Star right-of=Grace Hopper",
-      "refused": true,
-      "tap_method": null,
-      "ms": 47
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 752
     },
     {
       "target": "delete:Item 1",
@@ -252,7 +812,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 355
+      "ms": 516
     },
     {
       "target": "delete:Item 3",
@@ -262,7 +822,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 357
+      "ms": 517
     },
     {
       "target": "delete:Item 5",
@@ -272,7 +832,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 395
+      "ms": 507
     },
     {
       "target": "delete:Item 7",
@@ -282,7 +842,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 375
+      "ms": 517
     },
     {
       "target": "plus:Wireless Mouse",
@@ -292,7 +852,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 370
+      "ms": 400
     },
     {
       "target": "minus:Wireless Mouse",
@@ -302,7 +862,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 361
+      "ms": 388
     },
     {
       "target": "plus:USB-C Cable",
@@ -312,7 +872,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 341
+      "ms": 356
     },
     {
       "target": "minus:USB-C Cable",
@@ -322,7 +882,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 347
+      "ms": 400
     },
     {
       "target": "plus:Laptop Stand",
@@ -332,7 +892,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 360
+      "ms": 357
     },
     {
       "target": "minus:Laptop Stand",
@@ -342,7 +902,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 360
+      "ms": 524
     },
     {
       "target": "buy:Basic",
@@ -352,7 +912,7 @@
       "why": "ambiguous: text=Buy below=Basic matches 2 elements: [6] button \"Buy\", [12] button \"Buy\"",
       "refused": true,
       "tap_method": null,
-      "ms": 45
+      "ms": 48
     },
     {
       "target": "buy:Standard",
@@ -362,7 +922,7 @@
       "why": "ambiguous: text=Buy below=Standard matches 2 elements: [7] button \"Buy\", [13] button \"Buy\"",
       "refused": true,
       "tap_method": null,
-      "ms": 48
+      "ms": 53
     },
     {
       "target": "buy:Premium",
@@ -372,7 +932,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 331
+      "ms": 749
     },
     {
       "target": "buy:Enterprise",
@@ -382,7 +942,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 339
+      "ms": 756
     },
     {
       "target": "day:3",
@@ -392,7 +952,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 369
+      "ms": 765
     },
     {
       "target": "day:14",
@@ -402,7 +962,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 371
+      "ms": 781
     },
     {
       "target": "day:27",
@@ -412,7 +972,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 370
+      "ms": 785
     },
     {
       "target": "vday:5",
@@ -422,7 +982,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 348
+      "ms": 413
     },
     {
       "target": "vday:20",
@@ -432,7 +992,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 373
+      "ms": 405
     },
     {
       "target": "key:1",
@@ -442,7 +1002,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 363
+      "ms": 399
     },
     {
       "target": "key:5",
@@ -452,7 +1012,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 343
+      "ms": 386
     },
     {
       "target": "key:9",
@@ -462,7 +1022,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 377
+      "ms": 378
     },
     {
       "target": "key:0",
@@ -472,7 +1032,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 339
+      "ms": 402
     },
     {
       "target": "save",
@@ -482,7 +1042,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 341
+      "ms": 751
     },
     {
       "target": "settings-icon",
@@ -492,7 +1052,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 328
+      "ms": 743
     },
     {
       "target": "csave",
@@ -502,17 +1062,17 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 352
+      "ms": 757
     },
     {
       "target": "csettings-icon",
       "cat": "compose",
       "method": "locator",
-      "ok": false,
-      "why": "not-found: nothing matches desc=Settings",
-      "refused": true,
-      "tap_method": null,
-      "ms": 61
+      "ok": true,
+      "why": "ok",
+      "refused": false,
+      "tap_method": "action",
+      "ms": 770
     },
     {
       "target": "cincrement",
@@ -522,7 +1082,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 1124
+      "ms": 540
     },
     {
       "target": "share-icon",
@@ -532,7 +1092,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 401
+      "ms": 741
     },
     {
       "target": "delete-icon",
@@ -542,7 +1102,7 @@
       "why": "ok",
       "refused": false,
       "tap_method": "action",
-      "ms": 369
+      "ms": 746
     },
     {
       "target": "settings:Display",
@@ -552,7 +1112,7 @@
       "why": "top has 'DisplaySettings'",
       "refused": false,
       "tap_method": "action",
-      "ms": 917
+      "ms": 888
     },
     {
       "target": "settings:Notifications",
@@ -562,7 +1122,7 @@
       "why": "top has 'Notification'",
       "refused": false,
       "tap_method": "action",
-      "ms": 821
+      "ms": 809
     },
     {
       "target": "settings:Sounds and vibration",
@@ -572,7 +1132,7 @@
       "why": "top has 'Sound'",
       "refused": false,
       "tap_method": "action",
-      "ms": 781
+      "ms": 705
     },
     {
       "target": "settings:Connections",
@@ -582,27 +1142,27 @@
       "why": "top has 'Connections'",
       "refused": false,
       "tap_method": "action",
-      "ms": 1265
+      "ms": 831
     },
     {
       "target": "launcher:Play Store",
       "cat": "real app",
       "method": "locator",
       "ok": true,
-      "why": "mCurrentFocus=Window{bb98e9d u0 com.android.vending/com.android.vending.AssetBrowserActivity}",
+      "why": "mCurrentFocus=Window{33733ba u0 com.android.vending/com.android.vending.AssetBrowserActivity}",
       "refused": false,
       "tap_method": "action",
-      "ms": 755
+      "ms": 585
     },
     {
       "target": "launcher:Camera",
       "cat": "real app",
       "method": "locator",
       "ok": true,
-      "why": "mCurrentFocus=Window{ae111f9 u0 com.sec.android.app.camera/com.sec.android.app.camera.Camera}",
+      "why": "mCurrentFocus=Window{1211da8 u0 com.sec.android.app.camera/com.sec.android.app.camera.Camera}",
       "refused": false,
       "tap_method": "action",
-      "ms": 648
+      "ms": 1597
     },
     {
       "target": "row:Ada Lovelace",
@@ -615,7 +1175,7 @@
         498,
         231
       ],
-      "ms": 2641
+      "ms": 2929
     },
     {
       "target": "star:Ada Lovelace",
@@ -628,7 +1188,7 @@
         996,
         268
       ],
-      "ms": 2782
+      "ms": 2621
     },
     {
       "target": "row:Alan Turing",
@@ -641,7 +1201,7 @@
         498,
         429
       ],
-      "ms": 2621
+      "ms": 2609
     },
     {
       "target": "star:Alan Turing",
@@ -654,7 +1214,7 @@
         996,
         466
       ],
-      "ms": 2545
+      "ms": 2641
     },
     {
       "target": "row:Grace Hopper",
@@ -667,7 +1227,7 @@
         498,
         627
       ],
-      "ms": 2585
+      "ms": 2616
     },
     {
       "target": "star:Grace Hopper",
@@ -680,7 +1240,7 @@
         996,
         664
       ],
-      "ms": 2749
+      "ms": 2568
     },
     {
       "target": "row:Edsger Dijkstra",
@@ -693,7 +1253,7 @@
         498,
         825
       ],
-      "ms": 2726
+      "ms": 2607
     },
     {
       "target": "star:Edsger Dijkstra",
@@ -706,7 +1266,7 @@
         996,
         862
       ],
-      "ms": 2715
+      "ms": 2655
     },
     {
       "target": "row:Barbara Liskov",
@@ -719,7 +1279,7 @@
         498,
         1023
       ],
-      "ms": 2762
+      "ms": 2608
     },
     {
       "target": "star:Barbara Liskov",
@@ -732,7 +1292,7 @@
         996,
         1060
       ],
-      "ms": 2799
+      "ms": 2588
     },
     {
       "target": "crow:Ada Lovelace",
@@ -745,7 +1305,7 @@
         203,
         273
       ],
-      "ms": 2823
+      "ms": 2778
     },
     {
       "target": "cstar:Ada Lovelace",
@@ -758,7 +1318,7 @@
         955,
         298
       ],
-      "ms": 2832
+      "ms": 2665
     },
     {
       "target": "crow:Alan Turing",
@@ -771,7 +1331,7 @@
         182,
         441
       ],
-      "ms": 2816
+      "ms": 2709
     },
     {
       "target": "cstar:Alan Turing",
@@ -784,7 +1344,7 @@
         955,
         466
       ],
-      "ms": 2765
+      "ms": 2677
     },
     {
       "target": "crow:Grace Hopper",
@@ -797,7 +1357,7 @@
         207,
         609
       ],
-      "ms": 2793
+      "ms": 2648
     },
     {
       "target": "cstar:Grace Hopper",
@@ -810,7 +1370,7 @@
         955,
         634
       ],
-      "ms": 2832
+      "ms": 2664
     },
     {
       "target": "delete:Item 1",
@@ -823,7 +1383,7 @@
         943,
         232
       ],
-      "ms": 2798
+      "ms": 2628
     },
     {
       "target": "delete:Item 3",
@@ -836,7 +1396,7 @@
         943,
         484
       ],
-      "ms": 2844
+      "ms": 2660
     },
     {
       "target": "delete:Item 5",
@@ -849,7 +1409,7 @@
         943,
         736
       ],
-      "ms": 2871
+      "ms": 2690
     },
     {
       "target": "delete:Item 7",
@@ -862,7 +1422,7 @@
         943,
         988
       ],
-      "ms": 2848
+      "ms": 2673
     },
     {
       "target": "plus:Wireless Mouse",
@@ -875,7 +1435,7 @@
         943,
         285
       ],
-      "ms": 2733
+      "ms": 2646
     },
     {
       "target": "minus:Wireless Mouse",
@@ -888,7 +1448,7 @@
         607,
         285
       ],
-      "ms": 2708
+      "ms": 2638
     },
     {
       "target": "plus:USB-C Cable",
@@ -901,7 +1461,7 @@
         943,
         461
       ],
-      "ms": 2746
+      "ms": 2608
     },
     {
       "target": "minus:USB-C Cable",
@@ -914,7 +1474,7 @@
         607,
         461
       ],
-      "ms": 2767
+      "ms": 2616
     },
     {
       "target": "plus:Laptop Stand",
@@ -927,7 +1487,7 @@
         943,
         637
       ],
-      "ms": 2738
+      "ms": 2672
     },
     {
       "target": "minus:Laptop Stand",
@@ -940,7 +1500,7 @@
         607,
         637
       ],
-      "ms": 2749
+      "ms": 2628
     },
     {
       "target": "buy:Basic",
@@ -953,7 +1513,7 @@
         291,
         508
       ],
-      "ms": 2756
+      "ms": 2607
     },
     {
       "target": "buy:Standard",
@@ -966,7 +1526,7 @@
         789,
         508
       ],
-      "ms": 2803
+      "ms": 2679
     },
     {
       "target": "buy:Premium",
@@ -979,7 +1539,7 @@
         291,
         914
       ],
-      "ms": 2745
+      "ms": 2659
     },
     {
       "target": "buy:Enterprise",
@@ -992,7 +1552,7 @@
         789,
         914
       ],
-      "ms": 2706
+      "ms": 2659
     },
     {
       "target": "day:3",
@@ -1005,7 +1565,7 @@
         965,
         397
       ],
-      "ms": 2768
+      "ms": 2676
     },
     {
       "target": "day:14",
@@ -1018,7 +1578,7 @@
         539,
         645
       ],
-      "ms": 2772
+      "ms": 2631
     },
     {
       "target": "day:27",
@@ -1031,7 +1591,7 @@
         397,
         893
       ],
-      "ms": 2792
+      "ms": 2619
     },
     {
       "target": "vday:5",
@@ -1044,7 +1604,7 @@
         113,
         424
       ],
-      "ms": 2696
+      "ms": 2581
     },
     {
       "target": "vday:20",
@@ -1057,7 +1617,7 @@
         255,
         708
       ],
-      "ms": 2756
+      "ms": 2572
     },
     {
       "target": "key:1",
@@ -1070,7 +1630,7 @@
         208,
         418
       ],
-      "ms": 2796
+      "ms": 2619
     },
     {
       "target": "key:5",
@@ -1083,7 +1643,7 @@
         540,
         607
       ],
-      "ms": 2753
+      "ms": 2638
     },
     {
       "target": "key:9",
@@ -1096,7 +1656,7 @@
         872,
         796
       ],
-      "ms": 2730
+      "ms": 2651
     },
     {
       "target": "key:0",
@@ -1109,7 +1669,7 @@
         540,
         985
       ],
-      "ms": 2739
+      "ms": 2655
     },
     {
       "target": "save",
@@ -1122,7 +1682,7 @@
         540,
         274
       ],
-      "ms": 2742
+      "ms": 2574
     },
     {
       "target": "settings-icon",
@@ -1135,7 +1695,7 @@
         540,
         404
       ],
-      "ms": 2692
+      "ms": 2561
     },
     {
       "target": "csave",
@@ -1148,7 +1708,7 @@
         149,
         276
       ],
-      "ms": 2758
+      "ms": 2609
     },
     {
       "target": "csettings-icon",
@@ -1161,7 +1721,7 @@
         106,
         403
       ],
-      "ms": 2783
+      "ms": 2648
     },
     {
       "target": "cincrement",
@@ -1174,7 +1734,7 @@
         195,
         345
       ],
-      "ms": 2828
+      "ms": 2673
     },
     {
       "target": "share-icon",
@@ -1187,7 +1747,7 @@
         527,
         172
       ],
-      "ms": 2772
+      "ms": 2645
     },
     {
       "target": "delete-icon",
@@ -1200,7 +1760,7 @@
         673,
         172
       ],
-      "ms": 2728
+      "ms": 2592
     },
     {
       "target": "settings:Display",
@@ -1213,7 +1773,7 @@
         284,
         1874
       ],
-      "ms": 2787
+      "ms": 2746
     },
     {
       "target": "settings:Notifications",
@@ -1226,7 +1786,7 @@
         348,
         1636
       ],
-      "ms": 2834
+      "ms": 2779
     },
     {
       "target": "settings:Sounds and vibration",
@@ -1239,7 +1799,7 @@
         444,
         1438
       ],
-      "ms": 2799
+      "ms": 2773
     },
     {
       "target": "settings:Connections",
@@ -1252,608 +1812,38 @@
         346,
         1200
       ],
-      "ms": 2821
+      "ms": 2648
     },
     {
       "target": "launcher:Play Store",
       "cat": "real app",
       "method": "baseline",
       "ok": true,
-      "why": "mCurrentFocus=Window{bb98e9d u0 com.android.vending/com.android.vending.AssetBrowserActivity}",
+      "why": "mCurrentFocus=Window{33733ba u0 com.android.vending/com.android.vending.AssetBrowserActivity}",
       "pick": "unique",
       "at": [
         539,
         1974
       ],
-      "ms": 2713
+      "ms": 2694
     },
     {
       "target": "launcher:Camera",
       "cat": "real app",
       "method": "baseline",
       "ok": true,
-      "why": "mCurrentFocus=Window{ae111f9 u0 com.sec.android.app.camera/com.sec.android.app.camera.Camera}",
+      "why": "mCurrentFocus=Window{1211da8 u0 com.sec.android.app.camera/com.sec.android.app.camera.Camera}",
       "pick": "unique",
       "at": [
         875,
         1974
       ],
-      "ms": 2717
-    },
-    {
-      "target": "row:Ada Lovelace",
-      "cat": "row (text inside a clickable row)",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 407,
-      "pick": "unique"
-    },
-    {
-      "target": "star:Ada Lovelace",
-      "cat": "repeated icon in a row",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 370,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "row:Alan Turing",
-      "cat": "row (text inside a clickable row)",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 324,
-      "pick": "unique"
-    },
-    {
-      "target": "star:Alan Turing",
-      "cat": "repeated icon in a row",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 335,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "row:Grace Hopper",
-      "cat": "row (text inside a clickable row)",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 366,
-      "pick": "unique"
-    },
-    {
-      "target": "star:Grace Hopper",
-      "cat": "repeated icon in a row",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 352,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "row:Edsger Dijkstra",
-      "cat": "row (text inside a clickable row)",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 368,
-      "pick": "unique"
-    },
-    {
-      "target": "star:Edsger Dijkstra",
-      "cat": "repeated icon in a row",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 366,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "row:Barbara Liskov",
-      "cat": "row (text inside a clickable row)",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 370,
-      "pick": "unique"
-    },
-    {
-      "target": "star:Barbara Liskov",
-      "cat": "repeated icon in a row",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 371,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "crow:Ada Lovelace",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 385,
-      "pick": "unique"
-    },
-    {
-      "target": "cstar:Ada Lovelace",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 356,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "crow:Alan Turing",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 372,
-      "pick": "unique"
-    },
-    {
-      "target": "cstar:Alan Turing",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 368,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "crow:Grace Hopper",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 376,
-      "pick": "unique"
-    },
-    {
-      "target": "cstar:Grace Hopper",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 375,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "delete:Item 1",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 368,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "delete:Item 3",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 389,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "delete:Item 5",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 389,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "delete:Item 7",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 385,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "plus:Wireless Mouse",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 364,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "minus:Wireless Mouse",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 369,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "plus:USB-C Cable",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 364,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "minus:USB-C Cable",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 349,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "plus:Laptop Stand",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 368,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "minus:Laptop Stand",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": false,
-      "why": "connection: the agent closed the connection before replying (service not running?)",
-      "refused": true,
-      "tap_method": null,
-      "ms": 256,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "buy:Basic",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": false,
-      "why": "no element with that label"
-    },
-    {
-      "target": "buy:Standard",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 341,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "buy:Premium",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 376,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "buy:Enterprise",
-      "cat": "duplicates",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 354,
-      "pick": "nearest to anchor"
-    },
-    {
-      "target": "day:3",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 374,
-      "pick": "unique"
-    },
-    {
-      "target": "day:14",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 388,
-      "pick": "unique"
-    },
-    {
-      "target": "day:27",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 335,
-      "pick": "unique"
-    },
-    {
-      "target": "vday:5",
-      "cat": "virtual views",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 379,
-      "pick": "unique"
-    },
-    {
-      "target": "vday:20",
-      "cat": "virtual views",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 374,
-      "pick": "unique"
-    },
-    {
-      "target": "key:1",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 361,
-      "pick": "unique"
-    },
-    {
-      "target": "key:5",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 370,
-      "pick": "unique"
-    },
-    {
-      "target": "key:9",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 365,
-      "pick": "unique"
-    },
-    {
-      "target": "key:0",
-      "cat": "grid",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 375,
-      "pick": "unique"
-    },
-    {
-      "target": "save",
-      "cat": "button",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 349,
-      "pick": "unique"
-    },
-    {
-      "target": "settings-icon",
-      "cat": "icon",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 370,
-      "pick": "unique"
-    },
-    {
-      "target": "csave",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 359,
-      "pick": "unique"
-    },
-    {
-      "target": "csettings-icon",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 381,
-      "pick": "unique"
-    },
-    {
-      "target": "cincrement",
-      "cat": "compose",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 481,
-      "pick": "unique"
-    },
-    {
-      "target": "share-icon",
-      "cat": "unlabeled icon",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 354,
-      "pick": "unique"
-    },
-    {
-      "target": "delete-icon",
-      "cat": "unlabeled icon",
-      "method": "ref",
-      "ok": true,
-      "why": "ok",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 360,
-      "pick": "unique"
-    },
-    {
-      "target": "settings:Display",
-      "cat": "real app",
-      "method": "ref",
-      "ok": true,
-      "why": "top has 'DisplaySettings'",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 952,
-      "pick": "unique"
-    },
-    {
-      "target": "settings:Notifications",
-      "cat": "real app",
-      "method": "ref",
-      "ok": true,
-      "why": "top has 'Notification'",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 836,
-      "pick": "unique"
-    },
-    {
-      "target": "settings:Sounds and vibration",
-      "cat": "real app",
-      "method": "ref",
-      "ok": true,
-      "why": "top has 'Sound'",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 746,
-      "pick": "unique"
-    },
-    {
-      "target": "settings:Connections",
-      "cat": "real app",
-      "method": "ref",
-      "ok": true,
-      "why": "top has 'Connections'",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 949,
-      "pick": "unique"
-    },
-    {
-      "target": "launcher:Play Store",
-      "cat": "real app",
-      "method": "ref",
-      "ok": true,
-      "why": "mCurrentFocus=Window{bb98e9d u0 com.android.vending/com.android.vending.AssetBrowserActivity}",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 700,
-      "pick": "unique"
-    },
-    {
-      "target": "launcher:Camera",
-      "cat": "real app",
-      "method": "ref",
-      "ok": true,
-      "why": "mCurrentFocus=Window{ae111f9 u0 com.sec.android.app.camera/com.sec.android.app.camera.Camera}",
-      "refused": false,
-      "tap_method": "action",
-      "ms": 666,
-      "pick": "unique"
+      "ms": 2727
     }
   ],
   "notes": [
-    "ref rows come from a rerun after fixing the harness's element picker (merged row labels); locator and baseline rows are from the same full run.",
-    "ref misses in the full run: minus:Laptop Stand (the agent closed the socket mid-request; no crash in the crash buffer; logcat had been cleared by the next launch, so the cause is unknown) and buy:Basic (no 'Buy' element in that snapshot, likely taken before the grid laid out). Both passed 3/3 when rerun alone.",
-    "locator refusals are safe (typed not-found/ambiguous, no tap), but two are droidctl locator bugs: --desc does not match a desc merged from a child (Compose Icon inside a button: 'Settings', 'Star'), and --right-of/--left-of anchors must equal a whole merged row label ('Ada Lovelace \u00b7 Lunch tomorrow?'), not a part of it. buy:Basic/Standard with --below are genuinely ambiguous (two Buy buttons below in the same column).",
-    "baseline = mobile-mcp 1.0.5 Android robot re-implemented (uiautomator dump + collectElements + input tap at rect centre); element chosen with the same rule as ref. mobile-mcp itself was not run (its device path requires the mobilecli binary, which can install an agent on the phone).",
-    "on these static, fully visible targets the baseline's coordinate taps are accurate; the cases where coordinates fail (occlusion, keyboard, scrolled/moved elements, stale screens) are covered by tests/e2e and the resolver pair tests, not by this benchmark."
+    "2026-09-28 re-run (agent 0.4.2, stable refs, handled-click text): ref 52/52, locator 50/52 (2 genuinely ambiguous 'Buy' below a plan), baseline 52/52; 0 wrong taps. The two locator bugs found on 2026-09-27 are fixed (9 refusals gone).",
+    "Latency: taps that change nothing on screen now take ~750 ms median (was ~360 ms): the device waits its full 600 ms first-change window (settle_ms 600, only a `clicked` event follows). Yesterday's host code measures the same ~910 ms cold on the same tap today, so it is not a host regression; the old agent could not be reinstalled (user build refuses downgrades), so why yesterday's no-change taps settled early is unconfirmed (hypothesis: unrelated system-UI events, e.g. a charging animation, ended the wait). Taps that change the screen (grid, virtual views) are unchanged (~390 ms).",
+    "The 2026-09-27 ref miss 'minus:Laptop Stand' (agent closed the connection mid-request) matches the agent event race fixed in 0.4.2 (ConcurrentModificationException, dropbox); no agent crash during this run."
   ]
 }

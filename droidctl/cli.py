@@ -30,6 +30,7 @@ def cmd_devices(a):
         if state == "device":
             row["model"] = dev.sh(dev.adb_device(serial), ["getprop", "ro.product.model"])
             row["setup"] = bool(dev.device_state(serial))
+            row["backend"] = dev.backend_for(serial)
         rows.append(row)
     return {"ok": True, "devices": rows}
 
@@ -38,7 +39,8 @@ def render_devices(p):
     if not p["devices"]:
         console.print("[dim]no devices attached[/dim]")
     for r in p["devices"]:
-        extra = f"  {r.get('model', '')}" + ("  [green]setup[/green]" if r.get("setup") else "")
+        extra = f"  {r.get('model', '')}" + ("  [green]setup[/green]" if r.get("setup") else "") \
+            + (f"  backend {r['backend']}" if r.get("backend", "a11y") != "a11y" else "")
         console.print(f"{r['serial']}  {r['state']}{extra}")
 
 
@@ -82,6 +84,12 @@ def cmd_setup(a):
                         hint="run: make apk")
     serial = dev.resolve_serial(a.device)
     d = dev.adb_device(serial)
+    # an explicit --backend switches; without it, keep what this phone was set up with
+    backend = getattr(a, "backend", None) or dev.device_state(serial).get("backend") or "a11y"
+    if backend == "uiautomation":
+        return _setup_ua(serial, d)
+    if dev.ua_pids(d):
+        dev.stop_ua(serial)                   # chose a11y: don't leave backend B holding UiAutomation
 
     # 1. install, unless the phone already has this exact versionCode
     before_version = dev.installed_version(d)
@@ -115,18 +123,61 @@ def cmd_setup(a):
         raise UserError("the phone did not keep our accessibility service enabled", "not-installed",
                         hint="enable 'droidctl agent' in Settings > Accessibility, then run: droidctl doctor")
 
-    # 4. forward and ping
+    # 4. forward and ping. Listed but not answering: Android stops restarting a
+    #    service that keeps crashing (measured on the SM-N950F after the agent's
+    #    event race: enabled in settings, no process, until the setting changed), so
+    #    rebind it by writing the list without ours, then with ours appended again.
+    #    Every other entry keeps its exact text and order.
     port = dev.ensure_forward(serial)
-    info = _wait_for_agent(port)
-    if installed or added:
+    rebound = False
+    try:
+        info = _wait_for_agent(port, timeout=8.0 if (installed or added) else 3.0)
+    except UserError as e:
+        if e.kind != "connection" or added:
+            raise
+        kept, _ = dev.remove_service(dev.get_services(d))
+        if kept:
+            _put_setting(d, "enabled_accessibility_services", dev.join_services(kept))
+        else:
+            dev.sh(d, ["settings", "delete", "secure", "enabled_accessibility_services"])
+        time.sleep(0.3)
+        _put_setting(d, "enabled_accessibility_services", dev.join_services(dev.add_service(kept)[0]))
+        _put_setting(d, "accessibility_enabled", "1")
+        rebound = True
+        info = _wait_for_agent(port)
+    if installed or added or rebound:
         _wait_for_windows(port)
-    dev.update_device_state(serial, port=port, version_code=info.get("versionCode"))
-    return {"ok": True, "serial": serial, "installed": installed, "previous_version": before_version,
-            "service_added": added, "services_before": before, "services_after": dev.get_services(d),
+    dev.update_device_state(serial, port=port, version_code=info.get("versionCode"), backend="a11y")
+    return {"ok": True, "serial": serial, "backend": "a11y", "installed": installed, "previous_version": before_version,
+            "service_added": added, "service_rebound": rebound, "services_before": before, "services_after": dev.get_services(d),
             "port": port, "agent": info}
 
 
+def _setup_ua(serial, d):
+    """Backend B: push the agent (not installed) and start it; nothing is enabled."""
+    client, info = dev._connect_ua(serial, 5.0)
+    port = client.port
+    client.close()
+    dev.update_device_state(serial, backend="uiautomation", ua_port=port)
+    a11y_on = any(dev.is_ours(e) for e in dev.get_services(d))
+    out = {"ok": True, "serial": serial, "backend": "uiautomation", "port": port, "agent": info,
+           "a11y_service_enabled": a11y_on}
+    if a11y_on:
+        out["warning"] = ("droidctl's accessibility service is still enabled. Apps that hide their UI while "
+                          "an accessibility service is on stay hidden; to switch it off: "
+                          "droidctl teardown --backend a11y")
+    return out
+
+
 def render_setup(p):
+    if p.get("backend") == "uiautomation":
+        console.print(f"[green]ready[/green] {p['serial']}  agent {p['agent'].get('version')} over uiautomation "
+                      f"(sdk {p['agent'].get('sdk')}, {p['agent'].get('model')})  tcp:{p['port']}")
+        console.print("  nothing installed or enabled; the agent runs until idle "
+                      f"{dev.UA_IDLE_MS // 60000} min, a reboot, or: droidctl teardown")
+        if p.get("warning"):
+            console.print(f"  [yellow]{p['warning']}[/yellow]")
+        return
     console.print(f"[green]ready[/green] {p['serial']}  agent {p['agent'].get('version')} "
                   f"(sdk {p['agent'].get('sdk')}, {p['agent'].get('model')})  tcp:{p['port']}")
     console.print(f"  apk {'installed' if p['installed'] else 'already up to date'}; "
@@ -139,6 +190,12 @@ def render_setup(p):
 def cmd_teardown(a):
     serial = dev.resolve_serial(a.device)
     d = dev.adb_device(serial)
+    which = getattr(a, "backend", None) or "all"
+    ua = dev.stop_ua(serial) if which in ("all", "uiautomation") else None
+    if which == "uiautomation":
+        if dev.device_state(serial).get("backend") == "uiautomation":
+            dev.update_device_state(serial, backend="a11y", ua_port=None)
+        return {"ok": True, "serial": serial, "backend": which, "uiautomation": ua}
     restore = dev.device_state(serial).get("restore", {})
     kept, removed = dev.remove_service(dev.get_services(d))
     if removed:
@@ -163,12 +220,25 @@ def cmd_teardown(a):
         if "Success" not in out:
             raise UserError(f"pm uninstall failed: {out}", "adb")
         uninstalled = True
-    dev.clear_device_state(serial)
-    return {"ok": True, "serial": serial, "service_removed": removed, "services_after": kept,
-            "forward_removed": forward, "uninstalled": uninstalled}
+    if which == "all":
+        dev.clear_device_state(serial)
+    else:                                     # a11y only: keep backend B's choice
+        st = dev.device_state(serial)
+        dev.clear_device_state(serial)
+        if st.get("backend") == "uiautomation":
+            dev.update_device_state(serial, backend="uiautomation")
+    return {"ok": True, "serial": serial, "backend": which, "service_removed": removed, "services_after": kept,
+            "forward_removed": forward, "uninstalled": uninstalled, "uiautomation": ua}
 
 
 def render_teardown(p):
+    ua = p.get("uiautomation")
+    if ua is not None:
+        console.print(f"[green]done[/green] {p['serial']}: uiautomation agent "
+                      f"{'stopped' if ua['stopped'] else 'was not running'}"
+                      f"{', files removed' if ua['removed'] else ''}")
+    if p.get("backend") == "uiautomation":
+        return
     console.print(f"[green]done[/green] {p['serial']}: service "
                   f"{'removed' if p['service_removed'] else 'was not enabled'}, "
                   f"apk {'uninstalled' if p['uninstalled'] else 'kept'}")
@@ -210,7 +280,7 @@ def cmd_doctor(a):
                       f"  cache {hits}/{hits + misses} ({rate})")
     check("daemon", daemon_check)
 
-    later = ["apk", "service", "uiautomation", "socket", "peer-uid", "protocol", "rtt"]
+    later = ["backend", "apk", "service", "uiautomation", "socket", "peer-uid", "protocol", "rtt"]
     if not check("adb", lambda: (True, f"server version {int(dev._adb_host_query('host:version'), 16)}")):
         skip("device", *later)
         return {"ok": False, "checks": checks}
@@ -224,6 +294,19 @@ def cmd_doctor(a):
         skip(*later)
         return {"ok": False, "checks": checks}
     d = ctx["d"]
+
+    def backend():
+        ctx["backend"] = b = dev.backend_for(ctx["serial"])
+        src = "DROIDCTL_BACKEND" if os.environ.get("DROIDCTL_BACKEND") else \
+              "setup" if dev.device_state(ctx["serial"]).get("backend") else "default"
+        pids = dev.ua_pids(d)
+        ua = f"; uiautomation agent running (pid {', '.join(map(str, pids))})" if pids else ""
+        return True, f"{b} ({src}){ua}"
+    if not check("backend", backend):
+        skip(*later[1:])
+        return {"ok": False, "serial": ctx["serial"], "checks": checks}
+    if ctx["backend"] == "uiautomation":
+        return _doctor_ua(ctx, d, check, skip, checks)
 
     def apk():
         v = dev.installed_version(d)
@@ -277,6 +360,46 @@ def cmd_doctor(a):
         client.close()
     return {"ok": all(c["ok"] is not False for c in checks), "serial": ctx["serial"],
             "agent": info, "checks": checks}
+
+
+def _doctor_ua(ctx, d, check, skip, checks):
+    """Doctor for backend B: nothing is installed, so check what it needs instead."""
+    def service():
+        on = any(dev.is_ours(e) for e in dev.get_services(d))
+        return True, ("droidctl's accessibility service is ALSO enabled: apps that hide their UI while "
+                      "one is on stay hidden (droidctl teardown --backend a11y)") if on else \
+            "droidctl's accessibility service is not enabled (as intended for this backend)"
+    check("service", service)
+
+    def uiautomation():
+        procs = dev.sh(d, ["ps", "-A", "-o", "NAME"])
+        hits = sorted({p for p in procs.split() if "uiautomator" in p or "appium" in p})
+        if hits:
+            return False, f"{', '.join(hits)} running: it holds the one UiAutomation, so this backend cannot start"
+        return True, "no uiautomator/appium process"
+    check("uiautomation", uiautomation)
+
+    def sock():
+        ctx["client"], ctx["ping"] = dev.connect(ctx["serial"])      # starts the agent if needed
+        return True, (f"tcp:{ctx['client'].port} -> {dev.REMOTES['uiautomation']}, agent "
+                      f"{ctx['ping'].get('version')} (pid {', '.join(map(str, dev.ua_pids(d))) or '?'}, "
+                      f"exits after {dev.UA_IDLE_MS // 60000} min idle)")
+    if not check("socket", sock):
+        skip("peer-uid", "protocol", "rtt")
+        return {"ok": False, "serial": ctx["serial"], "backend": "uiautomation", "checks": checks}
+    info, client = ctx["ping"], ctx["client"]
+    try:
+        uid = info.get("peer_uid")
+        checks.append({"name": "peer-uid", "ok": uid in (2000, 0),
+                       "detail": f"{uid} ({ {2000: 'shell', 0: 'root'}.get(uid, 'unexpected')})"})
+        proto = info.get("protocol")
+        checks.append({"name": "protocol", "ok": proto == dev.PROTOCOL and info.get("backend") == "uiautomation",
+                       "detail": f"agent {proto} ({info.get('backend')}), host {dev.PROTOCOL}"})
+        check("rtt", lambda: (True, dev.rtt_stats(dev.time_pings(client, 20))))
+    finally:
+        client.close()
+    return {"ok": all(c["ok"] is not False for c in checks), "serial": ctx["serial"],
+            "backend": "uiautomation", "agent": info, "checks": checks}
 
 
 def render_doctor(p):
@@ -418,12 +541,14 @@ LAYOUTS = ("spatial", "flat")
 
 def _snap_opts(a):
     from droidctl import snapshot as snap_mod
-    layout = a.layout or os.environ.get("DROIDCTL_LAYOUT") or "spatial"
-    if layout not in LAYOUTS:
-        raise UserError(f"DROIDCTL_LAYOUT={layout!r}: use one of {', '.join(LAYOUTS)}", "bad-args")
-    return snap_mod.Opts(layout=layout, regions=not a.no_regions, rows=not a.no_rows,
-                         grids=not a.no_grids, infer=not a.no_infer, geo=a.geo, map=a.map,
-                         bounds=a.bounds, max=a.max, find=a.find, within=a.within)
+    try:     # $DROIDCTL_LAYOUT is the base; flags given on the command line win
+        return snap_mod.Opts.from_env(
+            strict=True,
+            layout=a.layout, regions=False if a.no_regions else None, rows=False if a.no_rows else None,
+            grids=False if a.no_grids else None, infer=False if a.no_infer else None,
+            geo=a.geo or None, map=a.map or None, bounds=a.bounds, max=a.max, find=a.find, within=a.within)
+    except ValueError as e:
+        raise UserError(str(e), "bad-args")
 
 
 def _recent_toast(client, prev_state):
@@ -477,6 +602,7 @@ def cmd_snapshot(a):
     snap = snap_mod.build(tree, activity=activity, system=a.system)
     if serial:
         snap.toast, snap.evseq = toast, evseq
+        snap_mod.carry_refs(prev_state, snap)   # before rendering: the numbers it shows are kept
     if a.within is not None and not any(e.ref == a.within for e in snap.elements):
         raise UserError(f"no element [{a.within}] on this screen", "not-found", hint="run: droidctl snapshot")
     prev = snap_mod.load_state(serial) if serial else None
@@ -727,11 +853,16 @@ def build_parser():
     sp = sub.add_parser("setup", parents=[jsonopt, devopt],
                         help="install the agent APK and append its accessibility service (keeps the others)")
     sp.add_argument("--reinstall", action="store_true", help="install even if the same version is present")
+    sp.add_argument("--backend", choices=dev.BACKENDS,
+                    help="a11y: the accessibility service (default); uiautomation: run the agent over adb with "
+                         "a UiAutomation, nothing installed or enabled. Remembered per phone")
     sp.set_defaults(fn=cmd_setup, render=render_setup)
 
     sp = sub.add_parser("teardown", parents=[jsonopt, devopt],
                         help="remove only our service, restore the a11y settings, uninstall the agent")
     sp.add_argument("--keep-apk", action="store_true", help="disable the service but keep the APK installed")
+    sp.add_argument("--backend", choices=dev.BACKENDS + ("all",), default="all",
+                    help="remove only this backend (default: all of droidctl)")
     sp.set_defaults(fn=cmd_teardown, render=render_teardown)
 
     sp = sub.add_parser("doctor", parents=[jsonopt, devopt],
@@ -759,7 +890,7 @@ def build_parser():
     sp.add_argument("--in", dest="within", type=int, metavar="REF", help="only element REF and what is inside it")
     sp.add_argument("--raw", action="store_true", help="the raw device tree as JSON")
     sp.add_argument("--bounds", action="store_true", help="add each element's box in device px")
-    sp.add_argument("--layout", choices=LAYOUTS, help="spatial (regions, rows, grids) or flat (default: $DROIDCTL_LAYOUT, else spatial)")
+    sp.add_argument("--layout", choices=LAYOUTS, help="spatial (regions, rows, grids) or flat (default: $DROIDCTL_LAYOUT, e.g. 'spatial,no-rows,geo', else spatial)")
     sp.add_argument("--no-regions", action="store_true", help="spatial layout without region headers")
     sp.add_argument("--no-rows", action="store_true", help="spatial layout with one element per line")
     sp.add_argument("--no-grids", action="store_true", help="spatial layout without grid tables")

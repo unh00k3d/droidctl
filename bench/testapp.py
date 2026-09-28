@@ -50,6 +50,9 @@ def clear_log(serial):
 def launch(serial, scenario, timeout=25.0):
     """Start a scenario fresh (reset=true), wait for its `shown` event, clear the log."""
     clear_log(serial)
+    # accessibility actions are not user activity: a long run of node taps lets the
+    # screen time out (tap-accuracy bench, 2026-09-28), so wake it for every scenario
+    adb(serial, "shell", "input", "keyevent", "KEYCODE_WAKEUP")
     adb(serial, "shell", "am", "start", "-n", f"{PKG}/.Main", "--es", "s", scenario, "--ez", "reset", "true")
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:

@@ -1,6 +1,5 @@
 package dev.droidctl.agent
 
-import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.graphics.Rect
 import android.os.Build
@@ -17,7 +16,7 @@ import org.json.JSONObject
  * The host does all pruning and formatting; this only has to be complete, compact
  * (absent = default) and fast. See PROTOCOL.md "tree" for the schema.
  */
-class Tree(private val svc: AccessibilityService) {
+class Tree(private val svc: Host) {
     companion object {
         const val BUDGET_MS = 2000L
         const val MAX_NODES = 10000
@@ -190,12 +189,12 @@ class Tree(private val svc: AccessibilityService) {
     }
 
     private fun setNotImportant(on: Boolean) {
-        val info = svc.serviceInfo ?: return
+        val info = svc.getInfo() ?: return
         val flag = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
         val want = if (on) info.flags or flag else info.flags and flag.inv()
         if (want != info.flags) {
             info.flags = want
-            svc.serviceInfo = info
+            svc.setInfo(info)
         }
     }
 
@@ -206,10 +205,10 @@ class Tree(private val svc: AccessibilityService) {
      * `no_root`. Returns how many application windows have no root.
      */
     private fun collect(allWindows: Boolean, walk: Walk, out: JSONArray): Int {
-        val list = if (allWindows) try { svc.windows } catch (_: Exception) { emptyList() } else emptyList()
+        val list = if (allWindows) try { svc.windows() } catch (_: Exception) { emptyList() } else emptyList()
         if (list.isEmpty()) {
-            var root = svc.rootInActiveWindow
-            if (root == null && walk.timeLeft() > 100) { SystemClock.sleep(50); root = svc.rootInActiveWindow }
+            var root = svc.activeRoot()
+            if (root == null && walk.timeLeft() > 100) { SystemClock.sleep(50); root = svc.activeRoot() }
             if (root == null) return 1
             val jw = JSONObject().put("id", root.windowId).put("type", "application").put("active", true)
                 .put("unlisted", true)
@@ -242,7 +241,7 @@ class Tree(private val svc: AccessibilityService) {
         // front was missing until its next window change). The active window is still
         // reachable directly, so add it when no application window was listed.
         if (list.none { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }) {
-            val root = svc.rootInActiveWindow
+            val root = svc.activeRoot()
             if (root != null && list.none { it.id == root.windowId }) {
                 val jw = JSONObject().put("id", root.windowId).put("type", "application")
                     .put("active", true).put("focused", true).put("unlisted", true)

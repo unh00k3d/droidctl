@@ -43,6 +43,33 @@ carries `"daemon": {"started": true, "pid": …}` instead, so stdout stays clean
 - **Where:** socket `~/.droidctl/d.sock` (0600), log `~/.droidctl/daemon.log`;
   `droidctl daemon status|logs`. The protocol is in [DAEMON.md](DAEMON.md).
 
+## Two backends
+
+droidctl's agent reaches the screen one of two ways, and everything else (snapshots, refs,
+actions, the daemon, MCP) is the same for both:
+
+| | `a11y` (default) | `uiautomation` |
+|---|---|---|
+| how | our accessibility service, installed and enabled by `setup` | the same agent code run by `app_process` from a pushed (not installed) APK, holding a UiAutomation |
+| changes on the phone | installs `dev.droidctl.agent`, appends it to `enabled_accessibility_services` | none: a file in `/data/local/tmp`, removed by `teardown` |
+| lifetime | permanent; rebinds after reboot | until 10 min idle, reboot or `teardown`; the next command restarts it |
+| gestures | `dispatchGesture` | injected touch events |
+| screenshots | `takeScreenshot` (API 30+), else `screencap` | `screencap` |
+| conflicts | Appium/uiautomator2 suppress it (`suppressed`) | only one UiAutomation client at a time: with Appium/uiautomator2 attached it can't start (`suppressed`) |
+
+`droidctl setup --backend uiautomation` selects it for a phone (`DROIDCTL_BACKEND` per call),
+and `doctor` shows which one answers. Use it where an accessibility service can't be enabled,
+or for apps that hide their UI while an unknown accessibility service is on (measured on a
+production banking app: with droidctl's service enabled its screens came back empty; with the
+service off, a UiAutomation client saw them). It needs exactly the trust droidctl already
+has (USB debugging and an authorized host): a UiAutomation is only available to the adb shell
+user, never to an installed app. droidctl never hides a service or spoofs anything to get past
+an app's checks, and automating a production app should be cleared with its owner.
+Measured on the SM-N950F (API 28): both backends pass the same e2e checks; `uiautomation` is a
+little slower (ping 16.8 vs 15.6 ms, snapshot 200 vs 147 ms, tap+settle 532 vs 493 ms, cold
+in-process CLI). It connects with `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`, so TalkBack and
+droidctl's own service keep running beside it (verified on API 28).
+
 ## Install
 
 Requires Python 3.10+, `adb` (Android platform-tools) and a phone with USB debugging on
@@ -177,40 +204,62 @@ Graded by the test app's own `DTA` events (exactly the intended event, nothing e
 
 | method | correct | failed safely (typed error, no tap) | wrong target |
 |---|---|---|---|
-| `snapshot`, then `tap REF` (the recommended path) | 50/52 | 1 | 0 |
-| `tap` with locators (`--text/--desc … --right-of/--below`) | 41/52 | 11 | 0 |
+| `snapshot`, then `tap REF` (the recommended path) | 52/52 | 0 | 0 |
+| `tap` with locators (`--text/--desc … --right-of/--below`) | 50/52 | 2 | 0 |
 | baseline: `uiautomator dump` + `input tap` at the element's centre (mobile-mcp 1.0.5's Android robot, re-implemented) | 52/52 | 0 | 0 |
 
-- **No method hit a wrong target.** The two `tap REF` misses both passed 3/3 when rerun:
-  - A snapshot was taken before a grid laid out.
-  - A socket dropped mid-tap. The later cause: an external UiAutomation client (`uiautomator dump`, also Appium) makes Android unbind accessibility services, which closes every agent connection for ~1–2 s. droidctl now waits and retries **read-only** requests. An action cut off this way returns `connection` with `maybe_performed: true` and is never resent; on the phone the cut-off tap had in fact run.
-- **Locator misses are refusals.** Nine came from two droidctl bugs, fixed after this run and not re-measured:
-  - `--desc` now matches a description merged from a child (a Compose icon inside a button).
-  - `--right-of`/`--left-of` anchors may be one part of a merged row label (`"Ada Lovelace"` of `"Ada Lovelace · Lunch tomorrow?"`).
-  - The two `--below` misses are genuinely ambiguous: two Buy buttons sit below in the same column.
+Measured 2026-09-28 on agent 0.4.2 (`bench/results/tap-accuracy.json`; the 2026-09-27 run had
+`tap REF` 50/52 and locators 41/52).
+- **No method hit a wrong target.** The two locator refusals are genuinely ambiguous: two Buy
+  buttons sit below the plan name in the same column.
+- **Fixed since the first run:** `--desc` matches a description merged from a child (a Compose
+  icon inside a button); `--right-of`/`--left-of` anchors may be one part of a merged row label
+  (`"Ada Lovelace"` of `"Ada Lovelace · Lunch tomorrow?"`); and an agent crash (an event
+  race, see PLAN.md) that had closed a connection mid-tap.
+- **Time per tap (median, warm daemon):** ~750 ms for droidctl when the tap changes nothing on
+  screen (it waits up to 600 ms for a first change, so a slow screen isn't reported as done),
+  ~390 ms when it does; the baseline takes ~2.6 s (`uiautomator dump` plus the tap, with no
+  check of what happened).
+- An external UiAutomation client (`uiautomator dump`, Appium) makes Android unbind
+  accessibility services while it runs, closing every agent connection for ~1–2 s. droidctl
+  waits and retries **read-only** requests; an action cut off this way returns `connection`
+  with `maybe_performed: true` and is never resent.
 - **Coordinate taps are accurate on static, fully visible targets.** The cases where they go wrong are covered by `tests/e2e` and the resolver's before/after pairs, not by this benchmark: elements occluded by an overlay or the keyboard, moved after a scroll, or on a screen that changed.
 - **mobile-mcp itself was not run.** Its device path needs the separate `mobilecli` binary, which can install an agent on the phone.
 - **`uiautomator dump` suppresses accessibility services while it runs** (see the dropped socket above). droidctl's agent answered again within 0.1 s after the dump ended.
 
-### Layout A/B (reduced run, provisional)
+### Layout A/B (full run, one model)
 
 `bench/spatial.py`: `claude-sonnet-5` headless (`claude -p`, only `Bash(droidctl:*)`), 10 test-app
-tasks × 3 layout variants × 1 run. Success comes from the app's `DTA` events. Total cost $4.18.
+tasks × 9 layout variants × 3 runs = 270 runs (2026-09-28, agent 0.4.2,
+`bench/results/spatial-ab-full-2.json`). Success and wrong taps come from the app's `DTA`
+events. Total cost $23.92. Each variant holds for every screen droidctl prints
+(`DROIDCTL_LAYOUT`), including action results.
 
-| variant | success | droidctl calls | input tokens (incl. cache) | wrong taps |
+| variant | success | droidctl calls | input tokens vs flat | wrong taps |
 |---|---|---|---|---|
-| flat | 10/10 | 37 | 1.19M | 0 |
-| spatial (the default) | 10/10 | 35 | 1.09M | 0 |
-| spatial + `shot --marks` | 10/10 | 42 | 1.55M | 0 |
+| flat | 30/30 | 78 | — | 0 |
+| **spatial (the default)** | 30/30 | 80 | +2.6% | 0 |
+| spatial without regions / rows / grids / inferred labels | 30/30 each | 81 / 85 / 84 / 84 | +2.8% to +7.9% | 0 |
+| spatial + `--geo` / `--map` | 30/30 each | 81 / 86 | +3.8% / +9.7% | 0 |
+| spatial + `shot --marks` | 30/30 | 82 | +14.2% | 0 |
 
-- **`delete_item7` was re-run after a test-app fix.** In the first run it failed in every variant because the test app's Delete only logged and never removed the row, so every agent saw no change and tapped again. Delete now removes its row; the re-run passed in all three variants. The flawed runs are kept in the results file under `superseded`.
-- **Flat and spatial tie on success:** spatial used 2 fewer calls and 8.7% fewer input tokens. `--marks` has the same success with +42% tokens and 7 more calls.
-- **Reading:** spatial stays the default because it costs no more, but this run doesn't show that it helps. `--marks` stays opt-in.
-- **Caveat:** one run per task and one model is not statistically meaningful.
+- **No layout measurably helps on these tasks.** Every variant succeeded every time; the
+  differences in calls are a handful out of ~80 and come from one or two tasks, which is
+  run-to-run noise. The tasks are at a ceiling for this model.
+- **Spatial stays the default, provisionally** (user decision 2026-09-28): it costs ~3%
+  more than flat and carries structure flat can't show (regions, grids, rows). `--geo`,
+  `--map` and `--marks` stay opt-in. Harder tasks or a second, weaker model are what could
+  separate the layouts.
+- **The first full run (`spatial-ab-full.json`) found two droidctl defects instead**, both
+  fixed before this run: 12 of its 13 failures were a correct tap reported as a bare
+  "unchanged" and then tapped again (results now say the click was handled), and 3 runs
+  deleted the wrong row with a ref number from before a scroll (refs are now stable on one
+  screen). The earlier 1-run pass is in `spatial-ab.json`.
 
 ### Pending
 
-Wireless-adb latency, and the full A/B protocol (2 models, 3 runs, per-layer ablations, `--geo`, `--map`).
+Wireless-adb latency, a second model for the A/B, and harder A/B tasks.
 
 ## How it is tested
 
