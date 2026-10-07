@@ -56,6 +56,10 @@ Drive an Android phone through its accessibility tree.
 5. `shot` is for pixels only (colours, images, visual bugs); prefer `snapshot`.
 6. Events that happened between your calls (toasts, new windows) are reported on the next
    result under `between_calls`.
+7. Empty screen (a header but no elements, or a `no tree for app window` warning)? The app
+   likely hides its UI from accessibility services (common in banking/finance). Tell the
+   user to run `droidctl diagnose --fix` in a shell (switches to the uiautomation backend
+   and disables the service), then relaunch the app; MCP cannot change the backend itself.
 """
 
 

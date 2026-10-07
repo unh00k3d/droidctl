@@ -244,9 +244,10 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `cheat` | – | every command and its options, on one screen |
 | `skill` | `<{print,install}> --dir DIR --force` | print the agent skill (SKILL.md), or install it for Claude Code |
 | `devices` | – | list attached devices and whether droidctl is set up |
-| `setup` | `--reinstall --backend {a11y,uiautomation}` | install the agent APK and append its accessibility service (keeps the others) |
+| `setup` | `--reinstall --backend {a11y,uiautomation} --keep-a11y` | install the agent APK and append its accessibility service (keeps the others) |
 | `teardown` | `--keep-apk --backend {a11y,uiautomation,all}` | remove only our service, restore the a11y settings, uninstall the agent |
 | `doctor` | – | check adb, APK, service, socket, peer UID and round-trip latency |
+| `diagnose` | `--fix` | explain why the current screen has no readable UI, and what to do (e.g. apps that hide from accessibility services) |
 | `ping` | `--count N` | round trip to the on-device agent |
 | `dump-fixture` | `<name> --pkg PKG --not-important --dir DIR --timeout S --allow-degraded` | save the current screen's raw tree as a test fixture (dev) |
 | `snapshot (snap)` | `--diff --find TEXT --in REF --raw --bounds --layout {spatial,flat} --no-regions --no-rows --no-grids --no-infer --geo --map --system --max N --full --fixture PATH` | the screen as a compact list of elements with refs |
