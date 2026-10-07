@@ -182,6 +182,8 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--max", type=int, default=100, metavar="N", help="at most N lines (100)")
     sp.add_argument("--pkg", metavar="PKG", help="only this app's process, plus its crashes (stack traces) from the crash buffer")
     sp.add_argument("--level", choices=("V", "D", "I", "W", "E", "F"), help="minimum level")
+    sp.add_argument("--tag", action="append", metavar="TAG", help="only this logcat tag (repeatable)")
+    sp.add_argument("--marks", action="store_true", help="only `droidctl mark` lines (same as --tag droidctl)")
 
     sp = add("shot", "a screenshot (downscaled JPEG), optionally with ref marks", "cmd_shot")
     sp.add_argument("--scale", type=float, default=0.5, metavar="F", help="downscale factor (0.5)")

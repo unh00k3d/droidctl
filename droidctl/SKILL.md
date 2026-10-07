@@ -41,7 +41,8 @@ interface; you never need `--help` per command (`droidctl cheat --json` has it a
 5. **Batch with `run`**: steps in one `run --json` share one process and one device session.
 6. **Timing for captures**: every `--json` result and error carries `t_start`/`t_end`
    (host clock, UTC ISO-8601) and `elapsed_ms`, to line actions up with a proxy history.
-   `droidctl mark "LABEL"` writes a marker line to the phone's logcat (tag `droidctl`).
+   `droidctl mark "LABEL"` writes a marker line to the phone's logcat (tag `droidctl`);
+   `droidctl logs --marks` reads them back (`--tag TAG` for any other tag).
 
 ```bash
 droidctl snapshot --json                    # the screen, with refs

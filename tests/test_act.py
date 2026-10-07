@@ -766,3 +766,83 @@ def test_scroll_to_result_is_not_counted_as_seen(home, monkeypatch):
     s._client.act_replies = [{"performed": True, "tree": tree("duplicates_scroll-b")}]
     act.cmd_scroll_to(args(text="Item 16", direction=None, one_way=False, max_scrolls=3))
     assert S.load_state("FAKE")["shown"] is False
+
+
+# --- bug RCA 2026-10-07 (a hardened finance app login) ------------------------
+def _with_focus(t, handle):
+    """A copy of a real tree with input focus on node ``handle`` (the one marked edit
+    this file allows: it stands for "that field took focus")."""
+    t = copy.deepcopy(t)
+
+    def walk(n):
+        if isinstance(n, dict):
+            if n.get("handle") == handle:
+                n["flags"] = sorted(set(n.get("flags", [])) | {"focused"})
+            for v in n.values():
+                walk(v)
+        elif isinstance(n, list):
+            for v in n:
+                walk(v)
+    walk(t)
+    return t
+
+
+def test_type_never_injects_keys_while_another_field_has_focus(home, monkeypatch):
+    """set_text refused, the username field holds focus, and the password field won't
+    take it: `adb input text` would type the password into the username. Skip it, fail loudly."""
+    t0 = _with_focus(real("testapp-password"), 19)          # username focused
+    s = session(monkeypatch, t0)
+    s._client.act_replies = [{"performed": False, "tree": t0}] + [{"performed": True, "tree": t0}] * 4
+    with pytest.raises(UserError) as e:
+        act.cmd_type(type_args(id="password", content="secret"))
+    assert e.value.kind == "no-change" and "tap it" in e.value.hint
+    assert not any(c[0] == "input" for c in s.shell_calls)
+    assert [c[3] for c in s._client.calls if c[0] == "act"][1:] == ["focus", "click"]
+    assert any(x.get("skipped") for x in e.value.data["steps"] if x["method"] == "input")
+
+
+def test_type_injects_keys_once_the_field_itself_has_focus(home, monkeypatch):
+    t0 = real("testapp-password")
+    focused = _with_focus(t0, 20)                             # the password field took focus
+    s = session(monkeypatch, t0)
+    s._client.act_replies = [{"performed": False, "tree": t0}, {"performed": True, "tree": focused}]
+    with pytest.raises(UserError):                            # the fake can't really type
+        act.cmd_type(type_args(id="password", content="secret"))
+    assert any(c[:2] == ("input", "text") for c in s.shell_calls)
+    assert [c[3] for c in s._client.calls if c[0] == "act"] == ["set_text", "focus"]
+
+
+def test_type_text_is_a_locator_not_the_content(home, monkeypatch):
+    session(monkeypatch, real("testapp-password"))
+    with pytest.raises(UserError) as e:
+        act.cmd_type(type_args(id="username", text="514524", content=None))
+    assert e.value.kind == "bad-args" and "locator" in str(e.value)
+
+
+def test_a_lone_unknown_number_is_explained(home, monkeypatch):
+    session(monkeypatch, real("testapp-password"))
+    with pytest.raises(UserError) as e:
+        act.cmd_type(type_args(target="514524", content=None))
+    assert e.value.kind == "bad-args" and "type REF 514524" in e.value.hint
+
+
+def test_two_fields_with_one_id_are_ambiguous_for_type(home, monkeypatch):
+    """Never a silent no-op: the resolver refuses to pick (here: the six OTP boxes by class)."""
+    session(monkeypatch, real("testapp-otp"))
+    with pytest.raises(UserError) as e:
+        act.cmd_type(type_args(cls="EditText", content="1"))
+    assert e.value.kind == "ambiguous" and e.value.data["count"] == 6
+
+
+def test_logs_filter_by_tag_and_marks(home, monkeypatch):
+    s = session(monkeypatch, tree("cart_inc-a"))
+    calls = []
+    s.adb = lambda *cmd, **kw: (calls.append(cmd), "")[1]
+    monkeypatch.setattr(act, "get_session", lambda serial, auto_setup=True: s)
+    monkeypatch.setattr(act.dev, "resolve_serial", lambda d: "FAKE")
+    act.cmd_logs(args(max=50, pkg=None, level=None, tag=None, marks=True))
+    assert calls[-1][-2:] == ("droidctl:V", "*:S")
+    act.cmd_logs(args(max=50, pkg=None, level="W", tag=["A", "B"], marks=False))
+    assert calls[-1][-3:] == ("A:W", "B:W", "*:S")
+    act.cmd_logs(args(max=50, pkg=None, level="E", tag=None, marks=False))
+    assert calls[-1][-1] == "*:E"

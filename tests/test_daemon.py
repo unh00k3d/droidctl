@@ -330,7 +330,7 @@ def test_events_between_calls_come_with_the_next_result(phones):
     assert "between calls" not in human.stdout               # reported once, not forever
     a.toast("Saved!")
     time.sleep(0.3)
-    assert 'between calls: toast "Saved!"' in dc(env, "snapshot", "-d", "AAA").stdout
+    assert 'events since your last call (not this screen): toast "Saved!"' in dc(env, "snapshot", "-d", "AAA").stdout
 
 
 def test_phone_a_never_blocks_phone_b(phones):

@@ -982,8 +982,9 @@ def _all_nodes(snap):
         stack.extend(n.children)
 
 
-def _refind_field(snap, want):
-    """The same input in a fresh snapshot: by resource id, else by box, else the focused one."""
+def _refind_field(snap, want, focused_ok=True):
+    """The same input in a fresh snapshot: by resource id, else by box, else
+    (``focused_ok``) the focused one."""
     edits = [n for n in _all_nodes(snap) if n.editable]
     if want.get("id"):
         hits = [n for n in edits if n.raw.get("id") == want["id"]]
@@ -995,8 +996,35 @@ def _refind_field(snap, want):
         same = [n for n in edits if n.rect and _dist(n.rect, want["rect"]) < 24]
         if len(same) == 1:
             return same[0]
+    if not focused_ok:
+        return None
     focused = [n for n in edits if "focused" in n.flags]
     return focused[0] if len(focused) == 1 else None
+
+
+def _give_focus(sess, snap, node, want, force):
+    """Input focus on this very field, verified -> (focused, node, snap).
+
+    `adb input text` types into whatever holds input focus, and ACTION_FOCUS can be
+    performed without the field taking focus. Unverified, the text of a second
+    field went into the first, which still had focus (a hardened finance app login,
+    two password fields with one id). ACTION_CLICK is what a person does next."""
+    if "focused" in node.flags:
+        return True, node, snap
+    for action in ("focus", "click"):
+        try:
+            r = sess.call("act", snap.dump, node.raw["handle"], action=action, force=force,
+                          settle={"quiet_ms": 150, "first_ms": 300, "timeout_ms": 1000}, retry=False)
+        except UserError:
+            continue
+        snap2 = S.build(r.get("tree") or sess.tree())
+        n2 = _refind_field(snap2, want, focused_ok=False)      # never "whichever is focused"
+        if n2 is None:
+            return False, node, snap
+        node, snap = n2, snap2
+        if "focused" in n2.flags:
+            return True, node, snap
+    return False, node, snap
 
 
 def _dist(r1, r2):
@@ -1125,28 +1153,37 @@ def _type(sess, a, t):
                     sess.call("clipboard", set=prev if prev is not None else "")
                 except UserError:
                     pass
-    # 3. adb input text (ASCII only), into the focused field
+    # 3. adb input text (ASCII only): only once this field verifiably holds input focus
+    unfocused = False
     if not ok(val) and (val == before and target != before) and text.isascii() and text:
         try:
+            focused = False
             if node is not None:
-                sess.call("act", snap.dump, node.raw["handle"], action="focus", force=force, retry=False)
-            sess.shell("input", "text", _input_text_arg(text if a.append or not before else target))
-            steps.append({"method": "input", "performed": True})
-            val, node, snap = _readback(sess, want)
-            method, reply = "input", None
+                focused, node, snap = _give_focus(sess, snap, node, want, force)
+            if not focused:
+                unfocused = True
+                steps.append({"method": "input", "skipped": "the field did not take input focus: "
+                                                            "the keys would go to another field"})
+            else:
+                sess.shell("input", "text", _input_text_arg(text if a.append or not before else target))
+                steps.append({"method": "input", "performed": True})
+                val, node, snap = _readback(sess, want)
+                method, reply = "input", None
         except UserError as e:
             steps.append({"method": "input", "error": e.kind})
+    hint = ("the app refused set_text and the field would not take focus: tap it "
+            "(droidctl tap REF), then type again" if unfocused else "")
     warning = None
     if want["password"] and not ok(val):
         n_now, n_want = len(val or ""), len(target)
         if (val or "") == (before or "") and target != (before or ""):
             raise UserError(f"the password field did not take the text ({n_now} characters, not {n_want})",
-                            "no-change", data={"steps": steps, "len": n_now})
+                            "no-change", hint=hint, data={"steps": steps, "len": n_now})
         warning = f"the password field holds {n_now} characters, not {n_want} (a length limit?)"
     elif not want["password"] and val != target and not _same_digits(val, target):
         if val == before and target != before:
             raise UserError(f"the field did not take the text (it still shows {val!r})", "no-change",
-                            data={"steps": steps, "value": val})
+                            hint=hint, data={"steps": steps, "value": val})
         warning = f"the field shows {val!r}, not {target!r} (a formatter, a length limit or auto-advance?)"
     if a.enter:
         steps.append(dict(_enter(sess, node, snap), method="enter"))
@@ -1191,6 +1228,19 @@ def cmd_type(a):
     if (a.content is None and a.target is not None and not (a.stdin or a.file)
             and (not re.fullmatch(r"\[?\d+\]?", a.target.strip()) or _locator(a) or a.ref is not None)):
         a.content, a.target = a.target, None
+    if a.content is None and not (a.stdin or a.file or a.clear or a.enter):
+        if a.text is not None:
+            # `type --id editText --text 514524` read as "type 514524": --text names the field
+            raise UserError(f"nothing to type: --text {a.text!r} is a locator (it finds the field by its "
+                            "text or hint); the text to type goes last", "bad-args",
+                            hint=f"droidctl type --id ID {a.text!r} (or: type REF {a.text!r})")
+        lone = a.target if a.target is not None else a.ref
+        known = (sess.state or {}).get("refs", {}) | (sess.state or {}).get("retired", {})
+        if lone is not None and str(lone).strip("[] ") not in known:
+            raise UserError(f"nothing to type: a lone number is read as a ref, and there is no ref "
+                            f"[{str(lone).strip('[] ')}] on this screen", "bad-args",
+                            hint=f"to type digits, name the field: droidctl type REF {str(lone).strip('[] ')} "
+                                 "(or --id/--text)")
     if (a.target is None and a.ref is None and not _locator(a) and not a.point):
         # no target: the focused input
         snap = sess.snap()
@@ -1519,6 +1569,10 @@ def cmd_logs(a):
     serial = dev.resolve_serial(a.device)
     sess = get_session(serial, auto_setup=False)
     cmd = ["logcat", "-d", "-v", "threadtime", "-t", str(max(1, a.max * (4 if a.pkg else 1)))]
+    tags = list(getattr(a, "tag", None) or []) + ([MARK_TAG] if getattr(a, "marks", False) else [])
+    # logcat filterspecs: only these tags (at --level), everything else silent
+    spec = ([f"{t}:{a.level or 'V'}" for t in dict.fromkeys(tags)] + ["*:S"] if tags
+            else ["*:" + a.level] if a.level else [])
     if a.pkg:
         pid = sess.shell("pidof", a.pkg, check=False).strip().split()
         # its crashes, from the crash buffer: they survive the process and log noise
@@ -1526,14 +1580,13 @@ def cmd_logs(a):
                                       timeout=30), a.pkg)[-a.max:]
         if not pid:
             # not running (maybe it crashed): lines that mention the package, plus its crashes
-            cmd += ["*:" + (a.level or "V")]
+            cmd += spec or ["*:V"]
             lines = [x for x in sess.adb(*cmd, timeout=30).splitlines() if a.pkg in x]
             lines = lines[-a.max:]
             text = "\n".join(lines + (["-- crash --"] + crash if crash else [])) or "(no lines)"
             return {"ok": True, "lines": lines, "crash": crash, "pid": None, "text": text}
         cmd += ["--pid", pid[0]]
-    if a.level:
-        cmd += ["*:" + a.level]
+    cmd += spec
     lines = sess.adb(*cmd, timeout=30).splitlines()
     lines = [x for x in lines if x and not x.startswith("--------- beginning")][-a.max:]
     if a.pkg:

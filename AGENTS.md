@@ -127,7 +127,8 @@ changed" into the `no-change` error; `--settle MS` sets the quiet window (defaul
 `no-scrollable`) rather than swiping blindly; use `swipe` for content that moves by touch only.
 `wait --idle` blocks until the screen stops changing, for slow work outside an action.
 Every `--json` result and error has `t_start`/`t_end` (host UTC, ISO-8601) and `elapsed_ms`;
-`mark LABEL` writes a line to the phone's logcat (tag `droidctl`) to cut captures into steps.
+`mark LABEL` writes a line to the phone's logcat (tag `droidctl`) to cut captures into steps;
+`logs --marks` (or `--tag TAG`) reads them back.
 
 **How `tap` decides** (`--method auto`, the default):
 - `ACTION_CLICK` on the element (or its clickable ancestor) → `method:"action"`.
@@ -284,7 +285,7 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `mark` | `<label>` | write a marker line to the device's logcat (tag droidctl), to cut captures into steps |
 | `current` | – | the foreground app/activity and whether the keyboard is shown |
 | `watch` | `--max N --timeout S --events TYPES --all` | pushed device events (clicks, toasts, windows, IME), bounded |
-| `logs` | `--max N --pkg PKG --level {V,D,I,W,E,F}` | recent logcat lines, bounded |
+| `logs` | `--max N --pkg PKG --level {V,D,I,W,E,F} --tag TAG --marks` | recent logcat lines, bounded |
 | `shot` | `[PATH] --scale F --full --quality Q --marks --crop REF --out F --base64` | a screenshot (downscaled JPEG), optionally with ref marks |
 | `launch` | `<pkg> --activity CLASS --stop --clear --timeout S --settle MS --expect-change` | start an app, wait for its window and settle; prints the new screen |
 | `stop-app` | `<pkg>` | force-stop an app |

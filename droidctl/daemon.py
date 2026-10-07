@@ -697,7 +697,9 @@ def execute(params):
                 if render is not None and payload is not None:
                     render(payload)
                 if between:
-                    _console("out").print("[dim]between calls: " + "; ".join(
+                    # events since the previous call, not this command's answer: a One UI
+                    # edge-panel window event printed under `current` was read as the front app
+                    _console("out").print("[dim]events since your last call (not this screen): " + "; ".join(
                         _fmt_between(b) for b in between) + "[/dim]", highlight=False)
         res = dict(result, code=code, stdout=out.getvalue(), stderr=err.getvalue(), json=want_json)
         if params.get("both"):
