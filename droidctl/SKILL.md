@@ -67,8 +67,19 @@ droidctl run --json --step 'launch com.android.settings' --step 'tap --text Disp
 - Several phones: `-d SERIAL` (or `ANDROID_SERIAL`).
 - `screen-off` (header `screen=off|locked`): the phone slept; node taps don't keep it
   awake. `droidctl press KEYCODE_WAKEUP`, then carry on.
-- A phone set up with `setup --backend uiautomation` runs the agent over adb with nothing
-  installed or enabled; everything else works the same (`doctor` shows the backend).
+- A phone set up with `setup --backend uiautomation` (Backend B) runs the agent over adb
+  with nothing installed or enabled; everything else works the same (`doctor` shows the
+  backend). Switching to B turns our own accessibility service **off** by default (so the
+  apps below can be read); `--keep-a11y` keeps it on.
+- **Blank or partial screen?** When `snapshot` shows a header but no elements, warns
+  `no tree for app window ...`, or is `degraded=no-root`, run **`droidctl diagnose`**: it
+  names the cause and the fix. The commonest is a **hardened app** (banking/finance) that
+  hides its whole UI whenever an accessibility service is enabled — Backend A can't read
+  it. Fix: **`droidctl diagnose --fix`** (switches to Backend B and disables our service),
+  **then relaunch the app** (`stop-app` + `launch`): a window drawn while a service was on
+  stays blocked until it is recreated. `diagnose` statuses: `hardened-a11y`,
+  `hardened-ua-service-on` (B selected but our service still on), `hardened-other-service`,
+  `suppressed-ua`, `latched-or-slow`, `degraded`, `opaque`, `transition`, `ok`.
 - Banking and other secure apps: screenshots of `FLAG_SECURE` windows fail with
   `secure-window` (the snapshot still works); some apps refuse to run on rooted phones.
 

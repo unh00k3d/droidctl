@@ -48,6 +48,25 @@ def _put_setting(d, key, value):
     dev.sh(d, ["settings", "put", "secure", key, value])
 
 
+def _disable_our_service(d):
+    """Remove only droidctl's own entry from enabled_accessibility_services, keeping
+    every other service's exact text and order. -> (removed, kept). The reverse of
+    setup's append; used to switch to a backend that must not look like a service."""
+    kept, removed = dev.remove_service(dev.get_services(d))
+    if removed:
+        if kept:
+            _put_setting(d, "enabled_accessibility_services", dev.join_services(kept))
+        else:
+            dev.sh(d, ["settings", "delete", "secure", "enabled_accessibility_services"])
+    return removed, kept
+
+
+# apps that hide their UI from any enabled accessibility service (common in
+# banking/finance): the relaunch note every backend-B path repeats
+_HARDENED_RELAUNCH = ("relaunch any app that was open (force-stop + reopen): a window "
+                      "drawn while a service was enabled stays blocked until it is recreated")
+
+
 def _wait_for_agent(port, timeout=8.0):
     """Poll ping until Android binds the service and the socket answers."""
     deadline = time.monotonic() + timeout
@@ -87,7 +106,7 @@ def cmd_setup(a):
     # an explicit --backend switches; without it, keep what this phone was set up with
     backend = getattr(a, "backend", None) or dev.device_state(serial).get("backend") or "a11y"
     if backend == "uiautomation":
-        return _setup_ua(serial, d)
+        return _setup_ua(serial, d, keep_a11y=getattr(a, "keep_a11y", False))
     if dev.ua_pids(d):
         dev.stop_ua(serial)                   # chose a11y: don't leave backend B holding UiAutomation
 
@@ -153,19 +172,31 @@ def cmd_setup(a):
             "port": port, "agent": info}
 
 
-def _setup_ua(serial, d):
-    """Backend B: push the agent (not installed) and start it; nothing is enabled."""
+def _setup_ua(serial, d, keep_a11y=False):
+    """Backend B: push the agent (not installed) and start it; nothing is installed.
+
+    Backend B exists for apps that blank their UI whenever an accessibility service
+    is enabled: its UiAutomation is not a service in enabled_accessibility_services,
+    so those apps do not detect it. But our OWN a11y service, left enabled, is one
+    such service -- it would keep the app hidden from Backend B too. So unless
+    --keep-a11y, switch it off here (the common footgun), and say to relaunch."""
     client, info = dev._connect_ua(serial, 5.0)
     port = client.port
     client.close()
     dev.update_device_state(serial, backend="uiautomation", ua_port=port)
+    disabled = False
+    if any(dev.is_ours(e) for e in dev.get_services(d)) and not keep_a11y:
+        disabled, _ = _disable_our_service(d)
     a11y_on = any(dev.is_ours(e) for e in dev.get_services(d))
     out = {"ok": True, "serial": serial, "backend": "uiautomation", "port": port, "agent": info,
-           "a11y_service_enabled": a11y_on}
-    if a11y_on:
-        out["warning"] = ("droidctl's accessibility service is still enabled. Apps that hide their UI while "
-                          "an accessibility service is on stay hidden; to switch it off: "
-                          "droidctl teardown --backend a11y")
+           "a11y_service_enabled": a11y_on, "a11y_service_disabled": disabled}
+    if disabled:
+        out["note"] = ("disabled droidctl's accessibility service so apps that hide their UI "
+                       "while one is on can be read; " + _HARDENED_RELAUNCH)
+    elif a11y_on:
+        out["warning"] = ("droidctl's accessibility service is still enabled (--keep-a11y). Apps that "
+                          "hide their UI while an accessibility service is on stay hidden; to switch it "
+                          "off: droidctl teardown --backend a11y, then " + _HARDENED_RELAUNCH)
     return out
 
 
@@ -175,6 +206,8 @@ def render_setup(p):
                       f"(sdk {p['agent'].get('sdk')}, {p['agent'].get('model')})  tcp:{p['port']}")
         console.print("  nothing installed or enabled; the agent runs until idle "
                       f"{dev.UA_IDLE_MS // 60000} min, a reboot, or: droidctl teardown")
+        if p.get("note"):
+            console.print(f"  [yellow]{p['note']}[/yellow]")
         if p.get("warning"):
             console.print(f"  [yellow]{p['warning']}[/yellow]")
         return
@@ -409,6 +442,200 @@ def render_doctor(p):
         if isinstance(detail, dict):
             detail = "  ".join(f"{k}={v}" for k, v in detail.items()) + " ms"
         console.print(f"{marks[c['ok']]} {c['name']:<13} {detail}", highlight=False)
+
+
+# --------------------------------------------------------------------------
+# diagnose: why does the current screen have no readable UI?
+# --------------------------------------------------------------------------
+# doctor checks the host/device/agent path; diagnose explains one screen that
+# came back blank or partial, because the commonest cause is not a broken setup
+# but an app that deliberately hides from accessibility while any service is on.
+_DIAG = {
+    "ok": "the foreground app's UI is readable",
+    "hardened-a11y": "this app hides its UI while an accessibility service is enabled, so Backend A "
+                     "(the accessibility service) cannot read it. This is common in banking/finance apps",
+    "hardened-ua-service-on": "Backend B is selected, but droidctl's accessibility service is still "
+                              "enabled -- this app hides from any enabled service, Backend B's included",
+    "hardened-other-service": "this app hides its UI while an accessibility service is enabled, and a "
+                              "non-droidctl service is on that droidctl cannot switch off",
+    "suppressed-ua": "a uiautomator/appium process holds the one UiAutomation and suppresses services",
+    "latched-or-slow": "the app window has no accessibility tree although no service is enabled: its "
+                       "window was built while one was on (and is latched), or its provider is slow/broken",
+    "degraded": "the device returned only part of the tree in time",
+    "opaque": "the window is readable but nothing in it is labelled or actionable (a canvas, map, game, "
+              "or a screen still loading)",
+    "transition": "two screens are on at once mid-transition; the read is not stable yet",
+    "no-app-window": "no application window is in the foreground",
+}
+
+
+def cmd_diagnose(a):
+    """Explain why the current screen has no readable UI, and what to do about it.
+
+    Read-only by default (inspects the foreground window plus the accessibility
+    state); --fix applies the recommended switch to Backend B."""
+    from droidctl import snapshot as snap_mod
+    serial = dev.resolve_serial(a.device)
+    d = dev.adb_device(serial)
+    backend = dev.backend_for(serial)
+
+    services = dev.get_services(d)
+    others = [e for e in services if not dev.is_ours(e)]
+    ours_enabled = any(dev.is_ours(e) for e in services)
+    a11y_on = ours_enabled and dev.a11y_enabled(d)
+    ua_procs = sorted({p for p in dev.sh(d, ["ps", "-A", "-o", "NAME"]).split()
+                       if "uiautomator" in p or "appium" in p})
+
+    client, _info = dev.connect(serial)
+    try:
+        tree = client.call("tree", {}, timeout=15)
+        deadline = time.monotonic() + 1.0
+        while snap_mod.leaving_windows(tree) and time.monotonic() < deadline:
+            time.sleep(0.1)
+            tree = client.call("tree", {}, timeout=15)
+    finally:
+        client.close()
+    snap = snap_mod.build(tree, system=False)
+
+    app_wins = [w for w in snap.windows if w.type == "application"]
+    blocked = [w for w in app_wins if not w.raw.get("root")]
+    readable = [w for w in app_wins if w.raw.get("root")]
+
+    def win_name(w):
+        return w.title or w.pkg or (f"window {w.id}" if w.id is not None else "app window")
+
+    # the foreground app, named even when its tree is withheld (snap.pkg falls back
+    # to a system window in that case, so read the raw app windows directly)
+    top = next((w for w in app_wins if w.raw.get("focused") or w.raw.get("active")),
+               max(app_wins, key=lambda w: w.layer, default=None))
+    app = {"pkg": (top.pkg or None) if top else None,
+           "window": win_name(top) if top else None,
+           "activity": snap.activity or None} if top else None
+
+    status = _diag_status(
+        has_app_window=bool(app_wins), has_blocked=bool(blocked), has_readable=bool(readable),
+        leaving=bool(snap.leaving), degraded=bool(snap.degraded), n_elements=len(snap.elements),
+        backend=backend, a11y_on=a11y_on, has_other_services=bool(others), has_ua_procs=bool(ua_procs))
+
+    fix = _diag_fix(status, others)
+    applied = None
+    if getattr(a, "fix", False):
+        applied = _diag_apply(status, serial, d)
+
+    return {
+        "ok": status == "ok",
+        "serial": serial,
+        "backend": backend,
+        "status": status,
+        "cause": _DIAG[status],
+        "app": app,
+        "blocked_windows": [win_name(w) for w in blocked],
+        "accessibility": {"droidctl_service_enabled": ours_enabled, "accessibility_enabled": a11y_on,
+                          "other_services": others, "uiautomator_appium": ua_procs},
+        "degraded": snap.degraded,
+        "elements": len(snap.elements),
+        "fix": fix,
+        "applied": applied,
+        "warnings": snap.warnings,
+    }
+
+
+def _diag_status(*, has_app_window, has_blocked, has_readable, leaving, degraded, n_elements,
+                 backend, a11y_on, has_other_services, has_ua_procs):
+    """Classify a screen's readability from its signals (pure, so it is unit-tested).
+
+    A blocked app window (one with no accessibility tree) is the interesting case:
+    which cause depends on what is enabled. The order matters -- an enabled service
+    outranks 'latched', and a UiAutomation client outranks both."""
+    if not has_app_window:
+        return "no-app-window"
+    if has_blocked:
+        if has_ua_procs:
+            return "suppressed-ua"
+        if a11y_on and backend == "uiautomation":
+            return "hardened-ua-service-on"
+        if a11y_on:
+            return "hardened-a11y"
+        if has_other_services:
+            return "hardened-other-service"
+        return "latched-or-slow"
+    if leaving:
+        return "transition"
+    if has_readable and n_elements:
+        return "ok"
+    if degraded:
+        return "degraded"
+    if has_readable:
+        return "opaque"
+    return "latched-or-slow"
+
+
+def _diag_fix(status, others):
+    """The remedy for a status, as a list of human lines (commands included)."""
+    switch = ["droidctl setup --backend uiautomation   # switch to Backend B (disables our service)",
+              "then " + _HARDENED_RELAUNCH]
+    return {
+        "ok": [],
+        "hardened-a11y": switch + ["(or: droidctl diagnose --fix does the switch for you)"],
+        "hardened-ua-service-on": [
+            "droidctl teardown --backend a11y   # our service is still enabled; switch it off",
+            "then " + _HARDENED_RELAUNCH,
+            "(or: droidctl diagnose --fix)"],
+        "hardened-other-service": [
+            f"a non-droidctl accessibility service is enabled: {', '.join(others)}",
+            "turn it off in Settings > Accessibility (droidctl must not touch another tool's service), "
+            "then " + _HARDENED_RELAUNCH,
+            "Backend B alone will not help while any service is enabled"],
+        "suppressed-ua": ["stop the uiautomator/appium client that holds UiAutomation, then snapshot again"],
+        "latched-or-slow": [
+            "force-stop and reopen the app, then: droidctl snapshot",
+            "if it is still blank with no service enabled, the provider may be slow: droidctl snapshot (retry)"],
+        "degraded": ["droidctl snapshot   # read again; raise the timeout if it keeps timing out"],
+        "opaque": ["droidctl wait, then snapshot; or droidctl shot --marks / tap --point X,Y"],
+        "transition": ["wait a moment, then: droidctl snapshot"],
+        "no-app-window": ["open the app you want to drive, then: droidctl diagnose"],
+    }[status]
+
+
+def _diag_apply(status, serial, d):
+    """--fix: apply the recommended switch to Backend B. Returns what it did."""
+    if status == "hardened-a11y":
+        res = _setup_ua(serial, d)      # sets backend B and disables our service
+        return {"action": "switched to Backend B", "a11y_service_disabled": res.get("a11y_service_disabled"),
+                "reminder": _HARDENED_RELAUNCH}
+    if status == "hardened-ua-service-on":
+        removed, _ = _disable_our_service(d)
+        return {"action": "disabled droidctl's accessibility service", "a11y_service_disabled": removed,
+                "reminder": _HARDENED_RELAUNCH}
+    return {"action": "nothing to apply for this status", "a11y_service_disabled": False}
+
+
+def render_diagnose(p):
+    mark = "[green]ok[/green]" if p["ok"] else "[yellow]issue[/yellow]"
+    app = p.get("app") or {}
+    where = app.get("window") or app.get("pkg") or "(no app window)"
+    console.print(f"{mark}  {p['status']}  [dim]backend={p['backend']}[/dim]", highlight=False)
+    console.print(f"  app: {where}" + (f"  [dim]({app['pkg']})[/dim]" if app.get("pkg") and app.get("window") else ""),
+                  highlight=False)
+    console.print(f"  {p['cause']}", highlight=False)
+    acc = p["accessibility"]
+    bits = [f"our service {'on' if acc['droidctl_service_enabled'] else 'off'}"]
+    if acc["other_services"]:
+        bits.append("others: " + ", ".join(acc["other_services"]))
+    if acc["uiautomator_appium"]:
+        bits.append("uiautomator/appium: " + ", ".join(acc["uiautomator_appium"]))
+    console.print(f"  [dim]accessibility: {'; '.join(bits)}[/dim]", highlight=False)
+    if p.get("blocked_windows"):
+        console.print(f"  [dim]no tree for: {', '.join(p['blocked_windows'])}[/dim]", highlight=False)
+    if p.get("applied"):
+        ap = p["applied"]
+        console.print(f"  [green]fixed[/green]: {ap['action']}", highlight=False)
+        if ap.get("reminder"):
+            console.print(f"  [yellow]next: {ap['reminder']}[/yellow]", highlight=False)
+    elif p["fix"]:
+        console.print("  fix:", highlight=False)
+        for line in p["fix"]:
+            console.print(f"    {line}", highlight=False)
 
 
 def cmd_ping(a):
@@ -856,6 +1083,9 @@ def build_parser():
     sp.add_argument("--backend", choices=dev.BACKENDS,
                     help="a11y: the accessibility service (default); uiautomation: run the agent over adb with "
                          "a UiAutomation, nothing installed or enabled. Remembered per phone")
+    sp.add_argument("--keep-a11y", action="store_true",
+                    help="(uiautomation) don't switch our accessibility service off; leaving it on keeps "
+                         "apps that hide from services hidden from Backend B too")
     sp.set_defaults(fn=cmd_setup, render=render_setup)
 
     sp = sub.add_parser("teardown", parents=[jsonopt, devopt],
@@ -868,6 +1098,13 @@ def build_parser():
     sp = sub.add_parser("doctor", parents=[jsonopt, devopt],
                         help="check adb, APK, service, socket, peer UID and round-trip latency")
     sp.set_defaults(fn=cmd_doctor, render=render_doctor)
+
+    sp = sub.add_parser("diagnose", parents=[jsonopt, devopt],
+                        help="explain why the current screen has no readable UI, and what to do "
+                             "(e.g. apps that hide from accessibility services)")
+    sp.add_argument("--fix", action="store_true",
+                    help="apply the recommended switch to Backend B (disables our service)")
+    sp.set_defaults(fn=cmd_diagnose, render=render_diagnose)
 
     sp = sub.add_parser("ping", parents=[jsonopt, devopt], help="round trip to the on-device agent")
     sp.add_argument("--count", type=int, default=1, metavar="N", help="ping N times and report min/median/p95")
