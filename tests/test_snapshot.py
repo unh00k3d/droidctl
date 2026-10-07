@@ -718,3 +718,43 @@ def test_no_settled_real_screen_is_mistaken_for_a_transition():
             continue
         tree = json.loads(path.read_text())["tree"]
         assert not S.leaving_windows(tree), path.stem
+
+
+def test_cli_json_is_timestamped_in_process(capsys):
+    cli.main(["snapshot", "--fixture", str(TREES / "real-settings-main.json"), "--json"])
+    p = json.loads(capsys.readouterr().out)
+    assert p["t_start"].endswith("Z") and p["t_start"] <= p["t_end"] and p["elapsed_ms"] >= 0
+    with pytest.raises(SystemExit):
+        cli.main(["snapshot", "--fixture", "/nonexistent.json", "--json"])
+    e = json.loads(capsys.readouterr().out)
+    assert e["ok"] is False and e["error"]["kind"] == "not-found" and e["t_start"].endswith("Z")
+
+
+def test_a_screen_seen_only_in_part_is_printed_in_full_next_time(monkeypatch, tmp_path, capsys):
+    """`snapshot --find X` shows a few lines; the next plain `snapshot` of the same
+    screen used to say `unchanged` and hide the rest (RCA 2026-10-07, issue 7)."""
+    monkeypatch.setenv("DROIDCTL_HOME", str(tmp_path))
+    tree = load("real-settings-display")["tree"]
+
+    class FakeClient:
+        def call(self, method, params=None, timeout=None):
+            if method == "events":
+                return {"events": [], "next": 0}
+            return copy.deepcopy(tree)
+
+        def close(self):
+            pass
+    monkeypatch.setattr(cli.dev, "resolve_serial", lambda s: "SERIAL")
+    monkeypatch.setattr(cli.dev, "connect", lambda serial: (FakeClient(), {}))
+    cli.main(["snapshot", "--find", "Font"])
+    capsys.readouterr()
+    cli.main(["snapshot"])
+    out = capsys.readouterr().out
+    assert "unchanged" not in out and "[7] switch on" in out
+    cli.main(["snapshot"])
+    assert "unchanged (16 elements" in capsys.readouterr().out     # now it has been seen
+
+
+def test_shot_takes_its_output_path_positionally():
+    a = cli.build_parser().parse_args(["shot", "/tmp/x.png"])
+    assert a.out_path == "/tmp/x.png" and a.out is None

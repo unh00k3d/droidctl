@@ -638,3 +638,131 @@ def test_an_off_screen_is_screen_off_not_not_found(home, monkeypatch):
         act.cmd_tap(args(text="No such thing"))
     assert e.value.kind == "screen-off" and "locked" in str(e.value)
     assert "screen=locked" in S.header(S.build(locked))
+
+
+# --- RCA 2026-10-07 (a hardened finance app session) --------------------------
+TREES = FIX.parent / "trees"
+
+
+def real(name):
+    return json.loads((TREES / f"{name}.json").read_text())["tree"]
+
+
+def test_scroll_to_uses_the_targets_own_container_and_side():
+    """A target the tree holds below the fold is scrolled in by its scrollable
+    ancestor, towards the side it lies on (not "the main list, down")."""
+    snap = S.build(real("testapp-nested_scroll"))
+    cont, direction = act._scroll_plan(snap, {"text": "Story 12"}, None)
+    hidden = next(n for n in act.R._walk_all(snap) if n.own_label() == "Story 12")
+    assert cont.node in hidden.ancestors() and cont.node.scrollable
+    assert direction == "down"
+    assert act._scroll_plan(snap, {"text": "Story 12"}, "up")[1] == "up"     # --direction wins
+
+
+def test_scroll_to_follows_a_pagers_axis():
+    """With nothing to aim at, a pager/tab strip scrolls sideways, not down."""
+    snap = S.build(real("testapp-tabs_pager"))
+    cont, direction = act._scroll_plan(snap, {"text": "Page Gamma content"}, None)
+    assert cont.role == "pager" and direction == "right"
+
+
+def test_scroll_to_acts_on_the_pager_sideways(home, monkeypatch):
+    t = real("testapp-tabs_pager")
+    s = session(monkeypatch, t)
+    s._client.act_replies = [{"performed": False}, {"performed": False}]
+    with pytest.raises(UserError) as e:
+        act.cmd_scroll_to(args(text="Page Gamma content", direction=None, one_way=False, max_scrolls=3))
+    assert e.value.kind == "not-found"
+    first = next(c for c in s._client.calls if c[0] == "act")
+    assert first[3] in ("scroll_right", "scroll_forward")
+
+
+def test_scroll_with_nothing_scrollable_fails_instead_of_swiping(home, monkeypatch):
+    s = session(monkeypatch, tree("cart_inc-a"))
+    with pytest.raises(UserError) as e:
+        act.cmd_scroll(args(direction="down"))
+    assert e.value.kind == "not-found" and e.value.data["reason"] == "no-scrollable"
+    assert "swipe up" in e.value.hint
+    assert s._client.count("gesture") == 0 and s._client.count("act") == 0
+
+
+def test_scroll_to_with_nothing_scrollable_says_so(home, monkeypatch):
+    session(monkeypatch, tree("cart_inc-a"))
+    with pytest.raises(UserError) as e:
+        act.cmd_scroll_to(args(text="Nope", direction=None, one_way=False, max_scrolls=5))
+    assert e.value.data["reason"] == "no-scrollable" and "nothing on it scrolls" in str(e.value)
+
+
+def test_not_found_names_the_screen_and_suggests_scroll(home, monkeypatch):
+    session(monkeypatch, tree("duplicates_scroll-a"))
+    with pytest.raises(UserError) as e:
+        act.cmd_tap(args(text="No such thing"))
+    assert e.value.kind == "not-found" and "--scroll" in e.value.hint
+    assert e.value.data["pkg"] == S.build(tree("duplicates_scroll-a")).pkg
+    assert " on " in str(e.value)
+
+
+def test_tap_scroll_scrolls_the_target_in_then_taps(home, monkeypatch):
+    """"Item 16" is below the fold in -a and on screen in -b."""
+    s = session(monkeypatch, tree("duplicates_scroll-a"))
+    with pytest.raises(UserError):
+        act.cmd_tap(args(text="Item 16"))                  # not on screen: offscreen
+    s._client.act_replies = [{"performed": True, "tree": tree("duplicates_scroll-b")}]
+    out = act.cmd_tap(args(text="Item 16", scroll=True))
+    acts = [c[3] for c in s._client.calls if c[0] == "act"]
+    assert acts == ["scroll_down"] or acts == ["scroll_forward"]
+    # a bare text row has no clickable node: the existing centre tap, inside the new frame
+    assert s._client.count("gesture") == 1
+    assert out["target"]["scrolls"] == 1 and out["target"]["element"]["label"] == "Item 16"
+
+
+def test_scroll_needs_a_locator(home, monkeypatch):
+    session(monkeypatch, tree("cart_inc-a"))
+    with pytest.raises(UserError) as e:
+        act.cmd_tap(args(target="3", scroll=True))
+    assert e.value.kind == "bad-args"
+
+
+def test_ambiguous_lists_where_each_candidate_is(home, monkeypatch):
+    """Still an error, never a pick; but look-alikes can be told apart."""
+    session(monkeypatch, tree("cart_inc-a"))
+    with pytest.raises(UserError) as e:
+        act.cmd_tap(args(text="+"))
+    assert e.value.kind == "ambiguous"
+    assert str(e.value).count("@") == e.value.data["count"]
+    assert all(c["region"] for c in e.value.data["candidates"])
+
+
+def wait_args(**kw):
+    base = dict(idle=False, quiet=None, text=None, id=None, desc=None, role=None, activity=None,
+                window=None, pkg=None, toast=None, gone=False, exact=False, timeout=2.0)
+    base.update(kw)
+    return args(**base)
+
+
+def test_wait_idle(home, monkeypatch):
+    s = session(monkeypatch, tree("cart_inc-a"))
+    out = act.cmd_wait(wait_args(idle=True))
+    assert out["idle"] and out["quiet_ms"] == act.IDLE_QUIET_MS
+    s._client.wait_idle = lambda q, t: {"idle": False, "ms": t}
+    with pytest.raises(UserError) as e:
+        act.cmd_wait(wait_args(idle=True))
+    assert e.value.kind == "timeout"
+    with pytest.raises(UserError) as e:
+        act.cmd_wait(wait_args(idle=True, text="x"))
+    assert e.value.kind == "bad-args"
+
+
+def test_mark_writes_a_quoted_logcat_line(home, monkeypatch):
+    s = session(monkeypatch, tree("cart_inc-a"))
+    out = act.cmd_mark(args(label="step 3; login 'ok'"))
+    assert s.shell_calls == [("log", "-t", "droidctl", "'step 3; login '\"'\"'ok'\"'\"''")]
+    assert out["label"] == "step 3; login 'ok'"
+
+
+def test_scroll_to_result_is_not_counted_as_seen(home, monkeypatch):
+    """scroll-to prints one line; the next `snapshot` must print the screen, not `unchanged`."""
+    s = session(monkeypatch, tree("duplicates_scroll-a"))
+    s._client.act_replies = [{"performed": True, "tree": tree("duplicates_scroll-b")}]
+    act.cmd_scroll_to(args(text="Item 16", direction=None, one_way=False, max_scrolls=3))
+    assert S.load_state("FAKE")["shown"] is False

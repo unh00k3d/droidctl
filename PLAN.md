@@ -1,5 +1,5 @@
 # droidctl — agent-first Android CLI (plan v3: own APK from day one)
-_Last updated 2026-09-28. Companion specs: `TESTAPP.md` (edge-case test app), `research/` (prior-art reports). Specs to be written during the build: `android/agent/PROTOCOL.md` (M1), `DAEMON.md` (M6)._
+_Last updated 2026-10-07. Companion specs: `TESTAPP.md` (edge-case test app), `research/` (prior-art reports). Specs to be written during the build: `android/agent/PROTOCOL.md` (M1), `DAEMON.md` (M6)._
 
 ## Decisions at a glance
 | topic | decision |
@@ -403,7 +403,7 @@ screen com.foo/.InboxActivity  sig=3f9a  keyboard=hidden  dialog=no  toast="Mess
 [9] switch   "Dark mode"  off
 ```
 - Options: `--diff`, `--find` (matches text, hint, desc, error), `--in REF`, `--raw` (raw JSON tree), `--bounds`, `--json`.
-- A repeated identical signature prints `unchanged`.
+- A repeated identical signature prints `unchanged`, but only if the agent was shown that screen in full: a screen seen only in part (`snapshot --find/--in`, a `scroll-to` result, `shot --marks`) prints in full next time (state `shown`; 2026-10-07 RCA).
 - **Signature:** hash of the package, activity and pruned app-window skeleton (roles + ids). Excludes systemui and window order.
 - **Fingerprint per ref** (saved in `~/.droidctl/snaps/<serial>.json` with the signature and the dump's handle map):
   - `uid` (API 33+);
@@ -503,6 +503,16 @@ screen com.shop/.CartActivity  sig=c09e  1080x2400
   - `action --ref N "Archive"` (custom actions such as swipe-to-delete without a gesture);
   - `set --ref N 7` (range/slider);
   - `focus`, `expand`/`collapse`, `dismiss`.
+- **Field RCA fixes (2026-10-07).** A hands-on session on a hardened finance app (Backend B, every resource id null) reported friction; what changed:
+  - `scroll-to` scrolls the target's **own** scrollable ancestor when the tree holds the target out of view, towards the side it lies on; with no target in the tree, the main list along its axis (a pager/tab strip scrolls right, not down). Before, it always scrolled the largest list down, and a tab in a horizontal strip was "not found after 0 scrolls". *No captured fixture has a horizontal strip whose hidden tab stays in the tree: verify on a device.*
+  - `scroll` with nothing scrollable fails (`not-found`, `data.reason: no-scrollable`, hint `swipe`) instead of swiping the whole screen, which had pushed a tab strip out of the tree and staled every ref on it.
+  - `tap/long-press --scroll` (locators only): scroll-to, then resolve uniquely and act.
+  - Locator `not-found` names the screen (`on .SomeActivity`, `data.activity/pkg`) and, if a list is on screen, suggests `--scroll`.
+  - `ambiguous` candidates show region and centre (`[23] button "" (content @540,1200)`); `data.candidates[].region`.
+  - `wait --idle` (`--stable`, `--quiet MS`, default 500): until no screen-change event for the quiet window; never-quiet screens end as `timeout`.
+  - Every `--json` result and error carries `t_start`/`t_end` (host UTC ISO-8601, ms) and `elapsed_ms`; `mark LABEL` writes a logcat line (tag `droidctl`).
+  - `shot PATH` (positional `--out`); the `no tree for app window` warning points at `droidctl diagnose`.
+  - **Declined:** a default tie-break for `ambiguous` (visible/topmost first) and content-addressed keys that fall back to position — both guess by position (non-negotiable). Refs already re-resolve by fingerprint and keep their numbers on one screen (`carry_refs`); the refs that went stale in that session were unlabeled, id-less buttons that nothing but position identifies, or targets the blind swipe had removed. "Settle off by default" was a misreading: every action settles (150 ms quiet) unless `--settle 0`. `setup --backend auto`: `diagnose --fix` already does the probing and the switch.
 - **type** (`type N "text" [--append] [--clear] [--enter]`, or `--stdin` / `--file F` to avoid shell quoting):
   1. `ACTION_SET_TEXT`: Unicode, no tap first.
   2. If that fails: focus, then clipboard paste (the service sets the clipboard, then ACTION_PASTE, then restores it).
@@ -531,7 +541,7 @@ Every command takes `--json`, `-d SERIAL|NAME` (falls back to `ANDROID_SERIAL`, 
   - `tap`, `long-press`, `type`, `scroll`, `scroll-to`, `swipe`, `action`, `set`, `focus`, `expand`, `collapse`, `dismiss`, `gesture --path`;
   - `back`, `home`, `recents`, `notifications`, `quick-settings`, `press KEY`.
   - Options: `--method auto|action|gesture`, `--settle MS|0`, `--expect-change`.
-- **Wait / observe:** `wait --text/--id/--gone/--activity/--toast [--timeout]`, `watch --max N` (pushed events), `logs --max N [--pkg] [--level]`.
+- **Wait / observe:** `wait --text/--id/--gone/--activity/--toast [--timeout]`, `wait --idle`, `mark LABEL`, `watch --max N` (pushed events), `logs --max N [--pkg] [--level]`.
 - **Apps:** `launch <pkg> [--clear] [--stop]` (via `adb shell`, then device `wait_for window` + settle), `stop-app`, `apps`, `install`, `open-url`.
 - **Integration:** `run` (steps, one connection), `serve --stdio`, `mcp [--install claude|codex|cursor|all] [--http]`, `cheat`, `skill print|install`, `version`.
 - **Dev:** `dump-fixture NAME`, `layout-check` (post-v1).

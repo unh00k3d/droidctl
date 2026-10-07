@@ -17,7 +17,7 @@ import time
 
 from droidctl import __version__
 from droidctl import device as dev
-from droidctl.core import UserError, console, die, emit
+from droidctl.core import Clock, UserError, console, die, emit
 
 
 # --------------------------------------------------------------------------
@@ -843,12 +843,17 @@ def cmd_snapshot(a):
         else:
             text += f"\n(new screen: sig was {prev.get('sig')}; full snapshot shown instead of a diff)"
     elif (prev and not (a.full or a.find or a.within is not None or a.map)
+          and prev.get("shown", True)     # a screen only seen in part (--find, scroll-to) prints in full
           and prev.get("sig") == snap.sig and prev.get("lines") == snap_mod.flat_lines(snap)):
         unchanged = True
         text = (snap_mod.header(snap, opts)
                 + f"\nunchanged ({len(snap.elements)} elements; --full to print them again)")
     if serial:
-        snap_mod.save_state(serial, snap_mod.to_state(snap, serial))
+        # what the agent has now seen of this screen: all of it, unless it asked for a part
+        # (a diff of a screen it had seen in full counts as all of it)
+        shown = not (a.find or a.within is not None) and (
+            not unchanged and not changes or (prev or {}).get("shown", True))
+        snap_mod.save_state(serial, snap_mod.to_state(snap, serial, shown=shown))
     shown = snap_mod.select(snap, opts)[:opts.max]
     return {
         "ok": True,
@@ -1162,12 +1167,15 @@ def dispatch(args, mode="inprocess"):
     emits per request itself. Errors funnel through die(), which prints per
     --json and raises SystemExit. Every --json result says where it ran.
     """
+    clock = Clock()
     try:
         payload = args.fn(args)
     except UserError as e:
-        die(args, e.kind, e, e.hint, getattr(e, "data", None), mode=mode)
+        die(args, e.kind, e, e.hint, getattr(e, "data", None), mode=mode, clock=clock)
     if isinstance(payload, dict):
         payload.setdefault("mode", mode)
+        for k, v in clock.stamp().items():
+            payload.setdefault(k, v)
     emit(args, payload, getattr(args, "render", None))
     # a payload that reports ok=false (doctor with a failed check) still printed
     # in full, but the exit code has to tell a script something is wrong

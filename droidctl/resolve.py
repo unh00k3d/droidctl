@@ -144,7 +144,8 @@ class Resolution:
 def _describe(elem, node=None):
     if elem is not None:
         return {"ref": elem.ref, "role": elem.role, "label": elem.label_full or None,
-                "id": elem.res_id, "bounds": list(elem.rect) if elem.rect else None}
+                "id": elem.res_id, "bounds": list(elem.rect) if elem.rect else None,
+                "region": getattr(elem, "region", None)}
     n = node
     return {"ref": None, "role": S.short_class(n.raw.get("class")).lower(),
             "label": n.own_label() or None, "id": n.get("id"),
@@ -544,11 +545,23 @@ SPATIAL = {"right_of": "right", "left_of": "left", "above": "above", "below": "b
 
 
 def _ambiguous(msg, elems, tried=None):
+    """Never a pick: which one is meant is the caller's call. Each candidate says
+    where it is, so look-alikes (two unlabeled buttons) can be told apart and
+    named with a spatial locator or --index without another snapshot."""
     cands = [_describe(e) for e in elems[:12]]
-    listing = ", ".join(f"[{c['ref']}] {c['role']} {_q(c['label'] or '')}" for c in cands[:6])
+    listing = ", ".join(f"[{c['ref']}] {c['role']} {_q(c['label'] or '')}{_place(c)}" for c in cands[:6])
     return UserError(f"{msg}: {listing}" + (" …" if len(elems) > 6 else ""), "ambiguous",
-                     hint="use a ref from `snapshot`, add --role/--id, a spatial locator, or --index N",
+                     hint="use a ref from `snapshot`, add --role/--id, a spatial locator "
+                          "(--right-of/--below … TEXT), or --index N (0-based, in the order listed)",
                      data={"candidates": cands, "count": len(elems), "tried": tried or []})
+
+
+def _place(c):
+    b = c.get("bounds")
+    if not b:
+        return ""
+    where = f"{(b[0] + b[2]) // 2},{(b[1] + b[3]) // 2}"
+    return f" ({c['region']} @{where})" if c.get("region") else f" (@{where})"
 
 
 def _label_nodes(e):

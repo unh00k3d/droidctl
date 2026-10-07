@@ -792,6 +792,14 @@ def _q(s):
     return s.replace('"', '\\"')
 
 
+def is_horizontal(n):
+    """A container that scrolls sideways: a pager, a tab strip, a carousel."""
+    coll = n.raw.get("collection") or {}
+    return (bool(n.actions & {"scroll_left", "scroll_right"})
+            or n.cls in ("HorizontalScrollView", "ViewPager", "ViewPager2")
+            or (coll.get("rows") == 1 and coll.get("cols", 0) > 1))
+
+
 def _list_info(e):
     """``8/25 more↓ (12%)`` for a scroll container."""
     n = e.node
@@ -805,9 +813,7 @@ def _list_info(e):
         owner = next((a for a in d.ancestors() if a.raw.get("collection")), None)
         if owner is n:
             items.append(d.raw["item"])
-    horizontal = (bool(n.actions & {"scroll_left", "scroll_right"})
-                  or n.cls in ("HorizontalScrollView", "ViewPager", "ViewPager2")
-                  or (coll.get("rows") == 1 and coll.get("cols", 0) > 1))
+    horizontal = is_horizontal(n)
     back = bool(n.actions & {"scroll_backward", "scroll_up", "scroll_left"})
     fwd = bool(n.actions & {"scroll_forward", "scroll_down", "scroll_right"})
     arrows = ""
@@ -1072,7 +1078,9 @@ def _warn_tree(wins, main, snap):
     for w in wins:
         if w.type == "application" and not w.raw.get("root") and (main is None or w.layer >= main.layer):
             snap.warnings.append(f"no tree for app window {w.title or w.pkg or w.id} "
-                                 "(a slow or broken accessibility provider?)")
+                                 # diagnose tells a slow provider from an app that hides from
+                                 # accessibility services (and offers the switch to Backend B)
+                                 "(slow or broken a11y provider? droidctl diagnose)")
     if main is None:
         return
     mine = [e for e in snap.elements if e.node.win is main]
@@ -1515,7 +1523,7 @@ def ref_record(e, snap):
     }
 
 
-def to_state(snap, serial=None):
+def to_state(snap, serial=None, shown=True):
     """The saved form (``~/.droidctl/snaps/<serial>.json``), read by the resolver.
 
     ::
@@ -1532,7 +1540,8 @@ def to_state(snap, serial=None):
              "bounds", "tap", "region", "parent",
              "password": bool,                          # never through the clipboard
              "scroll": [scroll_* actions offered now]}},# a fast-path scroll knows its edges
-         "evseq": last agent event seq already reported (toast header), or null}
+         "evseq": last agent event seq already reported (toast header), or null,
+         "shown": the agent saw this list in full, not a part (--find, scroll-to)}
     """
     refs = {str(e.ref): ref_record(e, snap) for e in snap.elements}
     return {"version": 1, "retired": snap.retired,
@@ -1540,7 +1549,7 @@ def to_state(snap, serial=None):
             "gen": snap.gen, "sig": snap.sig, "pkg": snap.pkg, "activity": snap.activity,
             "title": snap.title, "screen": list(snap.screen),
             "keyboard": list(snap.keyboard) if snap.keyboard else None,
-            "lines": flat_lines(snap), "refs": refs, "evseq": snap.evseq}
+            "lines": flat_lines(snap), "refs": refs, "evseq": snap.evseq, "shown": shown}
 
 
 # --------------------------------------------------------------------------

@@ -23,7 +23,7 @@ def render_text(p):
         print(f"warning: {p['warning']}", file=sys.stderr)
 
 
-def _locators(sp, positional=True):
+def _locators(sp, positional=True, scroll=False):
     """The locator options every element action shares."""
     if positional:
         sp.add_argument("target", nargs="?", metavar="REF", help="a ref from `snapshot` (e.g. 4 or [4])")
@@ -41,6 +41,9 @@ def _locators(sp, positional=True):
     g.add_argument("--below", metavar="ANCHOR", help="below this text or ref")
     g.add_argument("--near", metavar="ANCHOR", help="nearest to this text or ref")
     g.add_argument("--point", metavar="X,Y", help="device pixels: an explicit coordinate escape hatch")
+    if scroll:
+        g.add_argument("--scroll", action="store_true",
+                       help="with a locator: if it is not on screen, scroll it into view first (like scroll-to)")
 
 
 def _act_opts(sp, method=True):
@@ -65,12 +68,12 @@ def add_parsers(sub, jsonopt, devopt):
 
     # -- act on elements
     sp = add("tap", "tap an element: ACTION_CLICK, verified by the click event and a diff", "cmd_tap")
-    _locators(sp)
+    _locators(sp, scroll=True)
     sp.add_argument("--double", action="store_true", help="double-tap (a gesture)")
     _act_opts(sp)
 
     sp = add("long-press", "long-press an element (ACTION_LONG_CLICK, else a long gesture)", "cmd_long_press")
-    _locators(sp)
+    _locators(sp, scroll=True)
     _act_opts(sp)
 
     sp = add("type", "set an input's text (Unicode; set_text, then paste, then adb input)", "cmd_type")
@@ -92,8 +95,9 @@ def add_parsers(sub, jsonopt, devopt):
 
     sp = add("scroll-to", "scroll until an element matching --text/--id/--desc is on screen", "cmd_scroll_to")
     _locators(sp, positional=False)
-    sp.add_argument("--direction", choices=("up", "down", "left", "right"), default="down",
-                    help="scroll this way first (default down), then back the other way")
+    sp.add_argument("--direction", choices=("up", "down", "left", "right"),
+                    help="scroll this way first, then back the other way (default: towards the target "
+                         "if the tree knows where it is, else down, or right in a pager/tab strip)")
     sp.add_argument("--one-way", action="store_true", help="don't try the other direction at the end")
     sp.add_argument("--max-scrolls", type=int, default=15, metavar="N", help="give up after N scrolls (15)")
     _act_opts(sp, method=False)
@@ -145,7 +149,10 @@ def add_parsers(sub, jsonopt, devopt):
     _act_opts(sp, method=False)
 
     # -- wait / observe
-    sp = add("wait", "block on the device until a condition holds (event-driven)", "cmd_wait")
+    sp = add("wait", "block on the device until a condition holds, or --idle (event-driven)", "cmd_wait")
+    sp.add_argument("--idle", "--stable", dest="idle", action="store_true",
+                    help="no condition: until the screen stops changing for --quiet ms")
+    sp.add_argument("--quiet", type=int, metavar="MS", help="with --idle: the quiet window (500)")
     sp.add_argument("--text", metavar="TEXT", help="a visible node whose text/desc contains TEXT")
     sp.add_argument("--id", metavar="ID", help="a visible node with this resource id")
     sp.add_argument("--desc", metavar="DESC", help="a visible node whose desc contains DESC")
@@ -158,6 +165,10 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--window", metavar="TITLE|PKG", help="a window with this title or package")
     sp.add_argument("--pkg", metavar="PKG", help="an app window of this package in front")
     sp.add_argument("--timeout", type=float, default=10.0, metavar="S", help="give up after S seconds (10)")
+
+    sp = add("mark", "write a marker line to the device's logcat (tag droidctl), to cut captures into steps",
+             "cmd_mark")
+    sp.add_argument("label", help="the marker text, e.g. 'tap Login'")
 
     sp = add("current", "the foreground app/activity and whether the keyboard is shown", "cmd_current")
 
@@ -178,6 +189,7 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--quality", type=int, default=70, metavar="Q", help="JPEG quality (70)")
     sp.add_argument("--marks", action="store_true", help="draw ref-numbered boxes (takes a fresh snapshot)")
     sp.add_argument("--crop", type=int, metavar="REF", help="only this element's box")
+    sp.add_argument("out_path", nargs="?", metavar="PATH", help="output path (same as --out)")
     sp.add_argument("--out", metavar="F", help="output path (default ~/.droidctl/shots/…)")
     sp.add_argument("--base64", action="store_true", help="include the JPEG as base64 in --json")
 

@@ -6,6 +6,8 @@ thing everywhere: one JSON value on stdout, nothing else.
 """
 import json
 import sys
+import time
+from datetime import datetime, timezone
 
 
 # Lazy rich. Importing rich costs ~30-40 ms (measured in chromectl) and is only
@@ -79,6 +81,23 @@ ERROR_KINDS = {
 }
 
 
+def _utc(t):
+    return datetime.fromtimestamp(t, timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+class Clock:
+    """When a command ran, on the host's clock: `t_start`/`t_end` (UTC ISO-8601)
+    and `elapsed_ms` go into every --json result and error, so actions line up
+    with a proxy's history or a capture without bracketing each call with `date`."""
+
+    def __init__(self):
+        self.wall, self.mono = time.time(), time.monotonic()
+
+    def stamp(self):
+        ms = round((time.monotonic() - self.mono) * 1000)
+        return {"t_start": _utc(self.wall), "t_end": _utc(self.wall + ms / 1000), "elapsed_ms": ms}
+
+
 def emit(a, payload, render=None):
     """Agent mode prints the payload as JSON; human mode runs the renderer."""
     if getattr(a, "json", False):
@@ -88,7 +107,7 @@ def emit(a, payload, render=None):
     return payload
 
 
-def die(args, kind, message, hint="", data=None, mode=None):
+def die(args, kind, message, hint="", data=None, mode=None, clock=None):
     """Report a fatal error the way the caller asked for it, then exit 1.
 
     With --json the error is a JSON object on stdout, so an agent parsing stdout
@@ -100,7 +119,8 @@ def die(args, kind, message, hint="", data=None, mode=None):
             error["hint"] = hint
         if data:
             error["data"] = data
-        out_json({"ok": False, "error": error, **({"mode": mode} if mode else {})})
+        out_json({"ok": False, "error": error, **({"mode": mode} if mode else {}),
+                  **(clock.stamp() if clock else {})})
     else:
         err.print(f"{kind}: {message}" + (f"\n{hint}" if hint else ""), markup=False)
     sys.exit(1)

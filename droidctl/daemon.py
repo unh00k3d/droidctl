@@ -166,7 +166,7 @@ def _install_stdio():
 # a request needing other values waits until none with different ones runs.
 # --------------------------------------------------------------------------
 _KEEP_ENV = {"DROIDCTL_HOME", "DROIDCTL_IDLE", "DROIDCTL_NO_DAEMON", "DROIDCTL_AUTOSTART"}
-PATH_ARGS = ("file", "out", "apk", "dir", "fixture")
+PATH_ARGS = ("file", "out", "out_path", "apk", "dir", "fixture")
 CWD_COMMANDS = {"run"}
 
 
@@ -620,7 +620,7 @@ def _parser():
 def execute(params):
     """Run one argv like the CLI would; return {code, stdout, stderr, json, mode, ...}."""
     from droidctl import cli
-    from droidctl.core import UserError
+    from droidctl.core import Clock, UserError
     argv = [t for t in params.get("argv") or [] if t != "--no-daemon"]
     out, err = io.StringIO(), io.StringIO()
     _TL.out, _TL.err = out, err
@@ -653,6 +653,7 @@ def execute(params):
         want_json = bool(getattr(args, "json", False))
         ctx = _TL.ctx = _Ctx(args.cmd in READ_ONLY)
         payload, error, code, exited = None, None, 0, False
+        clock = Clock()
         try:
             payload = args.fn(args)
         except UserError as e:
@@ -674,7 +675,8 @@ def execute(params):
         if error is not None:
             code = 1
             if want_json:
-                print(json.dumps({"ok": False, "error": error, "mode": "daemon"}, indent=2, default=str))
+                print(json.dumps({"ok": False, "error": error, "mode": "daemon", **clock.stamp()},
+                                 indent=2, default=str))
             else:
                 from droidctl.core import err as err_console
                 err_console.print(f"{error['kind']}: {error['message']}"
@@ -682,6 +684,8 @@ def execute(params):
         elif not exited:
             if isinstance(payload, dict):
                 payload.setdefault("mode", "daemon")
+                for k, v in clock.stamp().items():
+                    payload.setdefault(k, v)
                 if between:
                     payload["between_calls"] = between
                 if payload.get("ok") is False:

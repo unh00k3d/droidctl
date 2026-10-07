@@ -79,7 +79,7 @@ screen dev.droidctl.testapp/.Main  sig=9b86  keyboard=hidden  dialog=no  1080x22
   `--map` (ASCII wireframe), `--layout flat` (one element per line), `--system` (include the
   status/navigation bars), `--max N`, `--raw` (the full raw tree as JSON).
 - `where REF`: one element's box in device px, its region and its neighbours.
-- `shot [--marks] [--crop REF] [--scale 0.5] [--out F]`: a JPEG screenshot, with ref boxes drawn
+- `shot [PATH] [--marks] [--crop REF] [--scale 0.5] [--out F]`: a JPEG screenshot, with ref boxes drawn
   by `--marks`. Use it for pixels only (colours, images, visual bugs); prefer `snapshot`.
   `FLAG_SECURE` windows (banking apps, password screens) fail with `secure-window`.
 - `current`: the foreground package/activity and whether the keyboard is shown.
@@ -90,8 +90,12 @@ Every element action takes a positional `REF` or a **locator**: `--ref N`, `--id
 `--text TEXT` (text, hint or desc, case-insensitive), `--desc`, `--class`, `--role`
 (+ `--index I`), or spatially `--right-of/--left-of/--above/--below/--near ANCHOR`
 (`tap --text "+" --right-of "Wireless Mouse"`). A locator that matches more than one element
-fails with `ambiguous` (the candidates are in `error.data`); it never picks one for you.
-`--point X,Y` (device pixels) is the explicit coordinate escape hatch.
+fails with `ambiguous` (the candidates, each with its region and position, are in the message
+and in `error.data`); it never picks one for you. A locator that matches nothing fails with
+`not-found` naming the screen it looked at; `tap/long-press --scroll` scrolls a locator's target
+into view first. Across a screen change or a scroll, prefer a locator to an old ref number:
+it is resolved against the live screen. `--point X,Y` (device pixels) is the explicit
+coordinate escape hatch.
 
 ```bash
 droidctl tap 7                                   # or tap --text "Checkout"
@@ -99,7 +103,8 @@ droidctl tap 7 --double | long-press 7
 droidctl type 2 "Merhaba dünya 😀" --enter        # --append, --clear
 droidctl type 2 --stdin < message.txt            # quotes/$/newlines: --stdin or --file F
 droidctl scroll down                             # the main list; scroll up 4 for a specific one
-droidctl scroll-to --text "Privacy"              # scroll until it is on screen
+droidctl scroll-to --text "Privacy"              # scroll its own list (or tab strip) until it is on screen
+droidctl tap --text "Privacy" --scroll           # the same, then tap it
 droidctl swipe left 4                            # finger direction; the screen if no element
 droidctl action 4 "Delete"                       # a custom accessibility action
 droidctl set 9 7                                 # a slider/range value
@@ -118,7 +123,11 @@ numbers not used before on that screen, so numbers can be out of order after a s
 number whose element went away is never reused and fails as `offscreen`/`stale-ref` (or acts
 again if the element came back). A different screen starts again at 1. `--expect-change` turns "nothing
 changed" into the `no-change` error; `--settle MS` sets the quiet window (default 150 ms,
-`0` = don't wait).
+`0` = don't wait). `scroll` on a screen where nothing scrolls fails (`not-found`, reason
+`no-scrollable`) rather than swiping blindly; use `swipe` for content that moves by touch only.
+`wait --idle` blocks until the screen stops changing, for slow work outside an action.
+Every `--json` result and error has `t_start`/`t_end` (host UTC, ISO-8601) and `elapsed_ms`;
+`mark LABEL` writes a line to the phone's logcat (tag `droidctl`) to cut captures into steps.
 
 **How `tap` decides** (`--method auto`, the default):
 - `ACTION_CLICK` on the element (or its clickable ancestor) → `method:"action"`.
@@ -252,8 +261,8 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `dump-fixture` | `<name> --pkg PKG --not-important --dir DIR --timeout S --allow-degraded` | save the current screen's raw tree as a test fixture (dev) |
 | `snapshot (snap)` | `--diff --find TEXT --in REF --raw --bounds --layout {spatial,flat} --no-regions --no-rows --no-grids --no-infer --geo --map --system --max N --full --fixture PATH` | the screen as a compact list of elements with refs |
 | `where` | `<ref>` | an element's box, region and neighbours (from the last snapshot) |
-| `tap` | `[REF] LOCATOR --double --method {auto,action,gesture} --settle MS --expect-change` | tap an element: ACTION_CLICK, verified by the click event and a diff |
-| `long-press` | `[REF] LOCATOR --method {auto,action,gesture} --settle MS --expect-change` | long-press an element (ACTION_LONG_CLICK, else a long gesture) |
+| `tap` | `[REF] LOCATOR --scroll --double --method {auto,action,gesture} --settle MS --expect-change` | tap an element: ACTION_CLICK, verified by the click event and a diff |
+| `long-press` | `[REF] LOCATOR --scroll --method {auto,action,gesture} --settle MS --expect-change` | long-press an element (ACTION_LONG_CLICK, else a long gesture) |
 | `type` | `[REF] [TEXT] LOCATOR --append --clear --enter --stdin --file F --settle MS --expect-change` | set an input's text (Unicode; set_text, then paste, then adb input) |
 | `scroll` | `<{up,down,left,right}> [REF] LOCATOR --settle MS --expect-change` | scroll an element (default: the main list) up/down/left/right |
 | `scroll-to` | `LOCATOR --direction {up,down,left,right} --one-way --max-scrolls N --settle MS --expect-change` | scroll until an element matching --text/--id/--desc is on screen |
@@ -271,11 +280,12 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `notifications` | `--settle MS --expect-change` | open the notification shade |
 | `quick-settings` | `--settle MS --expect-change` | open quick settings |
 | `press` | `<key> --settle MS --expect-change` | press a key via adb (enter, tab, del, search, KEYCODE_*, or a number) |
-| `wait` | `--text TEXT --id ID --desc DESC --role ROLE --gone --exact --activity CLASS --toast TEXT --window TITLE\|PKG --pkg PKG --timeout S` | block on the device until a condition holds (event-driven) |
+| `wait` | `--stable --quiet MS --text TEXT --id ID --desc DESC --role ROLE --gone --exact --activity CLASS --toast TEXT --window TITLE\|PKG --pkg PKG --timeout S` | block on the device until a condition holds, or --idle (event-driven) |
+| `mark` | `<label>` | write a marker line to the device's logcat (tag droidctl), to cut captures into steps |
 | `current` | – | the foreground app/activity and whether the keyboard is shown |
 | `watch` | `--max N --timeout S --events TYPES --all` | pushed device events (clicks, toasts, windows, IME), bounded |
 | `logs` | `--max N --pkg PKG --level {V,D,I,W,E,F}` | recent logcat lines, bounded |
-| `shot` | `--scale F --full --quality Q --marks --crop REF --out F --base64` | a screenshot (downscaled JPEG), optionally with ref marks |
+| `shot` | `[PATH] --scale F --full --quality Q --marks --crop REF --out F --base64` | a screenshot (downscaled JPEG), optionally with ref marks |
 | `launch` | `<pkg> --activity CLASS --stop --clear --timeout S --settle MS --expect-change` | start an app, wait for its window and settle; prints the new screen |
 | `stop-app` | `<pkg>` | force-stop an app |
 | `apps` | `--all --filter TEXT` | list installed apps (third-party by default) |

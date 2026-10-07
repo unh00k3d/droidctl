@@ -493,3 +493,14 @@ def test_doctor_reports_daemon_state_when_none_is_running(tmp_path, monkeypatch)
     daemon_c = payload["checks"][0]
     assert daemon_c["ok"] is True
     assert "not running" in daemon_c["detail"]
+
+
+def test_every_json_result_and_error_is_timestamped_through_the_daemon(home):
+    """t_start/t_end (UTC ISO-8601) + elapsed_ms, to line actions up with a capture."""
+    env = _env(home)
+    fx = os.path.join(os.path.dirname(__file__), "fixtures", "trees", "real-settings-main.json")
+    p = js(dc(env, "snapshot", "--fixture", fx, "--json"))
+    assert p["mode"] == "daemon" and p["t_start"].endswith("Z") and p["t_start"] <= p["t_end"]
+    assert isinstance(p["elapsed_ms"], int)
+    e = js(dc(env, "snapshot", "--fixture", "/nonexistent.json", "--json"))
+    assert e["ok"] is False and e["t_end"].endswith("Z")

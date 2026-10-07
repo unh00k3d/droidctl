@@ -23,11 +23,25 @@ interface; you never need `--help` per command (`droidctl cheat --json` has it a
    snapshots and action results (after a scroll, a deleted row, a changed counter);
    new elements get new numbers, and a number whose element went away is never
    reused. On a new screen numbering starts again at 1.
-3. **Copy labels verbatim** from the snapshot when you use `--text`/`--desc`; never
-   invent them from a screenshot. Prefer refs over text.
-4. **Every action reports what changed** (`changed`, `diff`, `new_screen`, `toast`), so
-   you rarely need another snapshot right after it.
+3. **Refs for the screen you just saw, locators across changes.** A ref from the latest
+   `snapshot` or action result is the precise choice on that screen. After a screen
+   change, a scroll, or in a script written ahead of time, use a **locator** instead
+   (`--text`/`--desc`/`--role`, spatial `--right-of "Total"`): it is resolved against the
+   live screen every time. Don't grep ref numbers out of old output. **Copy labels
+   verbatim** from the snapshot; never invent them from a screenshot. Many hardened apps
+   strip resource ids (`id` is null), so `--id` may not exist there. If the target may be
+   scrolled out of view, `tap --text X --scroll` scrolls it in, then taps. A locator that
+   matches several elements is `ambiguous`, never a pick: the error lists each candidate
+   with its region and position, so add a spatial locator or `--index N`.
+4. **Every action waits for the screen to settle, then reports what changed** (`changed`,
+   `diff`, `new_screen`, `toast`), so you rarely need another snapshot or a `sleep` after
+   it. Settling is on by default (`--settle MS` to lengthen it, `--settle 0` to skip).
+   Something slow outside an action (a load after login)? `wait --text X`, `wait --role
+   progress --gone`, or `wait --idle` (until the screen stops changing).
 5. **Batch with `run`**: steps in one `run --json` share one process and one device session.
+6. **Timing for captures**: every `--json` result and error carries `t_start`/`t_end`
+   (host clock, UTC ISO-8601) and `elapsed_ms`, to line actions up with a proxy history.
+   `droidctl mark "LABEL"` writes a marker line to the phone's logcat (tag `droidctl`).
 
 ```bash
 droidctl snapshot --json                    # the screen, with refs
@@ -38,6 +52,8 @@ droidctl scroll-to --text "Privacy" --json
 droidctl action 4 "Delete" --json            # custom accessibility actions (swipe-to-delete)
 droidctl wait --text "Saved" --timeout 5 --json
 droidctl wait --role progress --gone --json      # after a submit: until the spinner is gone
+droidctl tap --text "Privacy" --scroll --json   # scroll it into view (its own list/tab strip), then tap
+droidctl mark "step 3: login" --json              # a logcat marker between capture steps
 droidctl launch com.android.settings --json
 droidctl run --json --step 'launch com.android.settings' --step 'tap --text Display' --step 'snapshot'
 ```

@@ -114,9 +114,11 @@ class Session:
             self._state_loaded = True
         return self._state
 
-    def save(self, snap):
+    def save(self, snap, shown=True):
+        """``shown``: the agent was shown this screen in full (or as a diff of
+        one it saw), so a plain `snapshot` of the same screen may say `unchanged`."""
         S.carry_refs(self.state, snap)          # same screen: the agent's numbers stay valid
-        self._state = S.to_state(snap, self.serial)
+        self._state = S.to_state(snap, self.serial, shown=shown)
         self._state_loaded = True
         S.save_state(self.serial, self._state)
         return self._state
@@ -183,6 +185,7 @@ class Target:
         self.handle, self.click, self.dump, self.tap = handle, click, dump, tap
         self.res, self.pre, self.tier, self.via, self.rec = res, pre, tier, via, rec
         self.point = point
+        self.scrolls = 0              # --scroll: how many scrolls brought it into view
 
     @property
     def occluded(self):
@@ -197,7 +200,10 @@ class Target:
             return {"point": list(self.tap)}
         if self.res is not None:
             d = self.res.to_json()
-            return {k: d[k] for k in ("ref", "tier", "via", "score", "moved", "occluded", "tap", "element")}
+            out = {k: d[k] for k in ("ref", "tier", "via", "score", "moved", "occluded", "tap", "element")}
+            if self.scrolls:
+                out["scrolls"] = self.scrolls
+            return out
         r = self.rec or {}
         return {"ref": r.get("ref"), "tier": 0, "via": "fast-path", "tap": self.tap,
                 "element": {"ref": r.get("ref"), "role": r.get("role"), "label": r.get("label"),
@@ -243,6 +249,9 @@ def resolve_target(sess, a, fast=True):
         raise UserError("--point cannot be combined with a ref or a locator", "bad-args")
     if ref is not None and loc:
         raise UserError("give either a ref or a locator, not both", "bad-args")
+    if getattr(a, "scroll", False) and not loc:
+        raise UserError("--scroll needs a locator (--text/--id/--desc/…); a ref that scrolled away "
+                        "says so (offscreen) and names its scroll-to", "bad-args")
     if point:
         return Target(tap=_parse_point(point), point=True, via="point")
 
@@ -267,12 +276,42 @@ def resolve_target(sess, a, fast=True):
     else:
         snap = sess.snap()
         _awake(snap)
+        scrolls = 0
         try:
-            res = R.find(snap, index=getattr(a, "index", None), **loc)
+            try:
+                res = R.find(snap, index=getattr(a, "index", None), **loc)
+            except UserError as e:
+                if not (getattr(a, "scroll", False) and e.kind in ("not-found", "offscreen")):
+                    raise
+                # --scroll: scroll it into view, then resolve it there (still unique or an error)
+                found, scrolls, snap = _scroll_into_view(sess, a, loc, snap)
+                if found is None:
+                    raise UserError(f"{e} (and not after {scrolls} scrolls)", "not-found",
+                                    data=dict(e.data or {}, scrolls=scrolls))
+                res = R.find(snap, index=getattr(a, "index", None), **loc)
         except UserError as e:
-            raise _locked(e, snap)
+            raise _locked(_not_found_here(e, snap, loc, a), snap)
+        t = Target(handle=res.handle, click=res.click, dump=res.snap.dump, tap=res.tap, res=res,
+                   pre=res.snap, tier=res.tier, via=res.via)
+        t.scrolls = scrolls
+        return t
     return Target(handle=res.handle, click=res.click, dump=res.snap.dump, tap=res.tap, res=res,
                   pre=res.snap, tier=res.tier, via=res.via)
+
+
+def _not_found_here(err, snap, loc, a):
+    """A locator miss says which screen it looked at, and whether a list could
+    hold the target: "absent", "scrolled out" and "the wrong screen" looked the
+    same before (a hardened finance app: the agent was on another activity)."""
+    if err.kind != "not-found" or "tried" not in (err.data or {}):
+        return err
+    where = _where(snap)
+    hint = err.hint
+    if _main_scroller(snap) is not None and not getattr(a, "scroll", False):
+        hint = ("a list here may hold it: add --scroll (scrolls it into view, then acts), "
+                "or check the screen with droidctl snapshot --find TEXT")
+    return UserError(f"{err} on {where}", err.kind, hint=hint,
+                     data=dict(err.data, activity=snap.activity or None, pkg=snap.pkg))
 
 
 WAKE_HINT = "wake it: droidctl press KEYCODE_WAKEUP (then unlock the phone if it asks)"
@@ -699,7 +738,15 @@ def cmd_scroll(a):
         e = _main_scroller(snap)
         pre = {"lines": S.flat_lines(snap), "sig": snap.sig}
         if e is None:
-            return _swipe(sess, a, a.direction, None, pre, why="nothing scrollable: swiped the screen")
+            # no blind swipe of the whole screen: it moved whatever was under the
+            # finger (a hardened finance app: it pushed a tab strip out of the tree,
+            # and every ref on it went stale). A swipe has to be asked for.
+            _awake(snap)
+            finger = {"down": "up", "up": "down", "left": "right", "right": "left"}[a.direction]
+            raise UserError(f"nothing on this screen scrolls (screen: {_where(snap)})", "not-found",
+                            hint=f"if the content moves by touch only: droidctl swipe {finger}",
+                            data={"reason": "no-scrollable", "activity": snap.activity or None,
+                                  "pkg": snap.pkg})
         res = R.Resolution(e, snap, "locator", via="largest-scroller")
         t = Target(handle=res.handle, click=res.click, dump=snap.dump, tap=res.tap, res=res, pre=snap)
     else:
@@ -800,34 +847,82 @@ def cmd_gesture(a):
     return finish(sess, a, "gesture", g, pre, None, extra={"points": pts})
 
 
+def _scroll_plan(snap, loc, direction):
+    """(container, direction) for scroll-to. A target the tree already holds but
+    the screen does not show (scrolled out) is scrolled into view by *its own*
+    scrollable ancestor, towards the side it lies on: a tab strip or a pager is
+    not the main list (a hardened finance app: the wanted tab sat in a
+    horizontal tab strip, the main list scrolled 0 times). Otherwise the main
+    list, along its own axis."""
+    want = {k: loc[k] for k in ("id", "text", "desc", "cls") if k in loc}
+    hidden = R._find_hidden(snap, lambda n: R._node_matches(n, **want)) if want else None
+    cont = None
+    if hidden is not None:
+        cont = next((x.el for x in hidden.ancestors()
+                     if x.scrollable and x.el is not None and x.el.node is x and x.el.rect), None)
+        if direction is None:
+            direction = R._direction(hidden.raw.get("bounds"), hidden)
+    cont = cont or _main_scroller(snap)
+    if direction is None and cont is not None:
+        direction = "right" if S.is_horizontal(cont.node) else "down"
+    return cont, direction or "down"
+
+
+def _no_scrollable(snap, loc):
+    what = " ".join(f"{k}={v}" for k, v in loc.items())
+    return UserError(f"{what} is not on this screen, and nothing on it scrolls"
+                     f" (screen: {_where(snap)})", "not-found",
+                     hint="check you are on the right screen (droidctl current); a view that only "
+                          "moves by touch needs an explicit droidctl swipe",
+                     data={"reason": "no-scrollable", "activity": snap.activity or None, "pkg": snap.pkg})
+
+
+def _where(snap):
+    return S.short_activity(f"{snap.pkg}/{snap.activity}") if snap.activity else (snap.pkg or "?")
+
+
 def cmd_scroll_to(a):
-    """Scroll the main (or given) container until an element matching the locator is on screen."""
+    """Scroll the target's container (or the main list) until an element matching the locator is on screen."""
     sess = session_for(a)
     loc = _locator(a)
     if not loc:
         raise UserError("scroll-to needs --text/--id/--desc", "bad-args")
-    first = sess.snap()
+    snap = sess.snap()
+    _awake(snap)
+    found, scrolls, snap = _scroll_into_view(sess, a, loc, snap)
+    if found is None:
+        raise UserError(f"{' '.join(f'{k}={v}' for k, v in loc.items())} not found after {scrolls} scrolls",
+                        "not-found", data={"scrolls": scrolls})
+    return found
+
+
+def _scroll_into_view(sess, a, loc, first):
+    """Scroll until ``loc`` is on screen -> (result dict or None, scrolls, last snap).
+    The last snap is saved either way (the screen moved)."""
     pre = {"lines": S.flat_lines(first), "sig": first.sig}
     snap = first
-    scrolls, direction = 0, a.direction
+    scrolls, direction = 0, getattr(a, "direction", None)
     tried_back = False
     while True:
         try:
             res = R.find(snap, **loc)
             if res.elem is not None and not res.occluded:
                 elem = res.elem
-                sess.save(snap)
-                return {"ok": True, "found": True, "scrolls": scrolls, "ref": elem.ref,
-                        "changed": snap.sig != pre["sig"] or S.flat_lines(snap) != pre["lines"],
-                        "element": R._describe(elem),
-                        "text": S.header(snap, S.Opts.from_env()) + "\n" + S.element_line(elem, snap, S.Opts.from_env())}
+                sess.save(snap, shown=False)
+                return ({"ok": True, "found": True, "scrolls": scrolls, "ref": elem.ref,
+                         "changed": snap.sig != pre["sig"] or S.flat_lines(snap) != pre["lines"],
+                         "element": R._describe(elem),
+                         "text": S.header(snap, S.Opts.from_env()) + "\n"
+                         + S.element_line(elem, snap, S.Opts.from_env())}, scrolls, snap)
         except UserError as e:
             if e.kind not in ("not-found", "offscreen", "occluded"):
                 raise
-        if scrolls >= a.max_scrolls:
+        if scrolls >= getattr(a, "max_scrolls", SCROLL_INTO_VIEW_MAX):
             break
-        cont = _main_scroller(snap)
+        cont, direction = _scroll_plan(snap, loc, direction)
         if cont is None:
+            if scrolls == 0:
+                raise _no_scrollable(snap, loc)
             break
         res = R.Resolution(cont, snap, "locator")
         action = _scroll_action(cont.node, direction)
@@ -842,9 +937,11 @@ def cmd_scroll_to(a):
             tried_back = True
             direction = {"down": "up", "up": "down", "left": "right", "right": "left"}[direction]
         snap = new
-    sess.save(snap)
-    raise UserError(f"{' '.join(f'{k}={v}' for k, v in loc.items())} not found after {scrolls} scrolls",
-                    "not-found", data={"scrolls": scrolls})
+    sess.save(snap, shown=False)
+    return None, scrolls, snap
+
+
+SCROLL_INTO_VIEW_MAX = 15
 
 
 # --------------------------------------------------------------------------
@@ -1209,8 +1306,30 @@ def _wait_role(sess, a):
             time.sleep(min(0.15, max(0.0, deadline - time.monotonic())))
 
 
+IDLE_QUIET_MS = 500
+
+
+def _wait_idle(sess, a):
+    """`wait --idle`: no condition, just until the screen stops changing (no
+    content, window or scroll event for --quiet ms). A screen that never stops
+    (a spinner, a ticker) ends as `timeout`, not as a false "idle"."""
+    if any(getattr(a, k, None) for k in ("text", "id", "desc", "role", "activity", "window", "pkg")) \
+            or a.toast is not None or a.gone:
+        raise UserError("--idle takes no condition (only --quiet and --timeout)", "bad-args")
+    quiet = a.quiet if a.quiet is not None else IDLE_QUIET_MS
+    r = sess.call("wait_idle", quiet, int(a.timeout * 1000))
+    if not r.get("idle"):
+        raise UserError(f"the screen kept changing for {a.timeout:g} s (an animation or a live value?)",
+                        "timeout", hint="snapshot anyway, or wait for a specific --text/--gone",
+                        data={"ms": r.get("ms")})
+    return {"ok": True, "idle": True, "ms": r.get("ms"), "quiet_ms": quiet,
+            "text": f"idle after {r.get('ms')} ms (quiet for {quiet} ms)"}
+
+
 def cmd_wait(a):
     sess = session_for(a)
+    if getattr(a, "idle", False):
+        return _wait_idle(sess, a)
     if getattr(a, "role", None):
         return _wait_role(sess, a)
     cond = {"text": a.text, "id": a.id, "desc": a.desc, "activity": a.activity, "window": a.window,
@@ -1223,7 +1342,8 @@ def cmd_wait(a):
     if a.gone:
         cond["gone"] = True
     if not cond or list(cond) == ["gone"]:
-        raise UserError("wait needs --text/--id/--desc/--role/--activity/--toast/--window/--pkg", "bad-args")
+        raise UserError("wait needs --idle or a condition: --text/--id/--desc/--role/--activity/--toast/"
+                        "--window/--pkg", "bad-args")
     if a.exact:
         cond["exact"] = True
     timeout_ms = int(a.timeout * 1000)
@@ -1235,6 +1355,18 @@ def cmd_wait(a):
         if r.get(k) is not None:
             out[k] = r[k]
     return out
+
+
+def cmd_mark(a):
+    """A marker line in the device's logcat (tag `droidctl`), stamped on the host
+    clock too, to cut a capture (logcat, a proxy's history) into steps."""
+    sess = session_for(a)
+    sess.shell("log", "-t", MARK_TAG, shlex.quote(a.label))   # adb shell re-splits its args
+    return {"ok": True, "label": a.label, "tag": MARK_TAG,
+            "text": f"marked {a.label!r} (logcat tag {MARK_TAG})"}
+
+
+MARK_TAG = "droidctl"
 
 
 def _dumpsys_activity(sess):
@@ -1445,6 +1577,10 @@ def cmd_watch(a):
 # shot
 # --------------------------------------------------------------------------
 def cmd_shot(a):
+    if getattr(a, "out_path", None):
+        if a.out and a.out != a.out_path:
+            raise UserError("give the output path once: PATH or --out", "bad-args")
+        a.out = a.out_path
     import base64
     sess = session_for(a)
     scale = 1.0 if a.full else a.scale
@@ -1458,7 +1594,7 @@ def cmd_shot(a):
         crop = rec["bounds"]
     if a.marks and not a.crop:
         snap = sess.snap()
-        state = sess.save(snap)
+        state = sess.save(snap, shown=False)    # an image, not the list
     img = dev.screenshot(sess.client, sess.serial, scale=scale, quality=a.quality, crop=crop)
     data = base64.b64decode(img["data"])
     screen = (state or {}).get("screen") or [0, 0, (sess.info or {}).get("screen", {}).get("w", 0),

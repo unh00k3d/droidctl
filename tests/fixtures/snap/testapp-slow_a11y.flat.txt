@@ -1,4 +1,4 @@
 screen dev.droidctl.testapp/.Main  sig=f5e2  keyboard=hidden  dialog=no  degraded=no-root
 (no elements: nothing on screen is labelled or actionable)
 ! degraded tree (no-root): the device returned what it could read in time, so the screen may hold more than is listed. Refs here act on exactly these elements; after the screen changes they can't be re-matched until a complete read (try: wait, then snapshot)
-! no tree for app window s:slow_a11y (a slow or broken accessibility provider?)
+! no tree for app window s:slow_a11y (slow or broken a11y provider? droidctl diagnose)
