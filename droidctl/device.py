@@ -39,7 +39,7 @@ UA_EXIT = {3: "busy", 4: "socket", 5: "failed"}
 # The versionCode of the APK bundled in droidctl/assets. It has to match the
 # agent's build.gradle.kts (a unit test checks); setup compares it with what
 # the phone reports so an unchanged agent is not reinstalled.
-AGENT_VERSION_CODE = 10
+AGENT_VERSION_CODE = 11
 APK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "droidctl-agent.apk")
 DEVICE_TMP_APK = "/data/local/tmp/droidctl-agent.apk"
 

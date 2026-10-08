@@ -6,6 +6,7 @@ one exception is marked: a copy of a real tree with one field's text set, to
 stand for "the field took the text".
 """
 import argparse
+import re
 import copy
 import json
 import pathlib
@@ -756,7 +757,7 @@ def test_wait_idle(home, monkeypatch):
 def test_mark_writes_a_quoted_logcat_line(home, monkeypatch):
     s = session(monkeypatch, tree("cart_inc-a"))
     out = act.cmd_mark(args(label="step 3; login 'ok'"))
-    assert s.shell_calls == [("log", "-t", "droidctl", "'step 3; login '\"'\"'ok'\"'\"''")]
+    assert s.shell_calls == [("log", "-t", "droidctl-mark", "'step 3; login '\"'\"'ok'\"'\"''")]
     assert out["label"] == "step 3; login 'ok'"
 
 
@@ -841,8 +842,85 @@ def test_logs_filter_by_tag_and_marks(home, monkeypatch):
     monkeypatch.setattr(act, "get_session", lambda serial, auto_setup=True: s)
     monkeypatch.setattr(act.dev, "resolve_serial", lambda d: "FAKE")
     act.cmd_logs(args(max=50, pkg=None, level=None, tag=None, marks=True))
-    assert calls[-1][-2:] == ("droidctl:V", "*:S")
+    assert calls[-1][-2:] == ("droidctl-mark:V", "*:S")
+    assert "-t" not in calls[-1]          # -t counts lines before the filter (Galaxy S25)
     act.cmd_logs(args(max=50, pkg=None, level="W", tag=["A", "B"], marks=False))
     assert calls[-1][-3:] == ("A:W", "B:W", "*:S")
     act.cmd_logs(args(max=50, pkg=None, level="E", tag=None, marks=False))
     assert calls[-1][-1] == "*:E"
+    act.cmd_logs(args(max=50, pkg=None, level=None, tag=None, marks=False))
+    assert calls[-1][-2:] == ("-t", "50")  # unfiltered: the cheap tail
+
+
+# --- on-device findings 2026-10-08 (Galaxy S25, API 35, Backend B) ------------
+def test_action_results_show_the_numbers_that_were_saved(home, monkeypatch):
+    """The diff of a result was rendered before carry_refs renumbered the screen:
+    "Item 16" read [30] in the result and [34] in the state, so `tap 30` from that
+    result acted on another element."""
+    import re
+    s = session(monkeypatch, tree("duplicates_scroll-a"))
+    s._client.act_replies = [{"performed": True, "tree": tree("duplicates_scroll-b")}]
+    out = act.cmd_scroll(args(direction="down"))
+    saved = {str(r["label"]): int(k) for k, r in S.load_state("FAKE")["refs"].items()}
+    shown = {m.group(2): int(m.group(1)) for line in out["diff"]
+             for m in [re.match(r'^[+~] \[(\d+)\] \S+\s+"([^"]*)"', line)] if m}
+    assert shown and all(saved.get(lab) == n for lab, n in shown.items() if lab != "Delete")
+
+
+def test_default_scroll_follows_the_direction_axis():
+    """`scroll down` must not pick a sideways pager because it is the largest scrollable
+    (a news screen: it switched tabs instead of scrolling the list)."""
+    snap = S.build(real("testapp-nested_scroll"))
+    assert not S.is_horizontal(act._main_scroller(snap, "down").node)
+    assert S.is_horizontal(act._main_scroller(snap, "left").node)
+    assert act._main_scroller(S.build(real("testapp-tabs_pager")), "down") is None
+
+
+def test_scrolling_a_pager_up_or_down_is_refused(home, monkeypatch):
+    t = real("testapp-tabs_pager")
+    s = session(monkeypatch, t)
+    pager = next(e.ref for e in S.build(t).elements if e.role == "pager")
+    with pytest.raises(UserError) as e:
+        act.cmd_scroll(args(ref=pager, direction="down"))
+    assert e.value.kind == "bad-args" and "sideways" in str(e.value)
+    assert s._client.count("act") == 0
+
+
+def test_an_id_less_input_keeps_its_number_when_its_text_changes():
+    """Apps that strip resource ids: the field is known by class + hint, not by its
+    value. Records from a real capture; only the id and the value are changed here."""
+    snap = S.build(real("testapp-unicode"))
+    e = next(x for x in snap.elements if x.role == "input")
+    before = dict(S.ref_record(e, snap), id=None)
+    after = dict(before, label="ADESE", text="ADESE")
+    others = {r: dict(S.ref_record(x, snap)) for r, x in enumerate(snap.elements, 100) if x is not e}
+    pairs = S.match_refs({e.ref: before, **others}, [after, *others.values()])
+    assert pairs[e.ref] == 0
+    # and the resolver finds it (same screen, tier 3) instead of "gone"
+    state = S.to_state(snap)
+    state["refs"][str(e.ref)].update(id=None)
+    res = act.R.resolve_in(state["refs"][str(e.ref)], state, snap, e.ref)
+    assert res.elem is e
+
+
+def test_overlap_warnings_name_the_carried_numbers():
+    t = real("testapp-fab_sheet_drawer")
+    prev = S.to_state(S.build(t))
+    prev["refs"] = {str(int(k) + 100): v for k, v in prev["refs"].items()}
+    prev["next_ref"] = 200
+    snap = S.build(t)
+    S.carry_refs(prev, snap)
+    refs = {e.ref for e in snap.elements}
+    nums = [int(x) for w in snap.warnings if w.startswith("overlap") for x in re.findall(r"\[(\d+)\]", w)]
+    assert nums and all(n in refs for n in nums)
+
+
+def test_an_endless_carousel_shows_no_fake_count():
+    """A real capture's pager given the size an endless carousel reports (Integer.MAX_VALUE,
+    seen on the Galaxy S25): the count and percentage were meaningless."""
+    t = copy.deepcopy(real("testapp-tabs_pager"))
+    snap = S.build(t)
+    pager = next(e for e in snap.elements if e.role == "pager")
+    pager.node.raw["collection"] = {"rows": 1, "cols": 2 ** 31 - 1}
+    info = S._list_info(pager)
+    assert "2147483647" not in info and "%" not in info

@@ -127,7 +127,7 @@ changed" into the `no-change` error; `--settle MS` sets the quiet window (defaul
 `no-scrollable`) rather than swiping blindly; use `swipe` for content that moves by touch only.
 `wait --idle` blocks until the screen stops changing, for slow work outside an action.
 Every `--json` result and error has `t_start`/`t_end` (host UTC, ISO-8601) and `elapsed_ms`;
-`mark LABEL` writes a line to the phone's logcat (tag `droidctl`) to cut captures into steps;
+`mark LABEL` writes a line to the phone's logcat (tag `droidctl-mark`) to cut captures into steps;
 `logs --marks` (or `--tag TAG`) reads them back.
 
 **How `tap` decides** (`--method auto`, the default):
@@ -282,7 +282,7 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `quick-settings` | `--settle MS --expect-change` | open quick settings |
 | `press` | `<key> --settle MS --expect-change` | press a key via adb (enter, tab, del, search, KEYCODE_*, or a number) |
 | `wait` | `--stable --quiet MS --text TEXT --id ID --desc DESC --role ROLE --gone --exact --activity CLASS --toast TEXT --window TITLE\|PKG --pkg PKG --timeout S` | block on the device until a condition holds, or --idle (event-driven) |
-| `mark` | `<label>` | write a marker line to the device's logcat (tag droidctl), to cut captures into steps |
+| `mark` | `<label>` | write a marker line to the device's logcat (tag droidctl-mark), to cut captures into steps |
 | `current` | – | the foreground app/activity and whether the keyboard is shown |
 | `watch` | `--max N --timeout S --events TYPES --all` | pushed device events (clicks, toasts, windows, IME), bounded |
 | `logs` | `--max N --pkg PKG --level {V,D,I,W,E,F} --tag TAG --marks` | recent logcat lines, bounded |

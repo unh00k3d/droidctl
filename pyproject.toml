@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "droidctl"
-version = "0.1.0.dev0"
+version = "0.1.0.dev1"
 description = "An agent-first Android automation CLI: compact UI snapshots with refs and element-based actions."
 readme = "README.md"
 requires-python = ">=3.10"

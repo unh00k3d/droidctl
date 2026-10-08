@@ -134,7 +134,16 @@ class Session:
         return t
 
     def snap(self):
-        return S.build(self.tree())
+        return self.build(self.tree())
+
+    def build(self, tree):
+        """A snapshot numbered like the saved state (carry_refs), so every number an
+        action result shows is the one a later `tap N` resolves. Built without it,
+        a result after a scroll showed "Item 16" as [30] while the state saved it as
+        [34]: [30] then acted on another element."""
+        snap = S.build(tree)
+        S.carry_refs(self.state, snap)
+        return snap
 
     # -- adb (setup-type work; lazy adbutils)
     def adb(self, *cmd, timeout=30, check=True):
@@ -395,7 +404,7 @@ def _catch_up(sess, pre, post):
     changes, new_screen = [], False
     while time.monotonic() < deadline:
         time.sleep(0.15)
-        post = S.build(sess.tree())
+        post = sess.build(sess.tree())
         changes = S.diff(pre, post) if pre.get("lines") else []
         new_screen = bool(pre.get("sig")) and pre.get("sig") != post.sig
         if (changes or new_screen) and not _transitional(post):
@@ -419,7 +428,7 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     tree = (reply or {}).get("tree")
     if tree is None or S.leaving_windows(tree):   # settled mid-transition: read again
         tree = sess.tree()
-    post = S.build(tree)
+    post = sess.build(tree)
     # Settled on a frame the new screen has not drawn into yet, or whose root the
     # agent could not fetch in time (after `back` the returning activity came back
     # degraded:no-root in 4 of 5, a banking QA app, and no later event re-dumps it):
@@ -438,7 +447,7 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
            and time.monotonic() < deadline):
         time.sleep(0.12)
         raw = sess.tree()
-        post = S.build(raw)
+        post = sess.build(raw)
     events = (reply or {}).get("events") or []
     seqs = [e["seq"] for e in events if isinstance(e.get("seq"), int)]
     # the toasts this result reports must not come back in the next snapshot's header
@@ -714,9 +723,14 @@ _SCROLL = {"down": ("scroll_down", "scroll_forward"), "up": ("scroll_up", "scrol
 _SCROLL_ACTIONS = {x for pair in _SCROLL.values() for x in pair}
 
 
-def _main_scroller(snap):
-    """The largest scrollable element on screen (the thing `scroll down` means)."""
+def _main_scroller(snap, direction=None):
+    """The largest scrollable element on screen that moves along ``direction``'s axis
+    (the thing `scroll down` means). Not a pager for up/down: a news screen's tab
+    pager was the largest scrollable, and `scroll down` switched it to the next tab."""
     cands = [e for e in snap.elements if e.node.scrollable and e.rect]
+    if direction is not None:
+        sideways = direction in ("left", "right")
+        cands = [e for e in cands if S.is_horizontal(e.node) == sideways]
     if not cands:
         return None
     from droidctl import spatial as sp
@@ -735,7 +749,7 @@ def cmd_scroll(a):
     sess = session_for(a)
     if a.ref is None and a.target is None and not _locator(a):
         snap = sess.snap()
-        e = _main_scroller(snap)
+        e = _main_scroller(snap, a.direction)
         pre = {"lines": S.flat_lines(snap), "sig": snap.sig}
         if e is None:
             # no blind swipe of the whole screen: it moved whatever was under the
@@ -743,7 +757,8 @@ def cmd_scroll(a):
             # and every ref on it went stale). A swipe has to be asked for.
             _awake(snap)
             finger = {"down": "up", "up": "down", "left": "right", "right": "left"}[a.direction]
-            raise UserError(f"nothing on this screen scrolls (screen: {_where(snap)})", "not-found",
+            axis = "sideways" if a.direction in ("left", "right") else "up or down"
+            raise UserError(f"nothing on this screen scrolls {axis} (screen: {_where(snap)})", "not-found",
                             hint=f"if the content moves by touch only: droidctl swipe {finger}",
                             data={"reason": "no-scrollable", "activity": snap.activity or None,
                                   "pkg": snap.pkg})
@@ -753,8 +768,16 @@ def cmd_scroll(a):
         t = resolve_target(sess, a)
         pre = _pre_lines(sess, t)
     node = t.node
-    action = _scroll_action(node, a.direction)
     acts = node.actions if node is not None else set((t.rec or {}).get("scroll") or ())
+    action = _scroll_action(node, a.direction) if node is not None else (
+        _SCROLL[a.direction][0] if _SCROLL[a.direction][0] in acts else _SCROLL[a.direction][1])
+    sideways = _sideways(t)
+    if (sideways is not None and action in ("scroll_forward", "scroll_backward")
+            and sideways != (a.direction in ("left", "right"))):
+        # the generic action follows the container's own axis: "down" on a pager is "next page"
+        raise UserError(f"this container scrolls {'sideways' if sideways else 'up and down'}: "
+                        f"scroll {a.direction} would move it the other way", "bad-args",
+                        hint=f"use scroll {'left/right' if sideways else 'up/down'} on it, or another container")
     if acts & _SCROLL_ACTIONS and action not in acts:
         # the container scrolls, just not this way: it is at that edge. A swipe
         # would do nothing here at best, and inside a pager or a pull-to-refresh
@@ -769,6 +792,17 @@ def cmd_scroll(a):
         return finish(sess, a, "action", r, pre, t, extra={"action": action})
     box = (t.res.elem.rect if t.res is not None and t.res.elem is not None else None)
     return _swipe(sess, a, a.direction, box, pre, why=f"{action} not performed: swiped instead")
+
+
+def _sideways(t):
+    """Whether the target container scrolls sideways (None: not a scroll container)."""
+    if t.node is not None:
+        return S.is_horizontal(t.node) if t.node.scrollable else None
+    rec = t.rec or {}
+    if not rec.get("scroll"):
+        return None
+    return (rec.get("role") == "pager" or bool({"scroll_left", "scroll_right"} & set(rec["scroll"]))
+            or (rec.get("class") or "").endswith(("HorizontalScrollView", "ViewPager", "ViewPager2")))
 
 
 def _swipe_points(direction, box, frac=0.4):
@@ -862,7 +896,9 @@ def _scroll_plan(snap, loc, direction):
                      if x.scrollable and x.el is not None and x.el.node is x and x.el.rect), None)
         if direction is None:
             direction = R._direction(hidden.raw.get("bounds"), hidden)
-    cont = cont or _main_scroller(snap)
+    if cont is None:
+        # with no side known, prefer the vertical main list (a pager would page through tabs)
+        cont = _main_scroller(snap, direction or "down") or (None if direction else _main_scroller(snap))
     if direction is None and cont is not None:
         direction = "right" if S.is_horizontal(cont.node) else "down"
     return cont, direction or "down"
@@ -929,7 +965,7 @@ def _scroll_into_view(sess, a, loc, first):
         r = sess.call("act", snap.dump, res.handle, action=action,
                       settle={"quiet_ms": 150, "first_ms": 400, "timeout_ms": 1500}, retry=False)
         scrolls += 1
-        new = S.build(r.get("tree") or sess.tree()) if r.get("performed") else snap
+        new = sess.build(r.get("tree") or sess.tree()) if r.get("performed") else snap
         if not r.get("performed") or S.flat_lines(new) == S.flat_lines(snap):
             # the end of the list: try the other way once
             if tried_back or a.one_way:
@@ -1333,7 +1369,7 @@ def _wait_role(sess, a):
                    for e in snap.elements)
 
     while True:
-        snap = S.build(sess.tree())
+        snap = sess.build(sess.tree())
         present = hit(snap)
         done = (not present and not _transitional(snap)) if a.gone else present
         if done:
@@ -1416,7 +1452,7 @@ def cmd_mark(a):
             "text": f"marked {a.label!r} (logcat tag {MARK_TAG})"}
 
 
-MARK_TAG = "droidctl"
+MARK_TAG = "droidctl-mark"      # not the agent's own "droidctl" tag: `logs --marks` shows marks only
 
 
 def _dumpsys_activity(sess):
@@ -1470,7 +1506,7 @@ def _after_launch(sess, a, pkg, pre, t0):
                  extra={"pkg": pkg, "launch_ms": round((time.monotonic() - t0) * 1000),
                         "wait_ms": w.get("ms")})
     # a launch always shows the new screen in full
-    snap_text = S.render(S.build(sess.tree()), S.Opts.from_env()) if not out["new_screen"] else out["text"]
+    snap_text = S.render(sess.build(sess.tree()), S.Opts.from_env()) if not out["new_screen"] else out["text"]
     out["text"] = snap_text
     return out
 
@@ -1568,11 +1604,16 @@ def crash_blocks(crash_log, pkg):
 def cmd_logs(a):
     serial = dev.resolve_serial(a.device)
     sess = get_session(serial, auto_setup=False)
-    cmd = ["logcat", "-d", "-v", "threadtime", "-t", str(max(1, a.max * (4 if a.pkg else 1)))]
     tags = list(getattr(a, "tag", None) or []) + ([MARK_TAG] if getattr(a, "marks", False) else [])
     # logcat filterspecs: only these tags (at --level), everything else silent
     spec = ([f"{t}:{a.level or 'V'}" for t in dict.fromkeys(tags)] + ["*:S"] if tags
             else ["*:" + a.level] if a.level else [])
+    cmd = ["logcat", "-d", "-v", "threadtime"]
+    if not (spec or a.pkg):
+        # `-t N` counts the buffer's last N lines BEFORE any filter: with a tag, a
+        # level or a pid it returned nothing on a busy phone (a mark 7 s old, Galaxy
+        # S25). Filtered reads take the whole buffer and keep the last N here.
+        cmd += ["-t", str(max(1, a.max))]
     if a.pkg:
         pid = sess.shell("pidof", a.pkg, check=False).strip().split()
         # its crashes, from the crash buffer: they survive the process and log noise

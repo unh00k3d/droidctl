@@ -329,6 +329,7 @@ class Snap:
         self.carried = False
         self.off = self.locked = False  # the screen is off / the keyguard is up
         self.warnings = []
+        self.overlaps = []        # (element, element) behind "overlap" warnings
         self.dump = self.gen = None
         self.windows = []
         self.roots = []               # the Node tree of every kept window (the resolver searches it)
@@ -792,6 +793,9 @@ def _q(s):
     return s.replace('"', '\\"')
 
 
+ENDLESS = 2 ** 31 - 1 - 1000     # a collection this big is an endless (wrapping) one
+
+
 def is_horizontal(n):
     """A container that scrolls sideways: a pager, a tab strip, a carousel."""
     coll = n.raw.get("collection") or {}
@@ -805,6 +809,8 @@ def _list_info(e):
     n = e.node
     coll = n.raw.get("collection") or {}
     total = (coll.get("rows", 0) or 0) * max(1, coll.get("cols", 0) or 1) if coll.get("rows", 0) > 0 else None
+    if total is not None and max(coll.get("rows", 0) or 0, coll.get("cols", 0) or 0) >= ENDLESS:
+        total = None          # an endless carousel (Integer.MAX_VALUE items): no "1/2147483647 (50%)"
     items = []
     for d in _walk(n):
         if d is n or not d.raw.get("item") or not d.shown:
@@ -1107,7 +1113,20 @@ def _warn_overlaps(elems, snap):
             if a.node.win is not b.node.win or a.node.is_ancestor_of(b.node) or b.node.is_ancestor_of(a.node):
                 continue
             if sp.overlap_ratio(a.rect, b.rect) >= 0.5:
-                snap.warnings.append(f"overlap [{a.ref}] [{b.ref}]")
+                snap.overlaps.append((a, b))
+                snap.warnings.append(_overlap_text(a, b))
+
+
+def _overlap_text(a, b):
+    return f"overlap [{a.ref}] [{b.ref}]"
+
+
+def _renumber_overlaps(snap, before):
+    """carry_refs renumbers elements after the warnings were written (``before``: the
+    overlap texts then); a warning naming the old numbers pointed at other elements,
+    or at none on the screen."""
+    now = dict(zip(before, (_overlap_text(a, b) for a, b in snap.overlaps)))
+    snap.warnings = [now.get(w, w) for w in snap.warnings]
 
 
 # --------------------------------------------------------------------------
@@ -1577,13 +1596,16 @@ def _ctx_sim(a, b):
     return 1.0 if not A and not B else len(A & B) / len(A | B)
 
 
-def match_refs(old, new):
+def match_refs(old, new, retired=None):
     """Pair saved records with new ones: {old ref -> new index}. `old` is {ref: record},
     `new` a list of records. Identity (uid, view id) first, then the exact fingerprint,
     telling repeated ones ("Delete" in every row) apart by their row context, then a
     unique resource id (a counter whose text changed). Never by position: what can't be
-    paired uniquely is not paired."""
+    paired uniquely is not paired. ``retired`` records (elements that went away) are
+    paired only with what the live ones left: a field cleared back to its old text is
+    still the field the agent knows by its current number."""
     pairs, used = {}, set()
+    pool = dict(old)
 
     def take(cands_old, cands_new, key):
         groups = {}
@@ -1615,17 +1637,27 @@ def match_refs(old, new):
                     used.add(j)
 
     def left():
-        return ([(r, o) for r, o in old.items() if r not in pairs],
+        return ([(r, o) for r, o in pool.items() if r not in pairs],
                 [(j, n) for j, n in enumerate(new) if j not in used])
 
-    for ident in ("uid", "vid"):
-        take(*left(), key=lambda x, k=ident: (x.get(k), x.get("window")) if x.get(k) else None)
-    take(*left(), key=lambda x: tuple(x.get(k) for k in MATCH_KEYS))
-    # a changed text on a unique id (a counter) counts only on a screen already proven
-    # the same by the passes above: "Screen A" -> "Screen B" in the same title slot of
-    # the next page (TESTAPP lookalike_ok, same activity and signature) is not one element
-    if pairs:
-        take(*left(), key=lambda x: (x.get("role"), x.get("id"), x.get("window")) if x.get("id") else None)
+    def passes():
+        for ident in ("uid", "vid"):
+            take(*left(), key=lambda x, k=ident: (x.get(k), x.get("window")) if x.get(k) else None)
+        take(*left(), key=lambda x: tuple(x.get(k) for k in MATCH_KEYS))
+        # a changed text on a unique id (a counter) counts only on a screen already proven
+        # the same by the passes above: "Screen A" -> "Screen B" in the same title slot of
+        # the next page (TESTAPP lookalike_ok, same activity and signature) is not one element
+        if pairs:
+            take(*left(), key=lambda x: (x.get("role"), x.get("id"), x.get("window")) if x.get("id") else None)
+            # an input's text is its value, not its name: typing into an id-less field
+            # (apps that strip resource ids) renumbered it, and its old ref went stale
+            take(*left(), key=lambda x: (x.get("class"), x.get("hint"), x.get("window"))
+                 if x.get("role") == "input" and x.get("hint") else None)
+
+    passes()
+    if retired:
+        pool = {r: o for r, o in retired.items() if r not in old}
+        passes()
     return pairs
 
 
@@ -1646,20 +1678,23 @@ def carry_refs(prev, snap):
     if not same_screen(prev, snap) or (prev.get("next_ref") or 0) > REF_RESET:
         snap.retired, snap.next_ref = {}, n + 1
         return snap
-    old = {int(k): v for k, v in (prev.get("refs") or {}).items()}
-    old.update({int(k): v for k, v in (prev.get("retired") or {}).items()})
+    live = {int(k): v for k, v in (prev.get("refs") or {}).items()}
+    gone = {int(k): v for k, v in (prev.get("retired") or {}).items()}
+    old = {**gone, **live}
     new = [ref_record(e, snap) for e in snap.elements]
-    pairs = match_refs(old, new)
+    pairs = match_refs(live, new, retired=gone)
     if not pairs:                        # nothing in common: a new screen after all
         snap.retired, snap.next_ref = {}, n + 1
         return snap
     nxt = max([prev.get("next_ref") or 0, *(r + 1 for r in old)])
     by_new = {j: r for r, j in pairs.items()}
+    before = [_overlap_text(a, b) for a, b in snap.overlaps]
     for j, e in enumerate(snap.elements):
         if j in by_new:
             e.ref = by_new[j]
         else:
             e.ref, nxt = nxt, nxt + 1
+    _renumber_overlaps(snap, before)
     retired = {r: o for r, o in old.items() if r not in pairs}
     for r in sorted(retired)[:max(0, len(retired) - RETIRED_MAX)]:    # oldest numbers first
         retired.pop(r)

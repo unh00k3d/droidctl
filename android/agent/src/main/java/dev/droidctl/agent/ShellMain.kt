@@ -1,6 +1,7 @@
 package dev.droidctl.agent
 
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.annotation.SuppressLint
 import android.app.UiAutomation
 import android.content.ClipboardManager
 import android.content.Context
@@ -103,10 +104,23 @@ object ShellMain {
     }
 
     /** A Context for system services without an installed package (as scrcpy's server does). */
+    // runs only under app_process as shell, where the hidden-API policy does not apply
+    @SuppressLint("BlockedPrivateApi")
     private fun systemContext(): Context {
         val at = Class.forName("android.app.ActivityThread")
         val thread = at.getDeclaredConstructor().apply { isAccessible = true }.newInstance()
         at.getDeclaredField("sCurrentActivityThread").apply { isAccessible = true }.set(null, thread)
+        // Android 12 moved the configuration into a ConfigurationController that only
+        // attach() creates, and getSystemContext() reads it: on an unattached thread it
+        // threw an NPE (ConfigurationController.getConfiguration() on null; reported on
+        // a Galaxy S25, API 35). Give the thread its controller, nothing more:
+        // systemMain()/attach(true) would also set this process up as system_server.
+        if (Build.VERSION.SDK_INT >= 31) {
+            val internal = Class.forName("android.app.ActivityThreadInternal")
+            val controller = Class.forName("android.app.ConfigurationController")
+                .getDeclaredConstructor(internal).apply { isAccessible = true }.newInstance(thread)
+            at.getDeclaredField("mConfigurationController").apply { isAccessible = true }.set(thread, controller)
+        }
         return at.getDeclaredMethod("getSystemContext").invoke(thread) as Context
     }
 

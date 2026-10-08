@@ -166,7 +166,7 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--pkg", metavar="PKG", help="an app window of this package in front")
     sp.add_argument("--timeout", type=float, default=10.0, metavar="S", help="give up after S seconds (10)")
 
-    sp = add("mark", "write a marker line to the device's logcat (tag droidctl), to cut captures into steps",
+    sp = add("mark", "write a marker line to the device's logcat (tag droidctl-mark), to cut captures into steps",
              "cmd_mark")
     sp.add_argument("label", help="the marker text, e.g. 'tap Login'")
 
@@ -183,7 +183,7 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--pkg", metavar="PKG", help="only this app's process, plus its crashes (stack traces) from the crash buffer")
     sp.add_argument("--level", choices=("V", "D", "I", "W", "E", "F"), help="minimum level")
     sp.add_argument("--tag", action="append", metavar="TAG", help="only this logcat tag (repeatable)")
-    sp.add_argument("--marks", action="store_true", help="only `droidctl mark` lines (same as --tag droidctl)")
+    sp.add_argument("--marks", action="store_true", help="only `droidctl mark` lines (same as --tag droidctl-mark)")
 
     sp = add("shot", "a screenshot (downscaled JPEG), optionally with ref marks", "cmd_shot")
     sp.add_argument("--scale", type=float, default=0.5, metavar="F", help="downscale factor (0.5)")

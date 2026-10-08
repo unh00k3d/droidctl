@@ -196,6 +196,7 @@ def resolve_ref(state, ref, tree, activity=None):
     if old.get("parent") is not None:
         old["_container_role"] = state["refs"].get(str(old["parent"]), {}).get("role")
     snap = S.build(tree, activity=activity if activity is not None else state.get("activity") or None)
+    S.carry_refs(state, snap)     # the numbers in results and errors are the agent's numbers
     return resolve_in(old, state, snap, ref)
 
 
@@ -352,6 +353,11 @@ LOCATORS = [
     ("text+class", lambda o, r: bool(_txt(o) and o.get("class"))
      and r.get("class") == o.get("class") and _txt(r) == _txt(o)),
     ("desc", lambda o, r: bool(o.get("desc")) and norm(r.get("desc")) == norm(o.get("desc"))),
+    # an input is named by its hint; its text is the value (typed into a field with
+    # no id, it was "gone" while the same field sat there with the new text)
+    ("input+hint", lambda o, r: bool(o.get("role") == "input" and o.get("hint") and o.get("class"))
+     and r.get("role") == "input" and r.get("class") == o.get("class") and r.get("hint") == o.get("hint")
+     and r.get("window") == o.get("window")),
     # last: an id-less, label-less control (a Compose icon) outside any list is
     # known only by where it sits in the tree; the screen is unchanged (tier 3)
     ("class+path", lambda o, r: bool(not o.get("id") and not _txt(o) and not o.get("desc")
