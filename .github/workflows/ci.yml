@@ -1,0 +1,63 @@
+# Unit tests on Linux and macOS, and the prebuilt iOS runner rebuilt on a macOS runner.
+# Free on a public repo (standard GitHub-hosted runners).
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -e '.[test]'
+      # a short base temp: the daemon's unix socket path must stay under the OS limit
+      - run: python -m pytest -q --basetemp=/tmp/dct tests --ignore=tests/e2e
+
+  # The runner zip in droidctl/assets/ is what Linux and Macs without Xcode sign and install.
+  # Rebuild it here: it must still build, and the committed one must match the sources
+  # (tests/test_packaging.py checks the build id). The fresh zip is kept as an artifact, so a
+  # runner change made without a Mac can be committed from it.
+  runner:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -e .
+      - name: Build the runner (unsigned, XCTest stripped)
+        run: |
+          xcodebuild -version
+          python scripts/build_runner.py "$RUNNER_TEMP/droidctl-runner.zip"
+      - name: Compare with the committed runner
+        run: |
+          python - <<'EOF'
+          import hashlib, os, sys
+          from droidctl.ios import prebuilt
+          fresh = os.path.join(os.environ["RUNNER_TEMP"], "droidctl-runner.zip")
+          same = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
+          print("committed build", prebuilt.bundled_build(), "| sources", prebuilt.build_id(),
+                "| fresh build", prebuilt.bundled_build(fresh))
+          print("bytes identical:", same(fresh) == same(prebuilt.BUNDLED), "(differs when CI's Xcode differs)")
+          sys.exit(0 if prebuilt.bundled_build() == prebuilt.build_id() else
+                   "the runner sources changed: commit the droidctl-runner zip from this job's artifact")
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: droidctl-runner
+          path: ${{ runner.temp }}/droidctl-runner.zip
+          if-no-files-found: ignore

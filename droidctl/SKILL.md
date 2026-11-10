@@ -1,11 +1,11 @@
 ---
 name: droidctl
-description: Drive a real Android phone from the shell through its accessibility tree — read the screen as a compact list of elements with refs, tap/type/scroll by element (not coordinates), wait for UI conditions, launch apps, take screenshots, and batch steps. Use when a task needs an Android device or emulator: testing an app, reproducing a UI bug, automating a flow, or checking what a screen shows. Requires the `droidctl` CLI on PATH and a phone connected over adb.
+description: Drive a real Android phone or iPhone from the shell through its accessibility tree — read the screen as a compact list of elements with refs, tap/type/scroll by element (not coordinates), wait for UI conditions, launch apps, take screenshots, and batch steps. Use when a task needs an Android device, an emulator or an iPhone: testing an app, reproducing a UI bug, automating a flow, or checking what a screen shows. Requires the `droidctl` CLI on PATH and a phone connected over adb, or an iPhone over USB (a Mac with Xcode, or Linux/macOS with usbmuxd and go-ios, which setup offers to download).
 ---
 
 # droidctl
 
-One CLI over an Android phone's accessibility tree. Everything below is the whole
+One CLI over an Android phone's or an iPhone's accessibility tree. Everything below is the whole
 interface; you never need `--help` per command (`droidctl cheat --json` has it as data).
 
 ## The rules
@@ -99,6 +99,58 @@ droidctl run --json --step 'launch com.android.settings' --step 'tap --text Disp
   `suppressed-ua`, `latched-or-slow`, `degraded`, `opaque`, `transition`, `ok`.
 - Banking and other secure apps: screenshots of `FLAG_SECURE` windows fail with
   `secure-window` (the snapshot still works); some apps refuse to run on rooted phones.
+
+## iPhone (iOS 17+; a Mac with Xcode, or Linux / a Mac without Xcode)
+
+The same commands, with `-d UDID` (the hardware UDID `droidctl devices` shows). `droidctl setup
+-d UDID` is a guided checklist (Trust, Developer Mode, an Apple sign-in) that signs, installs
+and starts droidctl's runner; keep the phone unlocked.
+- **Without Xcode** (Linux, or `DROIDCTL_IOS_BACKEND=goios`): one command, `droidctl setup --ios`,
+  run by the user in their terminal. It offers to install usbmuxd (with the user's sudo), offers to
+  download a pinned go-ios, and on Linux asks which anisette server Apple's sign-in uses (Enter =
+  SideStore's public one; or `--anisette URL`). iOS 17.4.1 or later. On `not-trusted` setup opens Settings
+  at its main screen (not the Trust page itself): tell the user the path from the hint.
+- `signing` with `data.reason`:
+  - `anisette-rejected` (Apple's -80045, before the password is checked): Apple refuses that
+    anisette server's data; setup already tried the other public one. Suggest another server
+    (`--anisette URL`); don't let the user retry the same one over and over.
+  - `cert-limit`: the Apple team has as many development certificates as Apple allows (each
+    Mac, Linux host and sideloading tool takes one). droidctl never revokes one by itself: show
+    the user `data.certificates` and let them choose. A free team's Xcode has no Revoke button;
+    revoking breaks apps signed with that certificate (AltStore's, Xcode's).
+- **Signing is automatic after one sign-in, which only the user can do:** the first `setup` asks
+  for their Apple ID and password in a terminal (droidctl keeps Apple's token, never the
+  password) and then renews the 7-day profile by itself. If a command fails with `signing` and
+  the hint says `droidctl login` (or `data.reason` is `no-login`), ask the user to run
+  `droidctl setup --ios` or `droidctl login` in their terminal; you can't type the password.
+- **Points, not pixels:** the header's size (`390x844`), `--point`, `gesture --path` and boxes are
+  in points. A `shot` image is pixels: scale by header width / image width.
+- Icon buttons are often labelled with their image name (`button "arrowBack"`): use it as shown.
+  Pop-ups, including system permission prompts, are `-- dialog`: tap a button by its text.
+  Permission choices are the user's: ask unless told.
+- **Some app pop-ups are invisible to accessibility**: the result says `unchanged` although
+  something appeared. When a result doesn't match what should have happened, `shot` and look;
+  dismiss such a pop-up with `tap --point X,Y` (in points).
+- Actions wait for what they started, in one command: a spinner they brought up (≤8 s), a splash,
+  a push sliding in, a screen appearing ≤1.2 s after the tap (`loading_ms`). "still loading"
+  warning: `wait --role progress --gone --timeout 20`. Expect ~1–2 s per screen change.
+- `tap`: the element's accessibility action, else **one** checked touch (`via: "touch"`);
+  `handled: true` means the app got it: don't tap again.
+- `type` types real keystrokes (deleting the old value first). A field that submits itself (a
+  6-digit code box) closes as the last key goes in: `ok`, `verified: false`, a warning "the field
+  left the screen": the keys were taken, **don't type again**. `hide-keyboard` presses Return/Done;
+  a number pad has neither (`unsupported`): tap a label or another field.
+- `back` taps the screen's own back button; iOS has no system Back, so without one, or with a
+  dialog open, it is `unsupported` (the hint lists the dialog's buttons). `home` shows the Home
+  screen, where app icons are buttons (`tap --text "App Name"`).
+- `launch BUNDLE_ID`, `apps`, `install .app/.ipa`, `open-url`, `shot`, `logs`, `mark` work.
+  Unsupported: `press` keys other than enter, `--toast`, `--activity`, `launch --clear`,
+  `recents`, `notifications`, `quick-settings`, `expand`/`collapse`/`dismiss`.
+- `no-device` after the cable moved: retry in a few seconds; the first command after a reconnect
+  can take ~45 s. `launch`/`apps` timing out on "devicectl": the Mac's CoreDeviceService is stuck;
+  open the app from its Home-screen icon and tell the user (restarting it is their call).
+- Xcode can't reach the iPhone while droidctl reads its log (≤60 s after the last command):
+  `droidctl daemon stop` releases it.
 
 ## All commands
 

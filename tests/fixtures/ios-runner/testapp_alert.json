@@ -1,0 +1,749 @@
+{
+ "meta": {
+  "name": "testapp_alert",
+  "platform": "ios",
+  "captured": "2026-10-21T15:11:39+00:00",
+  "model": "iPhone13,2",
+  "release": "18.7.8",
+  "screen": {
+   "locked": false,
+   "rotation": 0,
+   "on": true,
+   "h": 844,
+   "w": 390,
+   "state": "clear",
+   "scale": 3
+  },
+  "runner": {
+   "version": "0.1.0",
+   "build": "i1k"
+  },
+  "package": "dev.droidctl.s1.testapp",
+  "dump_ms": 70,
+  "nodes": 48
+ },
+ "tree": {
+  "screen": {
+   "locked": false,
+   "rotation": 0,
+   "on": true,
+   "h": 844,
+   "w": 390,
+   "state": "clear",
+   "scale": 3
+  },
+  "gen": 79,
+  "ms": 70,
+  "front": "dev.droidctl.s1.testapp",
+  "keyboard": false,
+  "dump": 517748675,
+  "nodes": 48,
+  "apps": [
+   {
+    "bundle": "dev.droidctl.s1.testapp",
+    "root": {
+     "handle": 0,
+     "uid": "1638/app",
+     "children": [
+      {
+       "children": [
+        {
+         "children": [
+          {
+           "traits": 72057602627862528,
+           "uid": "1638/5495736832.1171",
+           "handle": 3,
+           "frame": [
+            60,
+            366.3333333333333,
+            270,
+            124.33333333333331
+           ],
+           "children": [
+            {
+             "traits": 8589934592,
+             "uid": "1638/5504619392.1172",
+             "handle": 4,
+             "frame": [
+              60,
+              366.3333333333333,
+              270,
+              124.33333333333331
+             ],
+             "children": [
+              {
+               "traits": 8589934592,
+               "uid": "1638/5496428160.1173",
+               "handle": 5,
+               "frame": [
+                60,
+                366.3333333333333,
+                270,
+                124.33333333333331
+               ],
+               "children": [
+                {
+                 "traits": 8589934592,
+                 "uid": "1638/5495893824.1174",
+                 "handle": 6,
+                 "frame": [
+                  60,
+                  366.3333333333333,
+                  270,
+                  124.33333333333331
+                 ],
+                 "children": [
+                  {
+                   "traits": 8589934592,
+                   "uid": "1638/5495966208.1176",
+                   "handle": 7,
+                   "frame": [
+                    60,
+                    366.3333333333333,
+                    270,
+                    124.33333333333331
+                   ],
+                   "children": [
+                    {
+                     "class": "_UIVisualEffectBackdropView",
+                     "frame": [
+                      60,
+                      366.3333333333333,
+                      270,
+                      124.33333333333331
+                     ],
+                     "uid": "1638/5495895616.1180",
+                     "type": 1,
+                     "traits": 8589934592,
+                     "handle": 8
+                    },
+                    {
+                     "class": "_UIVisualEffectContentView",
+                     "frame": [
+                      60,
+                      366.3333333333333,
+                      270,
+                      124.33333333333331
+                     ],
+                     "uid": "1638/5495887552.1181",
+                     "type": 1,
+                     "traits": 8589934592,
+                     "handle": 9
+                    }
+                   ],
+                   "class": "UIVisualEffectView",
+                   "type": 1
+                  }
+                 ],
+                 "class": "_UIDimmingKnockoutBackdropView",
+                 "type": 1
+                },
+                {
+                 "traits": 8589934592,
+                 "uid": "1638/5504620544.1175",
+                 "handle": 10,
+                 "frame": [
+                  60,
+                  366.3333333333333,
+                  270,
+                  124.33333333333331
+                 ],
+                 "children": [
+                  {
+                   "traits": 8589934592,
+                   "uid": "1638/5484535296.1177",
+                   "handle": 11,
+                   "frame": [
+                    60,
+                    366.3333333333333,
+                    270,
+                    80
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934592,
+                     "uid": "1638/5504615552.1182",
+                     "handle": 12,
+                     "frame": [
+                      60,
+                      366.3333333333333,
+                      270,
+                      80
+                     ],
+                     "children": [
+                      {
+                       "traits": 8589934656,
+                       "uid": "1638/5496340480.1189",
+                       "handle": 13,
+                       "frame": [
+                        76,
+                        386,
+                        238,
+                        20.333333333333314
+                       ],
+                       "class": "UILabel",
+                       "label": "Test alert",
+                       "type": 48
+                      },
+                      {
+                       "traits": 8589934656,
+                       "uid": "1638/5496341376.1169",
+                       "handle": 14,
+                       "frame": [
+                        76,
+                        410,
+                        238,
+                        15.666666666666686
+                       ],
+                       "class": "UILabel",
+                       "label": "Pick one",
+                       "type": 48
+                      }
+                     ],
+                     "class": "UIView",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5491339072.1183",
+                     "handle": 15,
+                     "frame": [
+                      297,
+                      366.3333333333333,
+                      30,
+                      80
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        324,
+                        327.3333333333333,
+                        3,
+                        36
+                       ],
+                       "uid": "1638/5491520256.1190",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 16
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Vertical scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5491339968.1184",
+                     "handle": 17,
+                     "frame": [
+                      60,
+                      413.3333333333333,
+                      270,
+                      30
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        21,
+                        440.3333333333333,
+                        36,
+                        3
+                       ],
+                       "uid": "1638/5504630144.1191",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 18
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Horizontal scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5491339072.1183",
+                     "handle": 19,
+                     "frame": [
+                      297,
+                      366.3333333333333,
+                      30,
+                      80
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        324,
+                        327.3333333333333,
+                        3,
+                        36
+                       ],
+                       "uid": "1638/5491520256.1190",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 20
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Vertical scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5491339968.1184",
+                     "handle": 21,
+                     "frame": [
+                      60,
+                      413.3333333333333,
+                      270,
+                      30
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        21,
+                        440.3333333333333,
+                        36,
+                        3
+                       ],
+                       "uid": "1638/5504630144.1191",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 22
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Horizontal scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    }
+                   ],
+                   "class": "_UIInterfaceActionGroupHeaderScrollView",
+                   "type": 46
+                  },
+                  {
+                   "traits": 8589934592,
+                   "uid": "1638/5495088320.1178",
+                   "handle": 23,
+                   "frame": [
+                    60,
+                    446.3333333333333,
+                    270,
+                    0.3333333333333144
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934592,
+                     "uid": "1638/5483995136.1185",
+                     "handle": 24,
+                     "frame": [
+                      60,
+                      446.3333333333333,
+                      270,
+                      0.3333333333333144
+                     ],
+                     "children": [
+                      {
+                       "class": "_UIVisualEffectContentView",
+                       "frame": [
+                        60,
+                        446.3333333333333,
+                        270,
+                        0.3333333333333144
+                       ],
+                       "uid": "1638/5495086528.1192",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 25
+                      }
+                     ],
+                     "class": "UIVisualEffectView",
+                     "type": 1
+                    }
+                   ],
+                   "class": "_UIInterfaceActionVibrantSeparatorView",
+                   "type": 1
+                  },
+                  {
+                   "traits": 8589934592,
+                   "uid": "1638/5484530176.1179",
+                   "handle": 26,
+                   "frame": [
+                    60,
+                    446.6666666666667,
+                    270,
+                    44
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934592,
+                     "uid": "1638/5495977984.1186",
+                     "handle": 27,
+                     "frame": [
+                      60,
+                      446.6666666666667,
+                      270,
+                      44
+                     ],
+                     "children": [
+                      {
+                       "traits": 8589934592,
+                       "uid": "1638/5495886208.1193",
+                       "handle": 28,
+                       "frame": [
+                        60,
+                        446.6666666666667,
+                        270,
+                        44
+                       ],
+                       "children": [
+                        {
+                         "traits": 8589934592,
+                         "uid": "1638/5495964672.1196",
+                         "handle": 29,
+                         "frame": [
+                          60,
+                          446.6666666666667,
+                          135,
+                          44
+                         ],
+                         "children": [
+                          {
+                           "traits": 8589934593,
+                           "uid": "1638/5484081152.1199",
+                           "handle": 30,
+                           "frame": [
+                            60,
+                            446.6666666666667,
+                            135,
+                            44
+                           ],
+                           "class": "_UIAlertControllerActionView",
+                           "label": "Cancel",
+                           "type": 9
+                          }
+                         ],
+                         "class": "_UIInterfaceActionCustomViewRepresentationView",
+                         "type": 1
+                        },
+                        {
+                         "traits": 8589934592,
+                         "uid": "1638/5495094144.1197",
+                         "handle": 31,
+                         "frame": [
+                          195,
+                          446.6666666666667,
+                          0.3333333333333428,
+                          44
+                         ],
+                         "children": [
+                          {
+                           "traits": 8589934592,
+                           "uid": "1638/5486439936.1200",
+                           "handle": 32,
+                           "frame": [
+                            195,
+                            446.6666666666667,
+                            0.3333333333333428,
+                            44
+                           ],
+                           "children": [
+                            {
+                             "class": "_UIVisualEffectContentView",
+                             "frame": [
+                              195,
+                              446.6666666666667,
+                              0.3333333333333428,
+                              44
+                             ],
+                             "uid": "1638/5507629056.1202",
+                             "type": 1,
+                             "traits": 8589934592,
+                             "handle": 33
+                            }
+                           ],
+                           "class": "UIVisualEffectView",
+                           "type": 1
+                          }
+                         ],
+                         "class": "_UIInterfaceActionVibrantSeparatorView",
+                         "type": 1
+                        },
+                        {
+                         "traits": 8589934592,
+                         "uid": "1638/5495964160.1198",
+                         "handle": 34,
+                         "frame": [
+                          195.33333333333337,
+                          446.6666666666667,
+                          134.66666666666663,
+                          44
+                         ],
+                         "children": [
+                          {
+                           "traits": 8589934593,
+                           "uid": "1638/5484079616.1201",
+                           "handle": 35,
+                           "frame": [
+                            195.33333333333337,
+                            446.6666666666667,
+                            134.66666666666663,
+                            44
+                           ],
+                           "class": "_UIAlertControllerActionView",
+                           "label": "OK",
+                           "type": 9
+                          }
+                         ],
+                         "class": "_UIInterfaceActionCustomViewRepresentationView",
+                         "type": 1
+                        }
+                       ],
+                       "class": "UIStackView",
+                       "type": 1
+                      }
+                     ],
+                     "class": "_UIInterfaceActionSeparatableSequenceView",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5484592000.1187",
+                     "handle": 36,
+                     "frame": [
+                      297,
+                      446.6666666666667,
+                      30,
+                      44
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        324,
+                        536.6666666666667,
+                        3,
+                        7
+                       ],
+                       "uid": "1638/5491509504.1194",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 37
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Vertical scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5484592448.1188",
+                     "handle": 38,
+                     "frame": [
+                      60,
+                      465.6666666666667,
+                      270,
+                      22
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        150,
+                        484.6666666666667,
+                        7,
+                        3
+                       ],
+                       "uid": "1638/5491522560.1195",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 39
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Horizontal scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5484592000.1187",
+                     "handle": 40,
+                     "frame": [
+                      297,
+                      446.6666666666667,
+                      30,
+                      44
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        324,
+                        536.6666666666667,
+                        3,
+                        7
+                       ],
+                       "uid": "1638/5491509504.1194",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 41
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Vertical scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "1638/5484592448.1188",
+                     "handle": 42,
+                     "frame": [
+                      60,
+                      465.6666666666667,
+                      270,
+                      22
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        150,
+                        484.6666666666667,
+                        7,
+                        3
+                       ],
+                       "uid": "1638/5491522560.1195",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 43
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Horizontal scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    }
+                   ],
+                   "class": "_UIInterfaceActionRepresentationsSequenceView",
+                   "type": 46
+                  }
+                 ],
+                 "class": "UIView",
+                 "type": 1
+                }
+               ],
+               "class": "_UIAlertControllerInterfaceActionGroupView",
+               "type": 1
+              }
+             ],
+             "class": "UIView",
+             "type": 1
+            }
+           ],
+           "class": "_UIAlertControllerPhoneTVMacView",
+           "label": "Test alert",
+           "type": 7
+          }
+         ],
+         "frame": [
+          0,
+          0,
+          390,
+          844
+         ],
+         "uid": "1638/5495972352.1170",
+         "type": 1,
+         "class": "UITransitionView",
+         "handle": 2
+        }
+       ],
+       "frame": [
+        0,
+        0,
+        390,
+        844
+       ],
+       "uid": "1638/4368906720.5",
+       "type": 4,
+       "class": "UIWindow",
+       "handle": 1
+      },
+      {
+       "children": [
+        {
+         "traits": 8589934592,
+         "uid": "1638/5495082048.1045",
+         "handle": 45,
+         "frame": [
+          0,
+          0,
+          390,
+          844
+         ],
+         "children": [
+          {
+           "class": "UIEditingOverlayGestureView",
+           "frame": [
+            0,
+            0,
+            390,
+            844
+           ],
+           "uid": "1638/5495082944.1047",
+           "type": 1,
+           "traits": 8589934592,
+           "handle": 46
+          },
+          {
+           "class": "UIInputSetHostView",
+           "frame": [
+            0,
+            844,
+            390,
+            233
+           ],
+           "uid": "1638/5491515648.1048",
+           "type": 1,
+           "traits": 8589934592,
+           "handle": 47
+          }
+         ],
+         "class": "UIInputSetContainerView",
+         "type": 1
+        }
+       ],
+       "frame": [
+        0,
+        0,
+        390,
+        844
+       ],
+       "uid": "1638/5484522752.1043",
+       "type": 4,
+       "class": "UITextEffectsWindow",
+       "handle": 44
+      }
+     ],
+     "frame": [
+      0,
+      0,
+      390,
+      844
+     ],
+     "class": "UIApplication",
+     "label": "droidctl S1",
+     "type": 2
+    }
+   }
+  ]
+ }
+}

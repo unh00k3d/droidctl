@@ -1,0 +1,30 @@
+{
+ "info": {
+  "commandType": "devicectl.device.info.apps",
+  "jsonVersion": 3,
+  "outcome": "success",
+  "version": "506.6"
+ },
+ "result": {
+  "apps": [
+   {
+    "appClip": false,
+    "builtByDeveloper": true,
+    "bundleIdentifier": "dev.droidctl.s1.testapp",
+    "bundleVersion": "1",
+    "defaultApp": false,
+    "hidden": false,
+    "internalApp": false,
+    "name": "droidctl S1",
+    "removable": true,
+    "url": "file:///private/var/containers/Bundle/Application/00000000-0000-4000-8000-000000000001/TestApp.app/",
+    "version": "1.0"
+   }
+  ],
+  "defaultAppsIncluded": false,
+  "hiddenAppsIncluded": false,
+  "internalAppsIncluded": false,
+  "matchingBundleIdentifier": "dev.droidctl.s1.testapp",
+  "removableAppsIncluded": true
+ }
+}

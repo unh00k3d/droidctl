@@ -1,0 +1,8378 @@
+[
+ {
+  "k": "noop_press",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 113,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    8,
+    13
+   ]
+  ],
+  "inner_ms": 8,
+  "inner": "ok",
+  "events": [
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "noop_press",
+  "mode": "P",
+  "round": 0,
+  "changes": []
+ },
+ {
+  "k": "switch_tap",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 403,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    275,
+    289
+   ],
+   [
+    294,
+    299
+   ]
+  ],
+  "inner_ms": 275,
+  "inner": "ok",
+  "events": [
+   [
+    84,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    85,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    85,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    85,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    245,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    277,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    278,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    288,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    289,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    289,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    296,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    296,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    297,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    298,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_tap",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    282,
+    723,
+    [
+     "48|16,55,358,20|switch value=0|",
+     "40|96,85,51,30|Switch|0"
+    ],
+    [
+     "48|16,55,358,20|switch value=1|",
+     "40|96,85,51,30|Switch|1"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "slider_inc",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 248,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    8,
+    146
+   ]
+  ],
+  "inner_ms": 8,
+  "inner": "ok",
+  "events": [
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    145,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    145,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    146,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "slider_inc",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    7,
+    422,
+    [
+     "48|16,55,358,20|slider value=0.70|",
+     "33|159,85,217,31|Slider|%70"
+    ],
+    [
+     "48|16,55,358,20|slider value=0.60|",
+     "33|159,85,217,31|Slider|%60"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "alert_open",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 689,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    279,
+    588
+   ]
+  ],
+  "inner_ms": 279,
+  "inner": "ok",
+  "events": [
+   [
+    85,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    85,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    155,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    156,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    245,
+    1018,
+    "1521/0.1",
+    ""
+   ],
+   [
+    281,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    282,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    452,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    564,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    567,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    570,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    572,
+    1006,
+    "1521/0.1",
+    ""
+   ],
+   [
+    573,
+    1006,
+    "1521/0.1",
+    ""
+   ],
+   [
+    586,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    587,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    588,
+    1025,
+    "1521/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "alert_open",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    281,
+    328,
+    [
+     "7|60,366,270,124|Test alert|",
+     "1|60,366,270,124||",
+     "1|60,366,270,124||"
+    ],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "alert_ok",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 649,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    306,
+    548
+   ]
+  ],
+  "inner_ms": 306,
+  "inner": "ok",
+  "events": [
+   [
+    103,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    104,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    122,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    123,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    124,
+    1000,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    308,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    309,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    545,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    546,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    546,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    547,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    548,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ]
+  ]
+ },
+ {
+  "k": "alert_ok",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    299,
+    313,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "7|60,366,270,124|Test alert|",
+     "1|60,366,270,124||",
+     "1|60,366,270,124||"
+    ]
+   ],
+   [
+    519,
+    951,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "table_page",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 117,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    8,
+    13
+   ]
+  ],
+  "inner_ms": 8,
+  "inner": "ok",
+  "events": [
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "table_page",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    8,
+    429,
+    [
+     "48|16,55,358,20|scroll drag_began|"
+    ],
+    [
+     "48|16,55,358,20|scroll end y=325|"
+    ]
+   ],
+   [
+    431,
+    855,
+    [
+     "48|16,55,358,20|scroll end y=651|",
+     "75|16,-35,358,44||",
+     "75|16,9,358,44||"
+    ],
+    [
+     "48|16,55,358,20|scroll drag_began|",
+     "75|16,159,358,44||",
+     "1|16,159,358,44||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "field_tap_kbd",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 785,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    277,
+    685
+   ]
+  ],
+  "inner_ms": 277,
+  "inner": "ok",
+  "events": [
+   [
+    83,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    84,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    126,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    127,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    134,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    134,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    134,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    135,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    135,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    135,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    135,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    158,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    159,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    162,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    162,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    162,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    162,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    163,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    163,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    171,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    173,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    173,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    176,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    176,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    176,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    178,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    178,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    178,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    178,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    178,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    178,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    179,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    179,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    186,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    186,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    187,
+    1018,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    239,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    240,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    278,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    279,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    468,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    469,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    470,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    470,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    485,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    486,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    487,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    678,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    679,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    679,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    683,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    684,
+    1031,
+    "1521/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    684,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    684,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    685,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "field_tap_kbd",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    384,
+    792,
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "48|16,55,358,20|field return|"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "setattr_kbd",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 710,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    52,
+    609
+   ]
+  ],
+  "inner_ms": 52,
+  "inner": "ok",
+  "events": [
+   [
+    45,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    46,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    53,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    55,
+    1005,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    81,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    81,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    82,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    82,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    82,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    82,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    90,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    108,
+    1018,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    155,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    155,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    389,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    389,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    390,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    390,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    403,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    403,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    404,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    604,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    605,
+    1031,
+    "1521/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    606,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    606,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    607,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    608,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    608,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    609,
+    1025,
+    "34/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "setattr_kbd",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    37,
+    431,
+    [
+     "48|16,55,358,20|field text=v0|"
+    ],
+    [
+     "48|16,55,358,20|field return|"
+    ]
+   ],
+   [
+    434,
+    844,
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "type_abc",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 371,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    260,
+    268
+   ]
+  ],
+  "inner_ms": 260,
+  "inner": "ok",
+  "events": [
+   [
+    53,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = a;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    54,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = a;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    55,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = b;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    56,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = b;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    57,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    57,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    66,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = c;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    67,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = c;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    68,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    263,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    265,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    266,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    267,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "type_abc",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    253,
+    710,
+    [
+     "48|16,55,358,20|field text=v0abcabc|",
+     "49|16,179,358,34||v0abcabc"
+    ],
+    [
+     "48|16,55,358,20|field editing_began|",
+     "49|16,179,358,34||v0abc"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "return_kbd_hide",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 719,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    250,
+    599
+   ],
+   [
+    604,
+    615
+   ]
+  ],
+  "inner_ms": 250,
+  "inner": "ok",
+  "events": [
+   [
+    51,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    52,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    72,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    72,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = \"\\n\";     ModifierFlags = 0;     Unmod"
+   ],
+   [
+    73,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = \"\\n\";     ModifierFlags = 0;     Unmod"
+   ],
+   [
+    73,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = \"_UICursorAccessoryViewController\"; "
+   ],
+   [
+    74,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = \"_UICursorAccessoryViewController\"; "
+   ],
+   [
+    78,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    79,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    159,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    159,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    160,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    160,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    253,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    253,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    370,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    379,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    379,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    380,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    528,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    578,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    588,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    589,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    589,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    590,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    591,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    591,
+    1031,
+    "34/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    591,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    592,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    592,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    593,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    594,
+    1031,
+    "1521/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    594,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    595,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    597,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    599,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    600,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    600,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    601,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    602,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    602,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    603,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    604,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    604,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    606,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    606,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    607,
+    1031,
+    "34/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    608,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    608,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    609,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    609,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    610,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    611,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    611,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    612,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    612,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "return_kbd_hide",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    214,
+    666,
+    [
+     "48|16,55,358,20|field return|",
+     "1|0,244,390,1245||"
+    ],
+    [
+     "48|16,55,358,20|field editing_began|",
+     "1|16,131,200,48||",
+     "1|16,131,200,48||"
+    ]
+   ],
+   [
+    669,
+    1076,
+    [],
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "switch_to_settings",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 262,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    64,
+    161
+   ]
+  ],
+  "inner_ms": 64,
+  "inner": "ok",
+  "events": [
+   [
+    64,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    65,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    92,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    93,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    101,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    103,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    109,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    109,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    114,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    114,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    115,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    147,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    151,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    151,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    152,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    160,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    160,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    161,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_to_settings",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    57,
+    73,
+    [],
+    []
+   ],
+   [
+    76,
+    204,
+    [
+     "2|0,0,390,844|Settings|",
+     "4|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "settings_push_general",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 1384,
+  "idle": true,
+  "rearms": 2,
+  "rounds": [
+   [
+    291,
+    766
+   ],
+   [
+    774,
+    1267
+   ],
+   [
+    1272,
+    1283
+   ]
+  ],
+  "inner_ms": 291,
+  "inner": "ok",
+  "events": [
+   [
+    89,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    90,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    217,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    217,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    224,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    224,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    293,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    293,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    332,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    333,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    336,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    338,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    339,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    340,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    341,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    341,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    515,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    578,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    578,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    763,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    764,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    764,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    771,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    772,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    773,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    773,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    774,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    775,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    776,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    778,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    779,
+    1000,
+    "1411/0.1",
+    "{     data = AXPerformElementUpdateImmediatelyToken;     pid"
+   ],
+   [
+    779,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    780,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    780,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    1081,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    1265,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1266,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1267,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    1276,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    1277,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    1279,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1281,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "settings_push_general",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    288,
+    465,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "21|0,47,390,148||",
+     "48|16,95,133,41|Settings|",
+     "45|16,144,358,36|Search|"
+    ]
+   ],
+   [
+    615,
+    755,
+    [
+     "48|164,59,62,20|General|"
+    ],
+    []
+   ],
+   [
+    757,
+    846,
+    [],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "settings_pop",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 794,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    288,
+    673
+   ],
+   [
+    688,
+    693
+   ]
+  ],
+  "inner_ms": 288,
+  "inner": "ok",
+  "events": [
+   [
+    95,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    97,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    161,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    162,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    163,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    290,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    290,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    522,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    523,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    534,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    535,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    552,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    671,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    671,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    672,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    680,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    681,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    682,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    682,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    683,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    684,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    684,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    685,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    685,
+    1000,
+    "1411/0.1",
+    "{     data = AXPerformElementUpdateImmediatelyToken;     pid"
+   ],
+   [
+    690,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    690,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    691,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    691,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "settings_pop",
+  "mode": "P",
+  "round": 0,
+  "changes": [
+   [
+    288,
+    449,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "21|0,47,390,44||",
+     "9|0,47,93,44|Settings|",
+     "48|164,59,62,20|General|"
+    ]
+   ],
+   [
+    766,
+    853,
+    [],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "switch_back_app",
+  "mode": "S",
+  "round": 0,
+  "settle_ms": 490,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    94,
+    315
+   ],
+   [
+    380,
+    387
+   ]
+  ],
+  "inner_ms": 94,
+  "inner": "ok",
+  "events": [
+   [
+    97,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    99,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    115,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    116,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    118,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    119,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    120,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    121,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    122,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    122,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    123,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    124,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    125,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    125,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    126,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    126,
+    1021,
+    "1521/0.1",
+    "{     pid = 1522;     suspended = 0; }"
+   ],
+   [
+    127,
+    1021,
+    "1521/0.1",
+    "{     pid = 1522;     suspended = 0; }"
+   ],
+   [
+    127,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    127,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    135,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    135,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    309,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    311,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    312,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    313,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    380,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    382,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    383,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    384,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    385,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_back_app",
+  "mode": "P",
+  "round": 0,
+  "changes": []
+ },
+ {
+  "k": "noop_press",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 116,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    8,
+    13
+   ]
+  ],
+  "inner_ms": 8,
+  "inner": "ok",
+  "events": [
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "noop_press",
+  "mode": "P",
+  "round": 1,
+  "changes": []
+ },
+ {
+  "k": "switch_tap",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 394,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    274,
+    293
+   ]
+  ],
+  "inner_ms": 274,
+  "inner": "ok",
+  "events": [
+   [
+    87,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    87,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    90,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    90,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    238,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    277,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    278,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    289,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    290,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    291,
+    1025,
+    "1521/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "switch_tap",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    282,
+    723,
+    [
+     "48|16,55,358,20|switch value=0|",
+     "40|96,85,51,30|Switch|0"
+    ],
+    [
+     "48|16,55,358,20|switch value=1|",
+     "40|96,85,51,30|Switch|1"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "slider_inc",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 294,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    7,
+    189
+   ]
+  ],
+  "inner_ms": 7,
+  "inner": "ok",
+  "events": [
+   [
+    8,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    8,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    186,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    186,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    187,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "slider_inc",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    7,
+    422,
+    [
+     "48|16,55,358,20|slider value=0.90|",
+     "33|159,85,217,31|Slider|%90"
+    ],
+    [
+     "48|16,55,358,20|slider value=0.80|",
+     "33|159,85,217,31|Slider|%80"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "alert_open",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 689,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    276,
+    573
+   ],
+   [
+    579,
+    584
+   ]
+  ],
+  "inner_ms": 276,
+  "inner": "ok",
+  "events": [
+   [
+    81,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    81,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    127,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    127,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    218,
+    1018,
+    "1521/0.1",
+    ""
+   ],
+   [
+    278,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    279,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    432,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    535,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    535,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    537,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    538,
+    1006,
+    "1521/0.1",
+    ""
+   ],
+   [
+    539,
+    1006,
+    "1521/0.1",
+    ""
+   ],
+   [
+    571,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    573,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    574,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    581,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    581,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    582,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    583,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "alert_open",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    281,
+    334,
+    [
+     "7|60,366,270,124|Test alert|",
+     "1|60,366,270,124||",
+     "1|60,366,270,124||"
+    ],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "alert_ok",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 655,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    297,
+    539
+   ],
+   [
+    546,
+    552
+   ]
+  ],
+  "inner_ms": 297,
+  "inner": "ok",
+  "events": [
+   [
+    95,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    97,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    115,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    116,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    116,
+    1000,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    299,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    300,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    537,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    537,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    538,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    538,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    539,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    548,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    549,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    549,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    550,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "alert_ok",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    291,
+    304,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "7|60,366,270,124|Test alert|",
+     "1|60,366,270,124||",
+     "1|60,366,270,124||"
+    ]
+   ],
+   [
+    520,
+    955,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "table_page",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 116,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    8,
+    13
+   ]
+  ],
+  "inner_ms": 8,
+  "inner": "ok",
+  "events": [
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "table_page",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    7,
+    405,
+    [
+     "48|16,55,358,20|scroll drag_began|"
+    ],
+    [
+     "48|16,55,358,20|scroll end y=977|"
+    ]
+   ],
+   [
+    407,
+    826,
+    [
+     "48|16,55,358,20|scroll end y=1302|",
+     "75|16,-26,358,44||",
+     "75|16,18,358,44||"
+    ],
+    [
+     "48|16,55,358,20|scroll drag_began|",
+     "75|16,-9,358,44||",
+     "75|16,35,358,44||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "field_tap_kbd",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 839,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    284,
+    737
+   ]
+  ],
+  "inner_ms": 284,
+  "inner": "ok",
+  "events": [
+   [
+    84,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    85,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    134,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    135,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    147,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    147,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    148,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    148,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    148,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    170,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    171,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    174,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    175,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    176,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    176,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    176,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    176,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    177,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    182,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    187,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    188,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    188,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    188,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    188,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    194,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    194,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    194,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    195,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    196,
+    1018,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    201,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    202,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    203,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    203,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    239,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    240,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    286,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    286,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    354,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    470,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    485,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    487,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    487,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    488,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    488,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    488,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    687,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    687,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    688,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    701,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    701,
+    1031,
+    "1521/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    701,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    735,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    736,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    736,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "field_tap_kbd",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    281,
+    689,
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "48|16,55,358,20|field return|"
+    ]
+   ],
+   [
+    692,
+    1120,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "setattr_kbd",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 708,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    52,
+    99
+   ],
+   [
+    110,
+    606
+   ]
+  ],
+  "inner_ms": 52,
+  "inner": "ok",
+  "events": [
+   [
+    46,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    47,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    53,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    53,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    53,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    54,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    54,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    54,
+    1005,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    56,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    56,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    79,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    80,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    80,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    80,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    80,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    80,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    87,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    92,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    98,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    99,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    99,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    99,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    108,
+    1018,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    110,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    111,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    154,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    154,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    387,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    388,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    388,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    391,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    402,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    403,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    403,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    596,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    596,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    597,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    602,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    603,
+    1031,
+    "1521/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    603,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    604,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    604,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "setattr_kbd",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    39,
+    399,
+    [
+     "48|16,55,358,20|field text=v1|"
+    ],
+    [
+     "48|16,55,358,20|field return|"
+    ]
+   ],
+   [
+    401,
+    808,
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "type_abc",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 374,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    261,
+    269
+   ]
+  ],
+  "inner_ms": 261,
+  "inner": "ok",
+  "events": [
+   [
+    50,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = a;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    51,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = a;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    52,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = b;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    53,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = b;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    57,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    59,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    61,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = c;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    63,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = c;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    64,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    264,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    266,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    267,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    268,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "type_abc",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    252,
+    708,
+    [
+     "48|16,55,358,20|field text=v1abcabc|",
+     "49|16,179,358,34||v1abcabc"
+    ],
+    [
+     "48|16,55,358,20|field editing_began|",
+     "49|16,179,358,34||v1abc"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "return_kbd_hide",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 714,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    245,
+    594
+   ],
+   [
+    599,
+    609
+   ]
+  ],
+  "inner_ms": 245,
+  "inner": "ok",
+  "events": [
+   [
+    49,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    50,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    69,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    69,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = \"\\n\";     ModifierFlags = 0;     Unmod"
+   ],
+   [
+    70,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = \"\\n\";     ModifierFlags = 0;     Unmod"
+   ],
+   [
+    70,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = \"_UICursorAccessoryViewController\"; "
+   ],
+   [
+    71,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = \"_UICursorAccessoryViewController\"; "
+   ],
+   [
+    84,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    84,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    159,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    160,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    160,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    161,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    247,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    247,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    369,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    369,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    370,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    370,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    524,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    578,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    579,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    586,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    587,
+    1031,
+    "34/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    587,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    588,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    589,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    590,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    590,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    591,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    591,
+    1031,
+    "34/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    592,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    592,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    592,
+    1031,
+    "1521/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    593,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    593,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    593,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    594,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    594,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    595,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    595,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    596,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    596,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    597,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    597,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    598,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    598,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    599,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    600,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    601,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    602,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    603,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    604,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    605,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    605,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    606,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "return_kbd_hide",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    214,
+    661,
+    [
+     "48|16,55,358,20|field return|",
+     "1|0,244,390,1245||"
+    ],
+    [
+     "48|16,55,358,20|field editing_began|",
+     "1|16,131,200,48||",
+     "1|16,131,200,48||"
+    ]
+   ],
+   [
+    663,
+    1070,
+    [],
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "switch_to_settings",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 453,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    61,
+    281
+   ],
+   [
+    344,
+    349
+   ]
+  ],
+  "inner_ms": 61,
+  "inner": "ok",
+  "events": [
+   [
+    62,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    63,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    68,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    68,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    69,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    70,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    84,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    85,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    86,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    86,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    87,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    117,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    117,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    277,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    278,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    278,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    279,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    339,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    346,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    347,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    348,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    349,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_to_settings",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    64,
+    68,
+    [],
+    []
+   ],
+   [
+    71,
+    76,
+    [],
+    []
+   ],
+   [
+    79,
+    211,
+    [
+     "2|0,0,390,844|Settings|",
+     "4|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "settings_push_general",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 1477,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    409,
+    840
+   ],
+   [
+    860,
+    1374
+   ]
+  ],
+  "inner_ms": 409,
+  "inner": "ok",
+  "events": [
+   [
+    219,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    220,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    323,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    323,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    329,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    331,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    357,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    359,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    360,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    362,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    363,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    364,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    365,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    367,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    411,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    411,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    622,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    680,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    681,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    689,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    838,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    838,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    839,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    860,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    861,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    861,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    862,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    862,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    862,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    863,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    863,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    875,
+    1000,
+    "1411/0.1",
+    "{     data = AXPerformElementUpdateImmediatelyToken;     pid"
+   ],
+   [
+    875,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    876,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    1177,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    1371,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1373,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1374,
+    1025,
+    "1411/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "settings_push_general",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    286,
+    469,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "21|0,47,390,148||",
+     "48|16,95,133,41|Settings|",
+     "45|16,144,358,36|Search|"
+    ]
+   ],
+   [
+    624,
+    765,
+    [
+     "48|164,59,62,20|General|"
+    ],
+    []
+   ],
+   [
+    768,
+    860,
+    [],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "settings_pop",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 792,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    293,
+    672
+   ],
+   [
+    678,
+    687
+   ]
+  ],
+  "inner_ms": 293,
+  "inner": "ok",
+  "events": [
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    93,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    156,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    157,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    159,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    295,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    296,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    517,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    518,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    531,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    531,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    548,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    668,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    669,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    670,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    677,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    678,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    679,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    679,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    681,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    682,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    683,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    684,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    684,
+    1000,
+    "1411/0.1",
+    "{     data = AXPerformElementUpdateImmediatelyToken;     pid"
+   ],
+   [
+    684,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    685,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    686,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    687,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "settings_pop",
+  "mode": "P",
+  "round": 1,
+  "changes": [
+   [
+    290,
+    449,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "21|0,47,390,44||",
+     "9|0,47,93,44|Settings|",
+     "48|164,59,62,20|General|"
+    ]
+   ],
+   [
+    764,
+    847,
+    [],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "switch_back_app",
+  "mode": "S",
+  "round": 1,
+  "settle_ms": 470,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    90,
+    307
+   ],
+   [
+    362,
+    368
+   ]
+  ],
+  "inner_ms": 90,
+  "inner": "ok",
+  "events": [
+   [
+    93,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    94,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    96,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    97,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    109,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    110,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    112,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    114,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    115,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    116,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    126,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    129,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    130,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    130,
+    1021,
+    "1521/0.1",
+    "{     pid = 1522;     suspended = 0; }"
+   ],
+   [
+    130,
+    1021,
+    "1521/0.1",
+    "{     pid = 1522;     suspended = 0; }"
+   ],
+   [
+    131,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    132,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    132,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    133,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    133,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    134,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    304,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    305,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    306,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    306,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    361,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    364,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    365,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    366,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    366,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_back_app",
+  "mode": "P",
+  "round": 1,
+  "changes": []
+ },
+ {
+  "k": "noop_press",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 118,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    9,
+    13
+   ]
+  ],
+  "inner_ms": 9,
+  "inner": "ok",
+  "events": [
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    11,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    12,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "noop_press",
+  "mode": "P",
+  "round": 2,
+  "changes": []
+ },
+ {
+  "k": "switch_tap",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 397,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    276,
+    296
+   ]
+  ],
+  "inner_ms": 276,
+  "inner": "ok",
+  "events": [
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    241,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    278,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    279,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    294,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    295,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    296,
+    1025,
+    "1521/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "switch_tap",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    275,
+    719,
+    [
+     "48|16,55,358,20|switch value=0|",
+     "40|96,85,51,30|Switch|0"
+    ],
+    [
+     "48|16,55,358,20|switch value=1|",
+     "40|96,85,51,30|Switch|1"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "slider_inc",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 341,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    7,
+    237
+   ]
+  ],
+  "inner_ms": 7,
+  "inner": "ok",
+  "events": [
+   [
+    10,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    10,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    232,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    233,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    234,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "slider_inc",
+  "mode": "P",
+  "round": 2,
+  "changes": []
+ },
+ {
+  "k": "alert_open",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 674,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    278,
+    571
+   ]
+  ],
+  "inner_ms": 278,
+  "inner": "ok",
+  "events": [
+   [
+    77,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    78,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    131,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    131,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    222,
+    1018,
+    "1521/0.1",
+    ""
+   ],
+   [
+    281,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    282,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    431,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    538,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    539,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    540,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    540,
+    1006,
+    "1521/0.1",
+    ""
+   ],
+   [
+    541,
+    1006,
+    "1521/0.1",
+    ""
+   ],
+   [
+    568,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    569,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    570,
+    1025,
+    "1521/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "alert_open",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    279,
+    326,
+    [
+     "7|60,366,270,124|Test alert|",
+     "1|60,366,270,124||",
+     "1|60,366,270,124||"
+    ],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "alert_ok",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 657,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    298,
+    555
+   ]
+  ],
+  "inner_ms": 298,
+  "inner": "ok",
+  "events": [
+   [
+    110,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    113,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    131,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    132,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    133,
+    1000,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    300,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    301,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    552,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    552,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    553,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    553,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ],
+   [
+    554,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIAlertController;     controllerTit"
+   ]
+  ]
+ },
+ {
+  "k": "alert_ok",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    299,
+    314,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "7|60,366,270,124|Test alert|",
+     "1|60,366,270,124||",
+     "1|60,366,270,124||"
+    ]
+   ],
+   [
+    556,
+    976,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "table_page",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 115,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    7,
+    13
+   ]
+  ],
+  "inner_ms": 7,
+  "inner": "ok",
+  "events": [
+   [
+    10,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    10,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    10,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    10,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "table_page",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    8,
+    407,
+    [
+     "48|16,55,358,20|scroll drag_began|"
+    ],
+    [
+     "48|16,55,358,20|scroll end y=1628|"
+    ]
+   ],
+   [
+    409,
+    824,
+    [
+     "48|16,55,358,20|scroll end y=1954|",
+     "75|16,-18,358,44||",
+     "75|16,26,358,44||"
+    ],
+    [
+     "48|16,55,358,20|scroll drag_began|",
+     "75|16,0,358,44||",
+     "75|16,44,358,44||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "field_tap_kbd",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 834,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    282,
+    734
+   ]
+  ],
+  "inner_ms": 282,
+  "inner": "ok",
+  "events": [
+   [
+    82,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    83,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    131,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    132,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    144,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    145,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    145,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    145,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    168,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    168,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    168,
+    4002,
+    "1521/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    172,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    172,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    172,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    172,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    173,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    173,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    176,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    176,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    177,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    181,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    185,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    185,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    185,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    185,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    186,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    192,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    192,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    193,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    194,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    194,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    194,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    194,
+    1018,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    196,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    196,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    197,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    197,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    237,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    237,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    284,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    285,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    351,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    481,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    482,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    482,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    483,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    493,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    494,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    494,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    684,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    685,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    685,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    703,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    703,
+    1031,
+    "1521/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    704,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    732,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    733,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    733,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "field_tap_kbd",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    280,
+    682,
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "48|16,55,358,20|field return|"
+    ]
+   ],
+   [
+    685,
+    1121,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "setattr_kbd",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 711,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    49,
+    54
+   ],
+   [
+    82,
+    608
+   ]
+  ],
+  "inner_ms": 49,
+  "inner": "ok",
+  "events": [
+   [
+    44,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    45,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    51,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    51,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    52,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    52,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    52,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    52,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    52,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    52,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    52,
+    1005,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    54,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    54,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    54,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    54,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    80,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    80,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    80,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    80,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    80,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    81,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    89,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    89,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    90,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    92,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    95,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    95,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    95,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIInputWindowController;     event ="
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    96,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemKeyboardDockController;     "
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    97,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    107,
+    1018,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    150,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    150,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    380,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    381,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    381,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    381,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    402,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    402,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    403,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    592,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    592,
+    1031,
+    "34/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    593,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    606,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid "
+   ],
+   [
+    606,
+    1031,
+    "1521/0.1",
+    "{     visible = 1; }"
+   ],
+   [
+    606,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    607,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    608,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "setattr_kbd",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    39,
+    437,
+    [
+     "48|16,55,358,20|field text=v2|"
+    ],
+    [
+     "48|16,55,358,20|field return|"
+    ]
+   ],
+   [
+    439,
+    853,
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "type_abc",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 362,
+  "idle": true,
+  "rearms": 0,
+  "rounds": [
+   [
+    250,
+    258
+   ]
+  ],
+  "inner_ms": 250,
+  "inner": "ok",
+  "events": [
+   [
+    47,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = a;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    48,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = a;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    49,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = b;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    50,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = b;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    55,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    56,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    58,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = c;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    60,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = c;     ModifierFlags = 0;     Unmodifi"
+   ],
+   [
+    61,
+    1017,
+    "1521/4315079408.12",
+    ""
+   ],
+   [
+    253,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    255,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    256,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    257,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "type_abc",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    252,
+    706,
+    [
+     "48|16,55,358,20|field text=v2abcabc|",
+     "49|16,179,358,34||v2abcabc"
+    ],
+    [
+     "48|16,55,358,20|field editing_began|",
+     "49|16,179,358,34||v2abc"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "return_kbd_hide",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 720,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    250,
+    597
+   ],
+   [
+    603,
+    618
+   ]
+  ],
+  "inner_ms": 250,
+  "inner": "ok",
+  "events": [
+   [
+    51,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    51,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    70,
+    1001,
+    "1521/0.1",
+    "{     data = \"<null>\";     pid = 1521; }"
+   ],
+   [
+    71,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = \"\\n\";     ModifierFlags = 0;     Unmod"
+   ],
+   [
+    72,
+    4002,
+    "1521/0.1",
+    "{     ModifiedInput = \"\\n\";     ModifierFlags = 0;     Unmod"
+   ],
+   [
+    72,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = \"_UICursorAccessoryViewController\"; "
+   ],
+   [
+    72,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = \"_UICursorAccessoryViewController\"; "
+   ],
+   [
+    84,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    84,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = STKPrewarmingViewController;     eve"
+   ],
+   [
+    156,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    157,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 412;     \"suspended-stat"
+   ],
+   [
+    158,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    159,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1460;     \"suspended-sta"
+   ],
+   [
+    253,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    254,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    368,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    369,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    369,
+    1001,
+    "34/0.1",
+    "{     data = AXForceUpdateChange;     pid = 34; }"
+   ],
+   [
+    370,
+    1001,
+    "1521/0.1",
+    "{     data = AXForceUpdateChange;     pid = 1521; }"
+   ],
+   [
+    526,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    577,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    589,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    591,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    593,
+    1008,
+    "1521/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    593,
+    1031,
+    "1521/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    594,
+    1025,
+    "1521/0.1",
+    ""
+   ],
+   [
+    594,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    594,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    595,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    596,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    596,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    598,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    598,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    601,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UISystemInputAssistantViewController"
+   ],
+   [
+    603,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    604,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UIPredictionViewController;     even"
+   ],
+   [
+    607,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    609,
+    4002,
+    "1521/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    610,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    611,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    612,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    612,
+    1031,
+    "34/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    613,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    613,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    614,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    614,
+    1008,
+    "34/0.1",
+    "{     data = AXAnnouncementTypeKeyboardDisappearSound;     p"
+   ],
+   [
+    614,
+    1031,
+    "34/0.1",
+    "{     visible = 0; }"
+   ],
+   [
+    615,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    615,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    615,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    616,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    616,
+    4002,
+    "34/0.1",
+    "{     controllerClass = UICompatibilityInputViewController; "
+   ],
+   [
+    617,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    617,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    618,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    618,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "return_kbd_hide",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    217,
+    656,
+    [
+     "48|16,55,358,20|field return|",
+     "1|0,244,390,1245||"
+    ],
+    [
+     "48|16,55,358,20|field editing_began|",
+     "1|16,131,200,48||",
+     "1|16,131,200,48||"
+    ]
+   ],
+   [
+    658,
+    1056,
+    [],
+    [
+     "4|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "switch_to_settings",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 469,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    66,
+    285
+   ],
+   [
+    360,
+    366
+   ]
+  ],
+  "inner_ms": 66,
+  "inner": "ok",
+  "events": [
+   [
+    70,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    71,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    79,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    79,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    80,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    81,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    91,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    92,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    93,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    93,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    126,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    128,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    282,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    282,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    283,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    285,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    357,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    362,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    363,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    364,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    364,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_to_settings",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    67,
+    73,
+    [],
+    []
+   ],
+   [
+    76,
+    211,
+    [
+     "2|0,0,390,844|Settings|",
+     "4|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    []
+   ]
+  ]
+ },
+ {
+  "k": "settings_push_general",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 1356,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    294,
+    721
+   ],
+   [
+    743,
+    1255
+   ]
+  ],
+  "inner_ms": 294,
+  "inner": "ok",
+  "events": [
+   [
+    94,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    96,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    200,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    201,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    207,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    207,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    296,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    296,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    353,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    356,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    358,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    361,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    362,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    363,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    366,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    367,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    498,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    560,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    560,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    565,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    717,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    718,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    718,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    741,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    742,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    742,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    743,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    743,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    743,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    744,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    744,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    745,
+    1000,
+    "1411/0.1",
+    "{     data = AXPerformElementUpdateImmediatelyToken;     pid"
+   ],
+   [
+    756,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    757,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    1057,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    1252,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1253,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    1255,
+    1025,
+    "1411/0.1",
+    ""
+   ]
+  ]
+ },
+ {
+  "k": "settings_push_general",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    292,
+    474,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "21|0,47,390,148||",
+     "48|16,95,133,41|Settings|",
+     "45|16,144,358,36|Search|"
+    ]
+   ],
+   [
+    633,
+    766,
+    [
+     "48|164,59,62,20|General|"
+    ],
+    []
+   ],
+   [
+    769,
+    855,
+    [],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "settings_pop",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 786,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    295,
+    669
+   ],
+   [
+    679,
+    685
+   ]
+  ],
+  "inner_ms": 295,
+  "inner": "ok",
+  "events": [
+   [
+    89,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    90,
+    4002,
+    "34/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    155,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    155,
+    4002,
+    "1411/0.1",
+    "{     event = TouchEventsCompleted; }"
+   ],
+   [
+    156,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    296,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    297,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    515,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    516,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    528,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    528,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    545,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    666,
+    1025,
+    "1411/0.1",
+    ""
+   ],
+   [
+    667,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    668,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    675,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    676,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    676,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    677,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = PSGGeneralController;     event = Vi"
+   ],
+   [
+    678,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    680,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtGC7SwiftUI32NavigationStackHosti"
+   ],
+   [
+    681,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    682,
+    4002,
+    "1411/0.1",
+    "{     controllerClass = \"_TtC11SettingsAppP33_D5FB2F106141AA"
+   ],
+   [
+    682,
+    1000,
+    "1411/0.1",
+    "{     data = AXPerformElementUpdateImmediatelyToken;     pid"
+   ],
+   [
+    683,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    683,
+    4002,
+    "1411/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    684,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    684,
+    4002,
+    "1411/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "settings_pop",
+  "mode": "P",
+  "round": 2,
+  "changes": [
+   [
+    282,
+    437,
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ],
+    [
+     "21|0,47,390,44||",
+     "9|0,47,93,44|Settings|",
+     "48|164,59,62,20|General|"
+    ]
+   ],
+   [
+    749,
+    836,
+    [],
+    [
+     "1|0,0,390,844||",
+     "1|0,0,390,844||",
+     "1|0,0,390,844||"
+    ]
+   ]
+  ]
+ },
+ {
+  "k": "switch_back_app",
+  "mode": "S",
+  "round": 2,
+  "settle_ms": 478,
+  "idle": true,
+  "rearms": 1,
+  "rounds": [
+   [
+    94,
+    312
+   ],
+   [
+    368,
+    374
+   ]
+  ],
+  "inner_ms": 94,
+  "inner": "ok",
+  "events": [
+   [
+    91,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    94,
+    1021,
+    "34/0.0",
+    "{     pid = 0;     pipPid = 1; }"
+   ],
+   [
+    98,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    101,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1411;     \"suspended-sta"
+   ],
+   [
+    102,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    102,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1523;     \"suspended-sta"
+   ],
+   [
+    120,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    122,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1521;     \"suspended-sta"
+   ],
+   [
+    123,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    124,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1524;     \"suspended-sta"
+   ],
+   [
+    125,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    126,
+    1021,
+    "34/0.0",
+    "{     \"display-type\" = 0;     pid = 1522;     \"suspended-sta"
+   ],
+   [
+    127,
+    1021,
+    "1521/0.1",
+    "{     pid = 1522;     suspended = 0; }"
+   ],
+   [
+    128,
+    1021,
+    "1521/0.1",
+    "{     pid = 1522;     suspended = 0; }"
+   ],
+   [
+    128,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    129,
+    4002,
+    "34/0.1",
+    "{     controllerClass = SBDeviceApplicationSceneViewControll"
+   ],
+   [
+    130,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    130,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    130,
+    1001,
+    "34/0.1",
+    "{     data = \"<null>\";     pid = 34; }"
+   ],
+   [
+    131,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    131,
+    1001,
+    "1411/0.1",
+    "{     data = \"<null>\";     pid = 1411; }"
+   ],
+   [
+    309,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    310,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    311,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    312,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    366,
+    1025,
+    "34/0.1",
+    ""
+   ],
+   [
+    371,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    371,
+    4002,
+    "1521/0.1",
+    "{     event = RunLoopIsIdle; }"
+   ],
+   [
+    372,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ],
+   [
+    372,
+    4002,
+    "1521/0.1",
+    "{     event = AnimationsNonActive; }"
+   ]
+  ]
+ },
+ {
+  "k": "switch_back_app",
+  "mode": "P",
+  "round": 2,
+  "changes": []
+ }
+]

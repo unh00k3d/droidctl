@@ -1,0 +1,239 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		A0000000000000000000PROX /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000PROJ0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A0000000000000000TAPP0;
+			remoteInfo = TestApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A0000000000000000APPREF /* TestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0000000000000000RUNREF /* Runner.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Runner.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A000000000000000GRPAPP0 /* TestApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TestApp;
+			sourceTree = "<group>";
+		};
+		A000000000000000GRPRUN0 /* Runner */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Runner;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXGroup section */
+		A00000000000000000MAIN0 = {
+			isa = PBXGroup;
+			children = (
+				A000000000000000GRPAPP0 /* TestApp */,
+				A000000000000000GRPRUN0 /* Runner */,
+				A00000000000000000PROD0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000PROD0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000APPREF /* TestApp.app */,
+				A0000000000000000RUNREF /* Runner.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A0000000000000000TAPP0 /* TestApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000CLAP0 /* Build configuration list for PBXNativeTarget "TestApp" */;
+			buildPhases = (
+				A0000000000000000APSRC0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A000000000000000GRPAPP0 /* TestApp */,
+			);
+			name = TestApp;
+			productName = TestApp;
+			productReference = A0000000000000000APPREF /* TestApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A0000000000000000TRUN0 /* Runner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000CLRN0 /* Build configuration list for PBXNativeTarget "Runner" */;
+			buildPhases = (
+				A0000000000000000RNSRC0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00000000000000000DEP00 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A000000000000000GRPRUN0 /* Runner */,
+			);
+			name = Runner;
+			productName = Runner;
+			productReference = A0000000000000000RUNREF /* Runner.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000PROJ0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					A0000000000000000TRUN0 = {
+						TestTargetID = A0000000000000000TAPP0;
+					};
+				};
+			};
+			buildConfigurationList = A00000000000000000CLPJ0 /* Build configuration list for PBXProject "S1" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A00000000000000000MAIN0;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A00000000000000000PROD0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A0000000000000000TAPP0 /* TestApp */,
+				A0000000000000000TRUN0 /* Runner */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A0000000000000000APSRC0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A0000000000000000RNSRC0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000DEP00 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A0000000000000000TAPP0 /* TestApp */;
+			targetProxy = A0000000000000000000PROX /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000BCAP0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(S1_TEAM)";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "droidctl S1";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(S1_BUNDLE_PREFIX).testapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A00000000000000000BCPJ0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "$(S1_TEAM)";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				ONLY_ACTIVE_ARCH = YES;
+				S1_BUNDLE_PREFIX = dev.droidctl.s1;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A00000000000000000BCRN0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(S1_BUNDLE_PREFIX).runner";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = TestApp;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000CLAP0 /* Build configuration list for PBXNativeTarget "TestApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000BCAP0 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A00000000000000000CLPJ0 /* Build configuration list for PBXProject "S1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000BCPJ0 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A00000000000000000CLRN0 /* Build configuration list for PBXNativeTarget "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000BCRN0 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000PROJ0 /* Project object */;
+}

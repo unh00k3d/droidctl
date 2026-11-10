@@ -1,0 +1,1217 @@
+{
+ "meta": {
+  "name": "safari_example",
+  "platform": "ios",
+  "captured": "2026-10-22T05:02:52+00:00",
+  "model": "iPhone13,2",
+  "release": "18.7.8",
+  "screen": {
+   "locked": false,
+   "rotation": 0,
+   "on": true,
+   "h": 844,
+   "w": 390,
+   "state": "clear",
+   "scale": 3
+  },
+  "runner": {
+   "version": "0.2.0",
+   "build": "9db185190d3f"
+  },
+  "package": "com.apple.mobilesafari",
+  "dump_ms": 121,
+  "nodes": 79
+ },
+ "tree": {
+  "screen": {
+   "locked": false,
+   "rotation": 0,
+   "on": true,
+   "h": 844,
+   "w": 390,
+   "state": "clear",
+   "scale": 3
+  },
+  "gen": 437,
+  "ms": 121,
+  "front": "com.apple.mobilesafari",
+  "keyboard": false,
+  "dump": 42211948,
+  "nodes": 79,
+  "apps": [
+   {
+    "bundle": "com.apple.mobilesafari",
+    "root": {
+     "handle": 0,
+     "uid": "2243/app",
+     "children": [
+      {
+       "children": [
+        {
+         "children": [
+          {
+           "children": [
+            {
+             "traits": 8589934592,
+             "uid": "2243/27836121984.13",
+             "handle": 4,
+             "id": "SafariWindow?View=Narrow&BarsKeptMinimized=false&UUID=00000000-0000-4000-8000-000000000000&UsingLoweredBar=true&IsSecure=true",
+             "frame": [
+              0,
+              0,
+              390,
+              844
+             ],
+             "children": [
+              {
+               "traits": 8589934592,
+               "uid": "2243/27836122880.14",
+               "handle": 5,
+               "frame": [
+                0,
+                0,
+                390,
+                844
+               ],
+               "children": [
+                {
+                 "traits": 8589934592,
+                 "uid": "2243/27836123328.16",
+                 "handle": 6,
+                 "frame": [
+                  0,
+                  0,
+                  390,
+                  844
+                 ],
+                 "children": [
+                  {
+                   "traits": 8589934592,
+                   "uid": "2243/27836146432.18",
+                   "handle": 7,
+                   "frame": [
+                    0,
+                    0,
+                    390,
+                    47
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934592,
+                     "uid": "2243/27835336704.23",
+                     "handle": 8,
+                     "frame": [
+                      0,
+                      0,
+                      390,
+                      47
+                     ],
+                     "children": [
+                      {
+                       "class": "_UIVisualEffectContentView",
+                       "frame": [
+                        0,
+                        0,
+                        390,
+                        47
+                       ],
+                       "uid": "2243/27836147328.31",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 9
+                      }
+                     ],
+                     "class": "UIVisualEffectView",
+                     "type": 1
+                    }
+                   ],
+                   "class": "UIView",
+                   "type": 1
+                  },
+                  {
+                   "class": "UIView",
+                   "frame": [
+                    0,
+                    0,
+                    390,
+                    47
+                   ],
+                   "uid": "2243/27836124224.19",
+                   "type": 1,
+                   "traits": 8589934592,
+                   "handle": 10
+                  },
+                  {
+                   "traits": 8589934592,
+                   "uid": "2243/27836925952.20",
+                   "handle": 11,
+                   "frame": [
+                    0,
+                    0,
+                    390,
+                    844
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934592,
+                     "uid": "2243/27856619008.194",
+                     "handle": 12,
+                     "id": "TabDocument?IsLoadedUsingDesktopUserAgent=false&InReaderMode=false&UUID=00000000-0000-4000-8000-000000000000&IsPrivate=false&IsPageLoaded=true&WebViewProcessID=2267",
+                     "frame": [
+                      0,
+                      0,
+                      390,
+                      844
+                     ],
+                     "children": [
+                      {
+                       "traits": 146028888064,
+                       "uid": "2243/27858894848.198",
+                       "handle": 13,
+                       "id": "WebView",
+                       "frame": [
+                        0,
+                        0,
+                        390,
+                        844
+                       ],
+                       "children": [
+                        {
+                         "traits": 8589934592,
+                         "uid": "2243/27838586368.202",
+                         "handle": 14,
+                         "frame": [
+                          0,
+                          0,
+                          390,
+                          844
+                         ],
+                         "children": [
+                          {
+                           "traits": 146028888064,
+                           "uid": "2243/27825764352.193",
+                           "handle": 15,
+                           "frame": [
+                            0,
+                            0,
+                            390,
+                            844
+                           ],
+                           "children": [
+                            {
+                             "children": [
+                              {
+                               "children": [
+                                {
+                                 "traits": 146029019136,
+                                 "uid": "2267/4387856544.5",
+                                 "handle": 18,
+                                 "frame": [
+                                  0,
+                                  47,
+                                  390,
+                                  844
+                                 ],
+                                 "children": [
+                                  {
+                                   "traits": 146029019136,
+                                   "uid": "2267/4387856784.6",
+                                   "handle": 19,
+                                   "frame": [
+                                    0,
+                                    47,
+                                    390,
+                                    885
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 146029019136,
+                                     "uid": "2267/4387853232.7",
+                                     "handle": 20,
+                                     "frame": [
+                                      32,
+                                      249,
+                                      326,
+                                      101
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019200,
+                                       "uid": "2267/4387862448.14",
+                                       "handle": 21,
+                                       "frame": [
+                                        33,
+                                        251,
+                                        324,
+                                        96
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.",
+                                       "value": "This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 146029019136,
+                                     "uid": "2267/4387856448.8",
+                                     "handle": 22,
+                                     "frame": [
+                                      32,
+                                      365,
+                                      326,
+                                      67
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019200,
+                                       "uid": "2267/4387855536.4",
+                                       "handle": 23,
+                                       "frame": [
+                                        33,
+                                        367,
+                                        324,
+                                        63
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "هذا النطاق مُخصص للاستخدام في أمثلة التوثيق دون الحاجة إلى إذن. هذه ليست خدمة، يُرجى تجنب الاعتماد عليها لأغراض الاختبار والمراقبة.",
+                                       "value": "هذا النطاق مُخصص للاستخدام في أمثلة التوثيق دون الحاجة إلى إذن. هذه ليست خدمة، يُرجى تجنب الاعتماد عليها لأغراض الاختبار والمراقبة.",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 146029019136,
+                                     "uid": "2267/4387863360.9",
+                                     "handle": 24,
+                                     "frame": [
+                                      32,
+                                      445,
+                                      326,
+                                      45
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019200,
+                                       "uid": "2267/4387863120.15",
+                                       "handle": 25,
+                                       "frame": [
+                                        33,
+                                        447,
+                                        324,
+                                        41
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "该域名仅用于文档示例，无需获得许可。这并非一项服务，请勿将其用于测试和监控目的。",
+                                       "value": "该域名仅用于文档示例，无需获得许可。这并非一项服务，请勿将其用于测试和监控目的。",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 146029019136,
+                                     "uid": "2267/4387852896.10",
+                                     "handle": 26,
+                                     "frame": [
+                                      32,
+                                      503,
+                                      326,
+                                      111
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019200,
+                                       "uid": "2267/4387863552.16",
+                                       "handle": 27,
+                                       "frame": [
+                                        34,
+                                        505,
+                                        322,
+                                        107
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "L’usage de ce domaine est réservé à des exemples de documentation, sans autorisation préalable. Il ne s’agit pas d’un service ; son utilisation à des fins de test ou de surveillance est à éviter.",
+                                       "value": "L’usage de ce domaine est réservé à des exemples de documentation, sans autorisation préalable. Il ne s’agit pas d’un service ; son utilisation à des fins de test ou de surveillance est à éviter.",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 146029019136,
+                                     "uid": "2267/4387863312.11",
+                                     "handle": 28,
+                                     "frame": [
+                                      32,
+                                      627,
+                                      326,
+                                      133
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019200,
+                                       "uid": "2267/4387849008.17",
+                                       "handle": 29,
+                                       "frame": [
+                                        35,
+                                        629,
+                                        320,
+                                        129
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "Данный домен предназначен для использования в примерах документации без необходимости получения предварительного разрешения. Это не сервис; не рекомендуется его использование для тестирования и мониторинга.",
+                                       "value": "Данный домен предназначен для использования в примерах документации без необходимости получения предварительного разрешения. Это не сервис; не рекомендуется его использование для тестирования и мониторинга.",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 146029019136,
+                                     "uid": "2267/4387854720.12",
+                                     "handle": 30,
+                                     "frame": [
+                                      32,
+                                      773,
+                                      326,
+                                      89
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019200,
+                                       "uid": "2267/4387848864.18",
+                                       "handle": 31,
+                                       "frame": [
+                                        32,
+                                        775,
+                                        326,
+                                        85
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "Este dominio está destinado al uso en ejemplos de documentación sin necesidad de permiso. Esto no es un servicio; evitar utilizarlo para realizar pruebas o monitoreos.",
+                                       "value": "Este dominio está destinado al uso en ejemplos de documentación sin necesidad de permiso. Esto no es un servicio; evitar utilizarlo para realizar pruebas o monitoreos.",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 146029019138,
+                                     "uid": "2267/4387855584.13",
+                                     "handle": 32,
+                                     "frame": [
+                                      154,
+                                      877,
+                                      82,
+                                      21
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 146029019202,
+                                       "uid": "2267/4387848480.19",
+                                       "handle": 33,
+                                       "frame": [
+                                        154,
+                                        877,
+                                        82,
+                                        21
+                                       ],
+                                       "class": "NSObject",
+                                       "label": "Learn more",
+                                       "value": "Learn more",
+                                       "type": 48
+                                      }
+                                     ],
+                                     "class": "NSObject",
+                                     "label": "Learn more",
+                                     "type": 42
+                                    }
+                                   ],
+                                   "class": "NSObject",
+                                   "label": "Example Domain",
+                                   "type": 1
+                                  }
+                                 ],
+                                 "class": "NSObject",
+                                 "type": 1
+                                }
+                               ],
+                               "frame": [
+                                0,
+                                0,
+                                390,
+                                844
+                               ],
+                               "uid": "2267/4607481632.3",
+                               "type": 1,
+                               "class": "NSObject",
+                               "handle": 17
+                              }
+                             ],
+                             "frame": [
+                              0,
+                              0,
+                              390,
+                              844
+                             ],
+                             "uid": "2243/17954513717778252695.9999",
+                             "type": 1,
+                             "class": "NSObject",
+                             "handle": 16
+                            }
+                           ],
+                           "class": "UIView",
+                           "type": 58
+                          },
+                          {
+                           "traits": 8589938688,
+                           "uid": "2243/27836182336.207",
+                           "handle": 34,
+                           "frame": [
+                            357,
+                            47,
+                            30,
+                            663
+                           ],
+                           "children": [
+                            {
+                             "class": "UIView",
+                             "frame": [
+                              384,
+                              50,
+                              3,
+                              300.3333333333333
+                             ],
+                             "uid": "2243/27853218048.212",
+                             "type": 1,
+                             "traits": 8589934592,
+                             "handle": 35
+                            }
+                           ],
+                           "class": "_UIScrollViewScrollIndicator",
+                           "label": "Vertical scroll bar, 2 pages",
+                           "value": "%0",
+                           "type": 1
+                          },
+                          {
+                           "traits": 8589938688,
+                           "uid": "2243/27836184128.208",
+                           "handle": 36,
+                           "frame": [
+                            0,
+                            677,
+                            390,
+                            30
+                           ],
+                           "children": [
+                            {
+                             "class": "UIView",
+                             "frame": [
+                              3,
+                              704,
+                              151.66666666666666,
+                              3
+                             ],
+                             "uid": "2243/27853222656.213",
+                             "type": 1,
+                             "traits": 8589934592,
+                             "handle": 37
+                            }
+                           ],
+                           "class": "_UIScrollViewScrollIndicator",
+                           "label": "Horizontal scroll bar, 1 page",
+                           "value": "%0",
+                           "type": 1
+                          },
+                          {
+                           "traits": 8589938688,
+                           "uid": "2243/27836182336.207",
+                           "handle": 38,
+                           "frame": [
+                            357,
+                            47,
+                            30,
+                            663
+                           ],
+                           "children": [
+                            {
+                             "class": "UIView",
+                             "frame": [
+                              384,
+                              50,
+                              3,
+                              300.3333333333333
+                             ],
+                             "uid": "2243/27853218048.212",
+                             "type": 1,
+                             "traits": 8589934592,
+                             "handle": 39
+                            }
+                           ],
+                           "class": "_UIScrollViewScrollIndicator",
+                           "label": "Vertical scroll bar, 2 pages",
+                           "value": "%0",
+                           "type": 1
+                          },
+                          {
+                           "traits": 8589938688,
+                           "uid": "2243/27836184128.208",
+                           "handle": 40,
+                           "frame": [
+                            0,
+                            677,
+                            390,
+                            30
+                           ],
+                           "children": [
+                            {
+                             "class": "UIView",
+                             "frame": [
+                              3,
+                              704,
+                              151.66666666666666,
+                              3
+                             ],
+                             "uid": "2243/27853222656.213",
+                             "type": 1,
+                             "traits": 8589934592,
+                             "handle": 41
+                            }
+                           ],
+                           "class": "_UIScrollViewScrollIndicator",
+                           "label": "Horizontal scroll bar, 1 page",
+                           "value": "%0",
+                           "type": 1
+                          }
+                         ],
+                         "class": "UIScrollView",
+                         "type": 58
+                        }
+                       ],
+                       "class": "UIView",
+                       "type": 58
+                      }
+                     ],
+                     "class": "UIView",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "2243/27854430528.195",
+                     "handle": 42,
+                     "frame": [
+                      41.333333333333336,
+                      811,
+                      307,
+                      30
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        338.3333333333333,
+                        838,
+                        7,
+                        3
+                       ],
+                       "uid": "2243/27856022400.199",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 43
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Horizontal scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589938688,
+                     "uid": "2243/27854430528.195",
+                     "handle": 44,
+                     "frame": [
+                      41.333333333333336,
+                      811,
+                      307,
+                      30
+                     ],
+                     "children": [
+                      {
+                       "class": "UIView",
+                       "frame": [
+                        338.3333333333333,
+                        838,
+                        7,
+                        3
+                       ],
+                       "uid": "2243/27856022400.199",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 45
+                      }
+                     ],
+                     "class": "_UIScrollViewScrollIndicator",
+                     "label": "Horizontal scroll bar, 1 page",
+                     "value": "%0",
+                     "type": 1
+                    }
+                   ],
+                   "class": "UIScrollView",
+                   "type": 46
+                  }
+                 ],
+                 "class": "UIView",
+                 "type": 1
+                }
+               ],
+               "class": "UIView",
+               "type": 1
+              },
+              {
+               "traits": 8589934592,
+               "uid": "2243/27825890304.15",
+               "handle": 46,
+               "id": "CapsuleViewController",
+               "frame": [
+                0,
+                0,
+                390,
+                844
+               ],
+               "children": [
+                {
+                 "traits": 8589934592,
+                 "uid": "2243/27824400384.17",
+                 "handle": 47,
+                 "frame": [
+                  0,
+                  0,
+                  390,
+                  844
+                 ],
+                 "children": [
+                  {
+                   "traits": 8589934592,
+                   "uid": "2243/27825890688.21",
+                   "handle": 48,
+                   "frame": [
+                    0,
+                    0,
+                    390,
+                    844
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934596,
+                     "uid": "2243/27835328512.27",
+                     "handle": 49,
+                     "id": "capsule_with_toolbar_shadow",
+                     "frame": [
+                      -372,
+                      659,
+                      450,
+                      163
+                     ],
+                     "class": "UIImageView",
+                     "type": 43
+                    },
+                    {
+                     "traits": 8589934596,
+                     "uid": "2243/27835451904.196",
+                     "handle": 50,
+                     "id": "capsule_with_toolbar_shadow",
+                     "frame": [
+                      -30,
+                      659,
+                      450,
+                      163
+                     ],
+                     "class": "UIImageView",
+                     "type": 43
+                    },
+                    {
+                     "traits": 8589934592,
+                     "uid": "2243/27835320832.28",
+                     "handle": 51,
+                     "frame": [
+                      0,
+                      710,
+                      390,
+                      134
+                     ],
+                     "children": [
+                      {
+                       "class": "_UIVisualEffectBackdropView",
+                       "frame": [
+                        0,
+                        710,
+                        390,
+                        134
+                       ],
+                       "uid": "2243/27836131840.34",
+                       "type": 1,
+                       "traits": 8589934592,
+                       "handle": 52
+                      },
+                      {
+                       "traits": 8589934592,
+                       "uid": "2243/27836132288.35",
+                       "handle": 53,
+                       "frame": [
+                        0,
+                        710,
+                        390,
+                        134
+                       ],
+                       "children": [
+                        {
+                         "class": "UIView",
+                         "frame": [
+                          0,
+                          710,
+                          390,
+                          0.33333333333337123
+                         ],
+                         "uid": "2243/27825898240.40",
+                         "type": 1,
+                         "traits": 8589934592,
+                         "handle": 54
+                        }
+                       ],
+                       "class": "_UIVisualEffectContentView",
+                       "type": 1
+                      }
+                     ],
+                     "class": "UIVisualEffectView",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589934592,
+                     "uid": "2243/27854722048.197",
+                     "handle": 55,
+                     "frame": [
+                      28,
+                      718,
+                      334,
+                      45
+                     ],
+                     "children": [
+                      {
+                       "traits": 8589934592,
+                       "uid": "2243/27835464192.200",
+                       "handle": 56,
+                       "frame": [
+                        28,
+                        718,
+                        334,
+                        45
+                       ],
+                       "children": [
+                        {
+                         "class": "_UIVisualEffectBackdropView",
+                         "frame": [
+                          28,
+                          718,
+                          334,
+                          45
+                         ],
+                         "uid": "2243/27854432768.203",
+                         "type": 1,
+                         "traits": 8589934592,
+                         "handle": 57
+                        },
+                        {
+                         "class": "_UIVisualEffectSubview",
+                         "frame": [
+                          28,
+                          718,
+                          334,
+                          45
+                         ],
+                         "uid": "2243/27836156544.204",
+                         "type": 1,
+                         "traits": 8589934592,
+                         "handle": 58
+                        },
+                        {
+                         "class": "_UIVisualEffectContentView",
+                         "frame": [
+                          28,
+                          718,
+                          334,
+                          45
+                         ],
+                         "uid": "2243/27836136320.205",
+                         "type": 1,
+                         "traits": 8589934592,
+                         "handle": 59
+                        }
+                       ],
+                       "class": "UIVisualEffectView",
+                       "type": 1
+                      },
+                      {
+                       "traits": 8589934592,
+                       "uid": "2243/27856017792.201",
+                       "handle": 60,
+                       "frame": [
+                        28,
+                        718,
+                        334,
+                        45
+                       ],
+                       "children": [
+                        {
+                         "traits": 8589934600,
+                         "uid": "2243/27839511424.206",
+                         "handle": 61,
+                         "id": "CapsuleNavigationBar?isSelected=true&isDistractionControlOverlayUp=false",
+                         "frame": [
+                          28,
+                          718,
+                          334,
+                          45
+                         ],
+                         "children": [
+                          {
+                           "traits": 8589934593,
+                           "uid": "2243/27839460480.209",
+                           "handle": 62,
+                           "id": "PageFormatMenuButton",
+                           "frame": [
+                            28,
+                            718,
+                            50.33333333333334,
+                            45
+                           ],
+                           "children": [
+                            {
+                             "class": "UIButtonLabel",
+                             "frame": [
+                              28,
+                              718,
+                              0,
+                              0
+                             ],
+                             "uid": "2243/27839479808.214",
+                             "type": 48,
+                             "traits": 8589934656,
+                             "handle": 63
+                            }
+                           ],
+                           "class": "UIButton",
+                           "label": "Page Menu",
+                           "type": 9
+                          },
+                          {
+                           "handle": 64,
+                           "uid": "2243/27854721408.215",
+                           "traits": 8590196736,
+                           "frame": [
+                            144.33333333333334,
+                            730.3333333333334,
+                            101.33333333333334,
+                            20.33333333333337
+                           ],
+                           "id": "TabBarItemTitle",
+                           "class": "UIView",
+                           "label": "Address",
+                           "type": 49,
+                           "value": "‎example.com"
+                          },
+                          {
+                           "traits": 8589934593,
+                           "uid": "2243/27839477760.211",
+                           "handle": 65,
+                           "id": "ReloadButton",
+                           "frame": [
+                            331.3333333333333,
+                            730.3333333333334,
+                            17.333333333333314,
+                            20.33333333333337
+                           ],
+                           "class": "UIButton",
+                           "label": "refresh",
+                           "type": 9
+                          }
+                         ],
+                         "selected": true,
+                         "class": "UIControl",
+                         "type": 1
+                        }
+                       ],
+                       "class": "UIView",
+                       "type": 1
+                      }
+                     ],
+                     "class": "UIView",
+                     "type": 1
+                    },
+                    {
+                     "traits": 8589934592,
+                     "uid": "2243/27835731712.30",
+                     "handle": 66,
+                     "id": "BottomBrowserToolbar",
+                     "frame": [
+                      0,
+                      766,
+                      390,
+                      44
+                     ],
+                     "children": [
+                      {
+                       "traits": 8589934592,
+                       "uid": "2243/27835734912.38",
+                       "handle": 67,
+                       "frame": [
+                        0,
+                        766,
+                        390,
+                        44
+                       ],
+                       "children": [
+                        {
+                         "traits": 8589934592,
+                         "uid": "2243/27836130944.45",
+                         "handle": 68,
+                         "frame": [
+                          0,
+                          766,
+                          390,
+                          44
+                         ],
+                         "children": [
+                          {
+                           "handle": 69,
+                           "uid": "2243/27835337216.52",
+                           "enabled": false,
+                           "id": "BackButton",
+                           "frame": [
+                            0,
+                            766,
+                            60,
+                            44
+                           ],
+                           "traits": 8589934849,
+                           "class": "_UIButtonBarButton",
+                           "label": "Back",
+                           "type": 9
+                          },
+                          {
+                           "handle": 70,
+                           "uid": "2243/27835338240.53",
+                           "enabled": false,
+                           "id": "ForwardButton",
+                           "frame": [
+                            82.66666666666667,
+                            766,
+                            60.000000000000014,
+                            44
+                           ],
+                           "traits": 8589934849,
+                           "class": "_UIButtonBarButton",
+                           "label": "Forward",
+                           "type": 9
+                          },
+                          {
+                           "traits": 8589934593,
+                           "uid": "2243/27835339264.6",
+                           "handle": 71,
+                           "id": "ShareButton",
+                           "frame": [
+                            165,
+                            766,
+                            60,
+                            44
+                           ],
+                           "class": "_UIButtonBarButton",
+                           "label": "Share",
+                           "type": 9
+                          },
+                          {
+                           "traits": 8589934593,
+                           "uid": "2243/27835340288.54",
+                           "handle": 72,
+                           "id": "SidebarButton",
+                           "frame": [
+                            247,
+                            766,
+                            61,
+                            44
+                           ],
+                           "class": "_UIButtonBarButton",
+                           "label": "Show Bookmarks",
+                           "type": 9
+                          },
+                          {
+                           "traits": 8589934593,
+                           "uid": "2243/27835341312.55",
+                           "handle": 73,
+                           "id": "TabOverviewButton",
+                           "frame": [
+                            330,
+                            766,
+                            60,
+                            44
+                           ],
+                           "class": "_UIButtonBarButton",
+                           "label": "Tabs",
+                           "type": 9
+                          }
+                         ],
+                         "class": "_UIButtonBarStackView",
+                         "type": 1
+                        }
+                       ],
+                       "class": "_UIToolbarContentView",
+                       "type": 1
+                      }
+                     ],
+                     "class": "UIToolbar",
+                     "label": "Toolbar",
+                     "type": 24
+                    }
+                   ],
+                   "class": "UIView",
+                   "type": 1
+                  },
+                  {
+                   "class": "_UIVisualEffectBackdropView",
+                   "frame": [
+                    0,
+                    718,
+                    390,
+                    126
+                   ],
+                   "uid": "2243/27836125120.22",
+                   "type": 1,
+                   "traits": 8589934592,
+                   "handle": 74
+                  }
+                 ],
+                 "class": "UIView",
+                 "type": 1
+                }
+               ],
+               "class": "UIView",
+               "type": 1
+              }
+             ],
+             "class": "UIView",
+             "type": 1
+            }
+           ],
+           "frame": [
+            0,
+            0,
+            390,
+            844
+           ],
+           "uid": "2243/27835742592.11",
+           "type": 1,
+           "class": "UIDropShadowView",
+           "handle": 3
+          }
+         ],
+         "frame": [
+          0,
+          0,
+          390,
+          844
+         ],
+         "uid": "2243/27835336192.9",
+         "type": 1,
+         "class": "UITransitionView",
+         "handle": 2
+        }
+       ],
+       "frame": [
+        0,
+        0,
+        390,
+        844
+       ],
+       "uid": "2243/27826015232.7",
+       "type": 4,
+       "class": "UIWindow",
+       "handle": 1
+      },
+      {
+       "children": [
+        {
+         "traits": 8589934592,
+         "uid": "2243/27836167296.10",
+         "handle": 76,
+         "frame": [
+          0,
+          0,
+          390,
+          844
+         ],
+         "children": [
+          {
+           "class": "UIEditingOverlayGestureView",
+           "frame": [
+            0,
+            0,
+            390,
+            844
+           ],
+           "uid": "2243/27836168640.12",
+           "type": 1,
+           "traits": 8589934592,
+           "handle": 77
+          },
+          {
+           "class": "UIInputSetHostView",
+           "frame": [
+            0,
+            844,
+            390,
+            233
+           ],
+           "uid": "2243/27825948544.64",
+           "type": 1,
+           "traits": 8589934592,
+           "handle": 78
+          }
+         ],
+         "class": "UIInputSetContainerView",
+         "type": 1
+        }
+       ],
+       "frame": [
+        0,
+        0,
+        390,
+        844
+       ],
+       "uid": "2243/27824409088.8",
+       "type": 4,
+       "class": "UITextEffectsWindow",
+       "handle": 75
+      }
+     ],
+     "frame": [
+      0,
+      0,
+      390,
+      844
+     ],
+     "class": "UIApplication",
+     "label": "Safari",
+     "type": 2
+    }
+   }
+  ]
+ }
+}

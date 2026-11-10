@@ -1,0 +1,40 @@
+{
+ "error": {
+  "code": 10002,
+  "domain": "com.apple.dt.CoreDeviceError",
+  "userInfo": {
+   "BundleIdentifier": {
+    "string": "com.example.nothere"
+   },
+   "NSLocalizedDescription": {
+    "string": "The application failed to launch."
+   },
+   "NSLocalizedFailureReason": {
+    "string": "The requested application com.example.nothere is not installed."
+   },
+   "NSLocalizedRecoverySuggestion": {
+    "string": "Provide a valid bundle identifier."
+   },
+   "NSUnderlyingError": {
+    "error": {
+     "code": -10814,
+     "domain": "NSOSStatusErrorDomain",
+     "userInfo": {
+      "_LSFunction": {
+       "string": "runEvaluator"
+      },
+      "_LSLine": {
+       "int": 1796
+      }
+     }
+    }
+   }
+  }
+ },
+ "info": {
+  "commandType": "devicectl.device.process.launch",
+  "jsonVersion": 3,
+  "outcome": "failed",
+  "version": "506.6"
+ }
+}

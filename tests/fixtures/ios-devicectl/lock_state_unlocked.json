@@ -1,0 +1,12 @@
+{
+ "info": {
+  "commandType": "devicectl.device.info.lockState",
+  "jsonVersion": 3,
+  "outcome": "success",
+  "version": "506.6"
+ },
+ "result": {
+  "passcodeRequired": false,
+  "unlockedSinceBoot": true
+ }
+}

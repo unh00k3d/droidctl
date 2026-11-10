@@ -367,7 +367,7 @@ def _unfocused(t):
 
 def test_enter_focuses_the_field_before_the_text_below_api_30(home, monkeypatch):
     """A key event goes to the input focus, which ACTION_SET_TEXT does not give, so
-    --enter went nowhere (a banking QA app calculator). Focus comes BEFORE the text:
+    --enter went nowhere (a real app calculator). Focus comes BEFORE the text:
     that field rewrote "250" to "25" when it gained focus after being filled."""
     t0 = _unfocused(tree("under_keyboard-a"))
     s = session(monkeypatch, t0)
@@ -421,7 +421,7 @@ def test_scroll_at_the_edge_reports_it_and_never_swipes(home, monkeypatch):
 
 def test_gesture_taps_settle_longer_unless_told():
     """No clicked event anchors a gesture's settle, and an activity the app starts
-    after the tab's own feedback came after 150 ms of quiet (a banking QA app tabs)."""
+    after the tab's own feedback came after 150 ms of quiet (a real app tabs)."""
     base = act._settle(args())
     assert act._tap_settle(args(), base)["quiet_ms"] == act.GESTURE_TAP_QUIET_MS
     assert act._tap_settle(args(), base)["timeout_ms"] == base["timeout_ms"]
@@ -433,7 +433,7 @@ def test_gesture_taps_settle_longer_unless_told():
 def test_a_settled_no_root_frame_is_read_again(home, monkeypatch):
     """After `back` the returning activity's root was not fetched in time
     (degraded: no-root) and no later event re-dumped it: the result showed an
-    empty screen (a banking QA app, 4 in 5). finish() reads again, bounded."""
+    empty screen (a real app, 4 in 5). finish() reads again, bounded."""
     rootless = dict(_trees("testapp-slow_a11y")[0], ms=120)   # a quick no-root: window not ready
     assert rootless.get("reason") == "no-root"
     s = session(monkeypatch, tree("cart_inc-a"))
@@ -540,7 +540,7 @@ def test_formatted_digits_count_as_the_typed_value(val, target, same):
 
 def test_an_activity_event_with_a_lagging_window_list_is_caught_up(home, monkeypatch):
     """Android 9: the new activity's window_state arrives inside the settle, but the
-    settled tree still shows the old screen (a banking QA app: Home tab). The result
+    settled tree still shows the old screen (a real app: Home tab). The result
     must report the new screen, not `unchanged`."""
     s = session(monkeypatch, tree("cart_inc-a"))
     ev = {"type": "window_state", "class": "com.example.DashboardActivity", "seq": 7}
@@ -588,7 +588,7 @@ def _trees(*names):
 
 
 def test_wait_role_gone_passes_a_rootless_frame_and_ends_when_the_spinner_goes(home, monkeypatch):
-    """A bare spinner (no text, no id) is only reachable by role (a banking QA app login)."""
+    """A bare spinner (no text, no id) is only reachable by role (a real app login)."""
     frames = _trees("testapp-spinner_forever", "testapp-slow_a11y", "testapp-cart")
     s = session(monkeypatch, frames[0])
     s._client.tree = lambda **kw: frames.pop(0) if len(frames) > 1 else frames[0]
@@ -599,7 +599,7 @@ def test_wait_role_gone_passes_a_rootless_frame_and_ends_when_the_spinner_goes(h
 
 def test_wait_role_shows_the_screen_it_saved(home, monkeypatch):
     """The saved state is what the next snapshot calls "unchanged", so the wait
-    has to show every element of it, not just the header (a banking QA app tour)."""
+    has to show every element of it, not just the header (a real app tour)."""
     frames = _trees("testapp-spinner_forever", "testapp-cart")
     s = session(monkeypatch, frames[0])
     s._client.tree = lambda **kw: frames.pop(0) if len(frames) > 1 else frames[0]

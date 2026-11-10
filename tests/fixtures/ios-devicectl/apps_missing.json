@@ -1,0 +1,16 @@
+{
+ "info": {
+  "commandType": "devicectl.device.info.apps",
+  "jsonVersion": 3,
+  "outcome": "success",
+  "version": "506.6"
+ },
+ "result": {
+  "apps": [],
+  "defaultAppsIncluded": false,
+  "hiddenAppsIncluded": false,
+  "internalAppsIncluded": false,
+  "matchingBundleIdentifier": "dev.droidctl.s1.testapp.nothere",
+  "removableAppsIncluded": true
+ }
+}

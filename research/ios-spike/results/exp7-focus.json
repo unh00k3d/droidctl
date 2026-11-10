@@ -1,0 +1,590 @@
+[
+ {
+  "k": "fetch_before",
+  "v": {
+   "values": {},
+   "err": null,
+   "rtt": 106.3,
+   "field": "1521/4315079408.12"
+  }
+ },
+ {
+  "k": "setattr",
+  "v": {
+   "inner": "ok",
+   "inner_ms": 55,
+   "idles": {
+    "runloop": 121,
+    "anim": 610
+   },
+   "settle": 710,
+   "ev": [
+    [
+     106,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     106,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     107,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     112,
+     1017,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     123,
+     1018,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     607,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     607,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     608,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     608,
+     1008,
+     "1521/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 1521; }"
+    ],
+    [
+     609,
+     1008,
+     "1521/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 1521; }"
+    ],
+    [
+     609,
+     1031,
+     "1521/0.1",
+     "{     visible = 1; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_after_setattr",
+  "v": {
+   "values": {
+    "XC_kAXXCAttributeActiveKeyboard": "1521/4863134208.1067",
+    "XC_kAXXCAttributeResponderElement": "1521/4315079408.12"
+   },
+   "rtt": 13.8
+  }
+ },
+ {
+  "k": "keyboard_in_tree",
+  "v": {
+   "present": true,
+   "rect": [
+    0,
+    553,
+    390,
+    233
+   ]
+  }
+ },
+ {
+  "k": "return",
+  "v": {
+   "inner": "ok",
+   "settle": 676,
+   "ev": [
+    [
+     560,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     560,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     566,
+     1031,
+     "1521/0.1",
+     "{     visible = 0; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_after_return",
+  "v": {}
+ },
+ {
+  "k": "tap_field",
+  "v": {
+   "inner_ms": 278,
+   "settle": 796,
+   "ev": [
+    [
+     166,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     191,
+     1018,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     690,
+     1031,
+     "1521/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     696,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "return2",
+  "v": {
+   "ev": [
+    [
+     584,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     587,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     593,
+     1031,
+     "1521/0.1",
+     "{     visible = 0; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_before",
+  "v": {
+   "values": {},
+   "err": null,
+   "rtt": 106.6,
+   "field": "1521/4315079408.12"
+  }
+ },
+ {
+  "k": "setattr",
+  "v": {
+   "inner": "ok",
+   "inner_ms": 24,
+   "idles": {
+    "runloop": 28,
+    "anim": 28
+   },
+   "settle": 231,
+   "ev": [
+    [
+     50,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     51,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     51,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     107,
+     1018,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     561,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     562,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     562,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     572,
+     1008,
+     "1521/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 1521; }"
+    ],
+    [
+     572,
+     1008,
+     "1521/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 1521; }"
+    ],
+    [
+     573,
+     1031,
+     "1521/0.1",
+     "{     visible = 1; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_after_setattr",
+  "v": {
+   "values": {
+    "XC_kAXXCAttributeActiveKeyboard": "1521/4863134208.1067",
+    "XC_kAXXCAttributeResponderElement": "1521/4315079408.12"
+   },
+   "rtt": 9.8
+  }
+ },
+ {
+  "k": "keyboard_in_tree",
+  "v": {
+   "present": true,
+   "rect": [
+    0,
+    553,
+    390,
+    233
+   ]
+  }
+ },
+ {
+  "k": "return",
+  "v": {
+   "inner": "ok",
+   "settle": 681,
+   "ev": [
+    [
+     567,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     568,
+     1031,
+     "1521/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     574,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_after_return",
+  "v": {}
+ },
+ {
+  "k": "tap_field",
+  "v": {
+   "inner_ms": 275,
+   "settle": 796,
+   "ev": [
+    [
+     172,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     193,
+     1018,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     689,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     695,
+     1031,
+     "1521/0.1",
+     "{     visible = 1; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "return2",
+  "v": {
+   "ev": [
+    [
+     587,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     592,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     596,
+     1031,
+     "1521/0.1",
+     "{     visible = 0; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_before",
+  "v": {
+   "values": {},
+   "err": null,
+   "rtt": 109.2,
+   "field": "1521/4315079408.12"
+  }
+ },
+ {
+  "k": "setattr",
+  "v": {
+   "inner": "ok",
+   "inner_ms": 24,
+   "idles": {
+    "runloop": 28,
+    "anim": 28
+   },
+   "settle": 224,
+   "ev": [
+    [
+     55,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     56,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     56,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     108,
+     1018,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     561,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     562,
+     1008,
+     "34/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 34; }"
+    ],
+    [
+     562,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     563,
+     1008,
+     "1521/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 1521; }"
+    ],
+    [
+     563,
+     1008,
+     "1521/0.1",
+     "{     data = AXAnnouncementTypeKeyboardAppearSound;     pid = 1521; }"
+    ],
+    [
+     563,
+     1031,
+     "1521/0.1",
+     "{     visible = 1; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_after_setattr",
+  "v": {
+   "values": {
+    "XC_kAXXCAttributeActiveKeyboard": "1521/4863134208.1067",
+    "XC_kAXXCAttributeResponderElement": "1521/4315079408.12"
+   },
+   "rtt": 6.9
+  }
+ },
+ {
+  "k": "keyboard_in_tree",
+  "v": {
+   "present": true,
+   "rect": [
+    0,
+    553,
+    390,
+    233
+   ]
+  }
+ },
+ {
+  "k": "return",
+  "v": {
+   "inner": "ok",
+   "settle": 675,
+   "ev": [
+    [
+     559,
+     1031,
+     "1521/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     570,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     573,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "fetch_after_return",
+  "v": {}
+ },
+ {
+  "k": "tap_field",
+  "v": {
+   "inner_ms": 277,
+   "settle": 796,
+   "ev": [
+    [
+     171,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     195,
+     1018,
+     "1521/4315079408.12",
+     ""
+    ],
+    [
+     688,
+     1031,
+     "1521/0.1",
+     "{     visible = 1; }"
+    ],
+    [
+     696,
+     1031,
+     "34/0.1",
+     "{     visible = 1; }"
+    ]
+   ]
+  }
+ },
+ {
+  "k": "return2",
+  "v": {
+   "ev": [
+    [
+     591,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     596,
+     1031,
+     "34/0.1",
+     "{     visible = 0; }"
+    ],
+    [
+     598,
+     1031,
+     "1521/0.1",
+     "{     visible = 0; }"
+    ]
+   ]
+  }
+ }
+]

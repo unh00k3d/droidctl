@@ -116,7 +116,7 @@ The host (snapshot, resolve, act, daemon) is already pure and speaks only to a d
 | screenshot | `takeScreenshot` (30+); FLAG_SECURE → `secure-window` | privileged capture (verify FLAG_SECURE behaviour on-device; do **not** assume it bypasses it) |
 | mutually exclusive? | — | **on a hardened app the a11y service must be OFF for B to see the UI** — the two backends don't run together there |
 
-**Measured 2026-09-27 (SM-N950F, a production banking app, welcome screen):** with our a11y service **enabled**, both droidctl and a plain `uiautomator dump` saw an empty app window (7 container nodes, `null root` on the login screen). With the service **disabled**, `uiautomator dump` saw the full tree (38 nodes: "Login", "Exchange Rates", …), reproduced twice. So the app hides its UI from *all* accessibility clients when an unknown service is enabled; it does not defend against the ADB/UiAutomation harness (out of its threat model). Its QA build has no such check. Implication: Backend B would drive such apps only with Backend A off, and **automating a production banking app should still be cleared with its owner** — the QA build is the sanctioned target.
+**Measured 2026-09-27 (SM-N950F, a hardened production app, welcome screen):** with our a11y service **enabled**, both droidctl and a plain `uiautomator dump` saw an empty app window (7 container nodes, `null root` on the login screen). With the service **disabled**, `uiautomator dump` saw the full tree (38 nodes: "Login", "Exchange Rates", …), reproduced twice. So the app hides its UI from *all* accessibility clients when an unknown service is enabled; it does not defend against the ADB/UiAutomation harness (out of its threat model). Its QA build has no such check. Implication: Backend B would drive such apps only with Backend A off, and **automating a production banking app should still be cleared with its owner** — the QA build is the sanctioned target.
 
 **The hard parts (must be understood before building).** Backend B is easy to get *working* and hard to make *good*; these four are where the effort goes, and none of them exists for Backend A:
 
@@ -131,10 +131,10 @@ The host (snapshot, resolve, act, daemon) is already pure and speaks only to a d
 - **Hard part 2 (events):** `setOnAccessibilityEventListener` feeds the same `Events` ring as A (`Core.onEvent`), so waits, settle, toasts and the daemon's subscription work unchanged while B lives (e2e: toast and settle checks pass).
 - **Hard part 3 (fragility):** measured first-launch cost ~0.9 s including a one-time `dex2oat`; launches afterwards ~0.2 s. Two launch bugs found on the device and fixed: `pgrep -f <name>` matched its own shell (a stopped agent looked alive, and `pkill -f` killed the adb shell), and a backgrounded `setsid` raced adbd killing the shell's process group (4/4 launches through adbutils died; foreground `setsid` 5/5 survived).
 - **Hard part 4 (coexistence):** another UiAutomation (uiautomator/Appium) makes `connect` fail with "already registered" → B exits 3 → `suppressed`. `doctor` shows the backend, B's pid, and warns when droidctl's own service is also enabled. **`setup --backend uiautomation` now switches Backend A's service OFF by default** (keeping other services; `--keep-a11y` to opt out), because a hardened app hides from B too while our own service is listed — the commonest footgun when moving to B. Windows drawn while a service was on stay latched-blocked until recreated, so the setup output tells the user to relaunch the target app.
-- **`diagnose` (per-app, vs `doctor`'s host/device checks):** `droidctl diagnose` reads the foreground window plus the accessibility state and classifies why a screen is blank — `hardened-a11y` (app hides from our enabled service, use B), `hardened-ua-service-on` (B selected but our service still on — the footgun), `hardened-other-service` (a non-droidctl service we must not touch), `suppressed-ua`, `latched-or-slow`, `degraded`, `opaque`, `transition`, `ok`. It prints the exact fix; `--fix` applies the switch to B (disables our service) and reminds to relaunch. Verified end-to-end on the SM-N950F against a hardened investment app (2026-10-07): diagnose → --fix → B reads the full tree.
+- **`diagnose` (per-app, vs `doctor`'s host/device checks):** `droidctl diagnose` reads the foreground window plus the accessibility state and classifies why a screen is blank — `hardened-a11y` (app hides from our enabled service, use B), `hardened-ua-service-on` (B selected but our service still on — the footgun), `hardened-other-service` (a non-droidctl service we must not touch), `suppressed-ua`, `latched-or-slow`, `degraded`, `opaque`, `transition`, `ok`. It prints the exact fix; `--fix` applies the switch to B (disables our service) and reminds to relaunch. Verified end-to-end on the SM-N950F against a hardened app (2026-10-07): diagnose → --fix → B reads the full tree.
 - **Differences as built:** gestures are injected `MotionEvent`s (10 ms steps along each stroke; multi-stroke = multi-pointer); `screenshot` always defers to the host's `screencap` path (which detects FLAG_SECURE); clipboard as `com.android.shell`.
 - **Measured (cold in-process CLI, test app):** ping 16.8 vs 15.6 ms (A), snapshot 200 vs 147 ms, tap+settle 532 vs 493 ms, gesture tap 992 vs 857 ms; 10/10 clicks landed exactly once on both. e2e: `tests/e2e/test_backend_b.py` 12/12 twice (setup changes no setting, node tap, injected tap on a touch-only view, swipe, drag path, long-press, Unicode type, toast events, screencap fallback, relaunch after `pkill`, works with A disabled, teardown leaves nothing), and the full A suite still passes on the refactored agent.
-- **Android 12+ startup fix (agent 0.4.3, 2026-10-08).** Reported on a Galaxy S25 (API 35): B never started, `E failed: no system context: NullPointerException … ConfigurationController.getConfiguration() on a null object reference`. Cause: since API 31 `ActivityThread.getConfiguration()` goes through `mConfigurationController`, which only `attach()` creates, and our thread is never attached. Fix: on API 31+ construct a `ConfigurationController(ActivityThreadInternal)` for the thread and set that field (the scrcpy approach), nothing else. Rejected: `ActivityThread.systemMain()` (the report's proposal), which runs `attach(true)` and sets the shell process up as system_server (renderer, the "android" Application); its note that `systemMain()` prepares the main looper was wrong. **Verified 2026-10-08 on the Galaxy S25 (SM-S931B, API 35, stock):** `setup --backend uiautomation` → `I ready sdk=35`; ping median 3.6 ms (doctor rtt median 2.0 ms, all checks ok); snapshot reads the hardened investment app in full with our service off; `current`, `wait --idle`, `scroll` down/up (performed, changed); relaunch after `pkill` works (connect 540 ms). Found there, open: on a live-updating screen (a ticker, so the fast path never applies), id-less and label-less nested lists can't be re-resolved even from the latest snapshot (`ambiguous` between three RecyclerViews, `ctx` empty; `class+path` is off inside adapter lists by design).
+- **Android 12+ startup fix (agent 0.4.3, 2026-10-08).** Reported on a Galaxy S25 (API 35): B never started, `E failed: no system context: NullPointerException … ConfigurationController.getConfiguration() on a null object reference`. Cause: since API 31 `ActivityThread.getConfiguration()` goes through `mConfigurationController`, which only `attach()` creates, and our thread is never attached. Fix: on API 31+ construct a `ConfigurationController(ActivityThreadInternal)` for the thread and set that field (the scrcpy approach), nothing else. Rejected: `ActivityThread.systemMain()` (the report's proposal), which runs `attach(true)` and sets the shell process up as system_server (renderer, the "android" Application); its note that `systemMain()` prepares the main looper was wrong. **Verified 2026-10-08 on the Galaxy S25 (SM-S931B, API 35, stock):** `setup --backend uiautomation` → `I ready sdk=35`; ping median 3.6 ms (doctor rtt median 2.0 ms, all checks ok); snapshot reads the hardened app in full with our service off; `current`, `wait --idle`, `scroll` down/up (performed, changed); relaunch after `pkill` works (connect 540 ms). Found there, open: on a live-updating screen (a ticker, so the fast path never applies), id-less and label-less nested lists can't be re-resolved even from the latest snapshot (`ambiguous` between three RecyclerViews, `ctx` empty; `class+path` is off inside adapter lists by design).
   - **Full tour, same day (Backend B, API 35):** bottom tabs, Markets radios and tab strip, Restricted Stocks list, a search field (`type` via set_text, Turkish text, `--clear`, all verified by read-back), News pager swipe (injected gesture), list scrolls, Profile, Settings, `back`/`home`/`launch`, `where`, `shot --marks` (boxes match the 1080x2340 screen), `wait --idle`, `mark`/`logs --marks`, a 4-step `run` through the daemon (2.0 s). Not exercised: long-press, the paste/`adb input` fallbacks, anything behind the app's password prompt. Bugs found and fixed: (1) **action results showed ref numbers that differed from the saved ones** (`finish`, `scroll-to` and ref resolution built snapshots without `carry_refs`; after a scroll "Item 16" read [30] in the result and [34] in the state) — now every action-side snapshot is numbered before rendering (`Session.build`); (2) default `scroll down` picked the largest scrollable even when it was a sideways pager, and paged tabs instead — now axis-aware, and `scroll up/down` on a pager is refused; (3) an id-less input was renumbered and its ref went stale once its text changed — inputs now also match by class + hint (carry and resolver tier 3), live refs before retired ones; (4) `overlap` warnings named pre-carry numbers; (5) `logs --tag/--marks` returned nothing on a busy phone (`logcat -t` counts before filtering) and marks shared the agent's own tag — marks now use `droidctl-mark`; (6) an endless carousel rendered `1/2147483647 (50%)`. Open: the id-less nested-list ambiguity above; a diff after `snapshot --system` lists the system bar as removed.
 - **Unverified:** everything on API 29+ (notably the API 34+ `UiAutomation(Context, …)` constructor fallback and clipboard rules), and on a stock phone.
 
@@ -565,7 +565,7 @@ Any coordinates we print are always in device pixels.
    - **Measure the round trip**: raw socket RTT over USB and over wireless adb, a cold `droidctl ping` end-to-end, and `-X importtime`. These numbers decide the Go/Rust gate and the settle defaults.
    - Write `android/agent/PROTOCOL.md` (the language-neutral device contract).
    - Verify on the phone: adb enabling on Android 13+, peer UID = 2000, TalkBack/other services preserved.
-2. **Raw tree: done 2026-09-27.** Device `tree` (all windows, compact schema, per-dump handles, 2 s budget with a `degraded` fallback, `gen` counter); `dump-fixture`; 11 real-app fixtures and 90 test-app fixtures. Steady-state dumps 40–70 ms on the device. The test app (83 scenarios, DTA ground truth, window title `s:<name>`) is built. The banking apps tried crash at start on this rooted phone with or without our service, so no banking fixtures. Known agent limits: `huge_tree` always exceeds the budget and `degraded` then returns the *previous* screen's tree; `slow_a11y` returns a rootless window without `degraded`.
+2. **Raw tree: done 2026-09-27.** Device `tree` (all windows, compact schema, per-dump handles, 2 s budget with a `degraded` fallback, `gen` counter); `dump-fixture`; 11 real-app fixtures and 90 test-app fixtures. Steady-state dumps 40–70 ms on the device. The test app (83 scenarios, DTA ground truth, window title `s:<name>`) is built. The hardened apps tried crash at start on this rooted phone with or without our service, so no fixtures of them. Known agent limits: `huge_tree` always exceeds the budget and `degraded` then returns the *previous* screen's tree; `slow_a11y` returns a rootless window without `degraded`.
    Original scope:
    - device `tree` plus handles;
    - `dump-fixture` to capture real trees from your apps and from the test app;
@@ -588,10 +588,178 @@ Any coordinates we print are always in device pixels.
 8. **Docs and release: done 2026-09-28** (the spatial A/B found no layout difference at ceiling; spatial stays provisional, see Open questions). README (daemon section, CLI vs MCP, security wording, measured benchmarks), AGENTS.md and SKILL.md with generated tables and drift tests, `skill print|install`, NOTICE, `make dist` (the wheel carries the APK). **Distribution (user decision 2026-09-28): like chromectl, `pipx install git+https://github.com/unh00k3d/droidctl.git`, then `droidctl setup`.** The prebuilt APK is committed so a git install needs no Android SDK; `make apk` records a hash of the agent sources next to it and `tests/test_packaging.py` fails on a stale APK. Pillow and the MCP SDK are regular dependencies; adb falls back to the binary adbutils ships, and droidctl starts an adb server when none runs. Test-app group 7 and the scenario coverage gate (`tests/test_coverage_gate.py`: every scenario has an e2e test or fixture) landed in `bc28043`; tap accuracy vs a mobile-mcp-style baseline in `3830da6` (see Verification). The full spatial A/B ran 2026-09-28 (see Open questions).
    Original scope: **Docs and release:** README (including the Background daemon section and CLI vs MCP guidance), AGENTS.md, SKILL.md, DAEMON.md, benchmarks (latency, tokens, tap accuracy vs mobile-mcp, the spatial A/B that decides layout defaults), packaging (APK bundled in the wheel); test app group 7 (device-level) and the scenario coverage gate.
 
+### iOS milestones (spec `IOS.md`, code plan `IOS-INTEGRATION.md`)
+- **I1: runner + transport + snapshot on the iPhone: done 2026-10-21** (iPhone 12, iOS 18.7.8, Xcode 26.2, free team).
+  - **Pieces:**
+    - `droidctl/ios/transport.py` (usbmuxd client, no iproxy);
+    - `devices.py` (devicectl);
+    - the ObjC runner in `droidctl/ios/xcode/` (agent protocol: ping, tree, gen, current, events/subscribe, screen_state, gesture, launch, global home, quit; the lock guard on input);
+    - `runner.py` (build per team, detached start, adopt, build-ID check, typed start errors);
+    - `mapping.py` (R1–R8 plus alerts as dialogs, keyboard as the IME window, one web view, slider ranges, overflow-based scrolling);
+    - `client.py` (`IosClient`, an `AgentClient` over usbmux);
+    - the guided `setup` (`ios/setup.py`).
+  - **Wiring:** `devices` lists iPhones by UDID (no adb needed for an iPhone alone), backend `ios` is chosen by the UDID, and the daemon opens its extra links through `device.open_client`.
+  - **Measured:**
+    - runner start → first ping 5–6 s;
+    - adopt through the daemon 0.74 s cold;
+    - auto-start of a stopped runner on the next command 8.9 s;
+    - cached daemon snapshot < 300 ms (e2e). *Correction (I2): the I1 e2e helper ran `python -m droidctl`, which is always in-process, so this was not a daemon number. Fixed in I2; the e2e now uses the console script and passes through the daemon.*
+  - **Snapshots** (dump ms / nodes → elements, tokens):
+
+    | screen | dump | nodes | elements | tokens |
+    |---|---|---|---|---|
+    | Settings › General | 148 ms | 151 | 13 | 148 |
+    | test app | 460 ms | 1060 | 25 | 219 |
+    | in-app alert | 70 ms | 48 | 4 | 53 |
+    | keyboard up | 477 ms | 1125 | 19 | 201 |
+  - **Tests:** 46 unit tests (`tests/test_ios_*.py`) on real runner trees (`tests/fixtures/ios-runner`), real devicectl JSON and real xcodebuild logs; 5 e2e tests (`tests/e2e/ios`, `DROIDCTL_IOS_UDID`) pass on the iPhone.
+  - **Found while building it** (details in `IOS.md`):
+    - `IsVisible` in a whole-app snapshot hangs it (> 10 s); it was dropped.
+    - The runner works without a host app (one app slot).
+    - A free team can install only **3 apps per device** (now measured, with `setup` handling it).
+    - A pending passcode prompt makes the start fail with "Timed out while enabling automation mode" while devicectl says unlocked.
+    - The runner app runs in a 320×480 compatibility mode, so the screen size comes from the app element.
+    - Each node's UIKit class arrives as attribute 5004.
+- **I2: actions: done 2026-10-21** (same phone; the S1 test app's DTA log as ground truth).
+  - **Pieces:**
+    - **Runner `act`:** `IsValid` → lock guard → enabled → an allowlisted AX action. A refused press becomes one touch, at the element's `VisiblePoint`, only after the hit-test check (else `occluded`, -32011).
+    - **Runner text and keys:** `set_text` by setAttribute, `focus` by a checked touch, `ime_enter`/`type` by `sendString` (only with focus, else `not-focused`, -32012), `hide_keyboard` (the Return key's AX press).
+    - **Runner settle:** both idle callbacks, re-armed by 1018 / 1031-shown, the 200 ms floor after AX scrolls, 100 ms quiet, 3000 ms cap. It settles `act`, `gesture`, `global home`, `launch`, `type` and `wait_idle`; `wait_change` wakes the host's `wait_for`.
+    - **Runner tree:** marks the focused field (ResponderElement).
+    - **`IosClient`:** turns any settle spec into the iOS rule; `wait_for` runs on the mapped tree.
+    - **act.py:** `delivered` counts as handled, `back` taps the navigation bar's back button (UIKit's private back-button trait), `press enter` only, a new `hide-keyboard` command for both platforms, and adb-only commands → `unsupported`.
+  - **Measured** (`bench/results/ios-i2-daemon.json`; 5 rounds through the daemon, each judged by DTA): **55/55 correct, every handler fired exactly once.**
+
+    | action | via | settle ms (median) | command ms (median) |
+    |---|---|---|---|
+    | tap custom view / SwiftUI Button / web button | ax | 107–112 | 1085–1089 |
+    | tap UIButton / UISwitch | touch | 669 / 405 | 1664 / 1390 |
+    | alert open / OK | touch | 691 / 657 | 1278 / 1256 |
+    | scroll down / up (AX page) | ax | 305 / 307 | 1298 / 1302 |
+    | type 5 characters (set value) | set_value | 699 | 2417 |
+    | hide-keyboard | Return key | 244 | 1235 |
+
+    - The command time is mostly two whole-app snapshots of this 1,060-node screen (~450 ms each: one to resolve the locator, one after the settle).
+    - A daemon cache hit drops the first: a tap on the custom view takes ~610 ms.
+    - Settings screens snapshot in ~90–150 ms.
+  - **The 200 ms AX-scroll floor is validated:** the settled tree showed the app's "scroll end" status in 5/5 rounds plus the e2e.
+  - **Tests:** 16 new unit tests (`tests/test_ios_act.py`), 13 new e2e tests (`tests/e2e/ios/test_i2.py`); all 18 iPhone e2e pass.
+  - **Found while building it** (details in `IOS.md` §11, §13):
+    - Web elements report WebKit's WebContent pid. Idle requests sent there never replied, and they emptied the web view's tree (2/2). Settle and `front` now use the host app.
+    - AX notifications arrive off the main thread (a settle crashed on a mutated log); the event state is locked.
+    - The Return key is a `Button` with identifier `Return` inside the keyboard, not a `Key`.
+    - A label change (`custom ax_activate` in the status label) posts no notification at all, so `gen` stays put; the settled snapshot still shows it.
+    - Keyboard view controllers and keyboard-sound announcements flooded the event stream; they are dropped from reports (they still count for settle).
+  - **Not done in I2:**
+    - **The dedicated iOS test app** (number pad with and without Done, secure and masked fields) is blocked by the 3-app limit until the S1 apps go after the expiry test (2026-10-27).
+    - **`set` on a slider:** there is no set-value; increment/decrement steps 10%. Unsupported for now.
+    - **Landscape:** the point conversion is implemented but unverified.
+    - **Secure fields:** unmeasured.
+- **I3: teardown / doctor / renewal: done 2026-10-21** (same phone).
+  - **`teardown -d UDID`** (`droidctl/ios/manage.py`):
+    - stops the runner;
+    - uninstalls droidctl's product runners, `dev.droidctl.r<8 hex>.runner.xctrunner` of any team, **and nothing else**;
+    - forgets the phone's state;
+    - lists what it does not undo: Developer Mode, the mounted disk image, the free team's Trust when the last app of the team goes, the certificate and profile;
+    - `--keep-apk` keeps the runner installed. Measured: 26.6 s, mostly devicectl's uninstall.
+  - **`doctor -d UDID`** is read-only:
+    - checks Xcode (version and path), USB and pairing, Developer Mode and iOS version, the team, the lock, the runner build against the sources, the profile's expiry, the runner (answering, build, round trip), the Xcode/iOS pair, and the Mac's sleep and thermal state;
+    - then lists teardown's disclosures;
+    - takes 1.3 s with the runner down.
+  - **Renewal:** `setup` re-signs the runner when its profile has expired or expires within 24 h. It drops the built products and lets automatic signing fetch a fresh profile. *Unverified until a real expiry (2026-10-27); unit-tested.*
+  - **Safety fix:** the "earlier droidctl runner" rule that `setup` uses to free an app slot matched any `dev.droidctl.*.runner.xctrunner`, including the S1 research runner. It now matches only the product scheme.
+  - **Found:** `pmset -g` shows xcodebuild, the runner's session holder, holding a sleep assertion, so the Mac stays awake while the runner runs. `doctor` reports it.
+  - **Tests:** 12 unit tests (`tests/test_ios_manage.py`, real `pmset` output) and 2 e2e (`tests/e2e/ios/test_i3.py`: doctor green → teardown removes only the runner → `not-installed` → setup back in ~9 s). All 20 iPhone e2e tests pass (3 min 48 s).
+- **I4: the rest of the command surface: done 2026-10-21** (same phone).
+  - **Runner:**
+    - `screenshot`: XCUIScreen, JPEG and scaling on the phone, turned to the interface orientation, crop in tree points.
+    - `open_url`: XCUISystem `openURL:`.
+    - `mark`: an NSLog line.
+    - `launch` and `open_url` now wait until the hit-test shows the app in front, then settle. Launching from Safari otherwise settled on SpringBoard's transition (202 ms) or hit the cap.
+  - **Host:**
+    - `launch` (`--stop` = devicectl terminate, then launch; `--clear`/`--activity` refused);
+    - `stop-app`, `apps` (`--all` adds system apps; `--filter` matches the name too), `install` (`.app`/`.ipa` via devicectl; refuses droidctl's own runner, whose replacement ended the running session);
+    - `open-url`, `shot` (`--marks`, `--crop`), `mark`;
+    - `logs` (`--pkg`, `--level`, `--tag`, `--marks`).
+  - **`logs` design:**
+    - The phone's syslog through `com.apple.syslog_relay`: lockdown StartSession with the Mac's pair record, then TLS. Our own usbmux transport, no libimobiledevice (`droidctl/ios/syslog.py`).
+    - The stream is live only. The daemon keeps a 50,000-line ring, read only while droidctl is in use (60 s after the last command); without the daemon `logs` listens for 2 s.
+    - **An open log stream keeps Xcode off the iPhone:** xcodebuild waited 60 s on "Device is busy (Connecting to iPhone)", 2/2. After repeated failures like that, CoreDeviceService sat at 95% CPU and every start was slow (42–62 s) until it was restarted (with the user's OK).
+    - So the ring lets go whenever droidctl builds or starts the runner: an `xcode-busy` flag file any process sees. With it, a start during the ring took 5.3 s and CoreDeviceService stayed idle. A single 2 s read left no trace (start 5.1 s after it).
+    - Crash reports are not collected yet.
+  - **Home screen:** SpringBoard's status-bar window over the Home screen was classified as a dialog; it is `system` now.
+  - **Measured through the daemon** (3 runs each):
+
+    | command | ms |
+    |---|---|
+    | `shot` (585×1266, 78 KB) / with `--marks` | 111–148 / 127–180 |
+    | `apps` | 362–377 |
+    | `logs --pkg` (two devicectl lookups) | 938–998 |
+    | `mark` | 2–3 |
+    | `stop-app` | 765–1044 |
+    | `launch`, app in the background / cold `--stop` | 1006–1468 / ~1670 |
+    | `open-url` (Safari) | ~1100–1300 (once 3000 with `idle:false` while the page loaded) |
+
+    The marks land on the elements (checked by eye on the test app).
+  - **Tests:** 15 unit tests (`tests/test_ios_apps.py`, on real devicectl JSON and real syslog lines from the test app and runner) and 7 e2e tests (`tests/e2e/ios/test_i4.py`). **All 27 iPhone e2e tests pass in 1 min 39 s.**
+- **Real apps, MCP and an easier setup: 2026-10-22.**
+  - **Safari, driven like an agent** (e2e `tests/e2e/ios/test_real_apps.py`, 3/3 runs): address bar → type a URL `--enter` → wait for the article → tap a link → `back` → scroll.
+  - **Mapping fixes it needed** (tests on real captures `safari_example`, `safari_wikipedia`):
+    - The page's root, labelled with the page title and as big as the page, merged the whole page into one row: it is layout now.
+    - Web landmarks ("banner", "navigation", "Contents, navigation") are containers, not text.
+    - "Toolbar" and other bar labels are not text.
+    - Safari's `BackButton` is the back button.
+    - A full-screen web view proves it scrolls through its scroll bar ("Vertical scroll bar, 7 pages", now kept as `scrolls`).
+  - **Runner change:** **AX page scrolls never move a WKWebView** (0/8: refused, or "ok" with nothing moved), so the runner declines them and the host drags instead. The drag rests 150 ms before lifting (no fling).
+  - **Scroll settle in Safari:** the run-loop idle reply comes 2.5–2.7 s after a drag in Safari. The page really does keep changing for up to 2.4 s (lazy content, polled), so it stays.
+  - **The real app**, read-only up to the welcome screen (nothing tapped but "continue"/"OK"; nothing saved): its launcher screen, info sheet and welcome screen read cleanly. One gap: the action after "continue" settled during the splash (the welcome screen came ~1 s later); `wait --text` covers it.
+  - **MCP against the iPhone** (e2e): launch, snapshot, tap, type, `key hide-keyboard`, scroll, wait, shot (image block) and logs all work through `droidctl mcp`. The MCP guide and `key` now cover iPhones.
+  - **Easier setup:**
+    - The team comes from Xcode's own record of signed-in accounts (no certificate needed first; free vs paid known); with several, an interactive pick.
+    - No Apple ID → setup opens Xcode.
+    - Not paired → `devicectl manage pair` raises "Trust This Computer?".
+    - Developer Mode off → AMFI "reveal" shows the switch.
+    - Untrusted profile → setup opens Settings > VPN & Device Management on the phone (`prefs:root=General&path=ManagedConfigurationList`, verified on iOS 18.7.8).
+    - The steps are numbered, and a README quick start lists the four moments the user is needed.
+    - Any command re-signs a runner whose profile ends within a day, so the weekly free-team renewal needs nobody.
+    - *Unverified on this phone (already set up): the pair prompt, the Developer Mode reveal, opening Xcode, the certificate created by `-allowProvisioningUpdates`, and the interactive team pick.*
+  - **Lifecycle unit tests** (`tests/test_ios_lifecycle.py`, 37): the setup checklist (non-interactive stop with step/instructions/rerun, interactive "told once, carries on", the step timeout) and every step's branches (Xcode license/first launch, one or several iPhones, the pair prompt and Developer Mode reveal sent once, team, lock, signing, the app limit freeing only droidctl's older runners, the Settings page opened once); the runner's start against FakeRunner (our build, a stale build refused, trust and lock failures typed from xcodebuild's output, logs off the iPhone during the start), connect, build errors; teardown's Trust wording; doctor; and the syslog relay through a fake lockdown (StartSession → StartService → StopSession), the ring letting go for `xcode_busy`, staying off while idle, and stale flags. iOS unit coverage 56% → 81%; the rest are the devicectl/keychain subprocess wrappers, covered on the phone. Totals: 126 iOS unit tests, 1036 unit tests overall pass; iPhone e2e 29/29.
+  - **Renewal was a no-op, fixed:** a forced re-sign 6 days before expiry embedded the same cached profile (Xcode keeps a valid one). Now: one re-sign per profile in its last day, "renewed" only when the profile UUID changed, and after expiry a re-sign on each start or `profile-expired`. Whether Xcode issues a new profile after expiry is checked 2026-10-28 (IOS-HANDOFF.md §7.1).
+  - **Error kinds:** `signing`, `not-trusted`, `profile-expired` were raised but not registered (so missing from AGENTS.md); registered, and `test_docs` now fails on any unregistered kind.
+  - **On the phone** (`tests/e2e/ios/test_setup_fresh.py`, 4): the AMFI reveal, an honest re-sign, setup from an empty home (30 s), interactive setup under a pty.
+  - **The dedicated test app** (`ios/testapp`, `scripts/ios_testapp.py`): built, runs on the simulator; its Forms e2e (`test_testapp_forms.py`, 5) waits for a free slot.
+  - Totals: 1039 unit tests pass; iPhone e2e 33 pass, 5 skipped (Forms).
+- **A second real app (a third-party test build): 2026-10-26.** Driven read-only through every tab, detail pages and their tabs, search, a login screen and an overlay; no login, no transactions. CLI, daemon and MCP. Eight bugs found and fixed (rules in `IOS.md` §9.4c):
+  - **A system prompt broke the session:** the location prompt's view service (270x180) was cached as the screen size for the runner's life: no prompt buttons, `dialog=no`, a squashed screenshot, every later hit-test at the wrong centre. Now only a frame filling the screen is the screen, SpringBoard is read with a view service in front (title and buttons, a dialog), and `launch` accepts a system alert (it timed out).
+  - **Wrong tap by position:** `tap --text "A"` opened "B" (a cell labelled "A, B, C", touched at its centre); a list row's centre was one of its price boxes. R9 makes each text its own target, touched where it is: all three cards then opened their own screens, the detail tabs and the sector rows too.
+  - **False `occluded`:** the app's AX hit-test answered "Empty list" (a table under the button) for "Next", and the neighbouring tab for a tab button (deterministic, 6/6). The assertion now passes for an empty scroll container, an ancestor of the target, or an answer whose own frame isn't at the point (`hit_test` says which); a real cover still fails (a hidden tab button stayed `occluded`).
+  - **`back` found no back button** (custom `arrowBack`, `nav back`): back-like leading navigation-bar buttons count.
+  - **Presented sheets were not dialogs** (`dialog=no` over the app's verification sheet): a `UIDimmingView` presentation is a modal window.
+  - **Noise:** blank `button … component?` wrappers (R10) and a hidden "Button" in every action row (R11) are gone.
+  - **Setup after `teardown`** asked for a sign-in while Xcode's command-line builds see no Apple ID: teardown forgets the phone's team. A signed-out team whose profile is valid and not due now signs, from droidctl's build or Xcode's own profile cache (`setup.cached_profile`); a rebuild after a runner change signed that way (the runner was rebuilt 5 times that day).
+  - Totals: 1061 unit tests pass; iPhone e2e 33 pass, 5 skipped (Forms).
+- **Moving quickly through three real apps: 2026-10-26.** Test and dev builds of third-party apps (pre-login: settings, splash, pop-ups, welcome, a calculator with a full form, the login form read-only, a story view; two languages) and the second app again, every step timed through the daemon. Rules in `IOS.md` §9.4c and §11:
+  - **Typing was silently lost on formatted fields:** set_value changed an amount field's shown value, not the app's model; it emptied when editing ended. `type` now uses keys first (focus, delete, type, read back), set_value as the fallback.
+  - **`hide-keyboard` destroyed input on a number pad** (a typed newline cleared the field) and reported success with the keyboard up (`hidden: 0` read as success). Now `unsupported` with a hint, and judged on the screen.
+  - **Waiting by hand after taps:** a spinner the action brought up, a splash, and a push read mid-way are now waited out in the same command (bounded): 1.0 s, a login 1.3 s, a detail page 2.7 s.
+  - **A story view read as SpringBoard** (nothing accessible at the centre): more probe points for the front app.
+  - **Not dialogs:** an app-drawn pop-up card (backdrop + floating card) is now one; `back` under a dialog names its buttons.
+  - **A dev build:** custom switches exposed as buttons (R12), a read-only text view shown as an input (R13).
+  - **`type --text Label`** matching a form row and its input picks the input; a stale handle (a table reloaded per price tick) is re-resolved once.
+  - **Speed:** an action resolves on the last tree while the runner's `gen`/`dump` are unchanged (skips a 250–460 ms read), state saved in one write. Per step on static screens ~0.8–0.95 s, of which droidctl ~150 ms and the settle (iOS's push animation, the touch) the rest; on the second app 1.0–2.2 s, mostly its own network loads.
+  - Totals: 1069 unit tests pass; iPhone e2e 33 pass, 5 skipped (Forms).
+- **Logged in to the second real app: 2026-10-26.** With a test user the user provided, droidctl logged in and went through every tab and their sub-screens, read-only. Per step, in one command: tabs 1.3–1.6 s, sub-screens 1.0–2.1 s (one 3.2 s), back 0.8–1.1 s, a detail page 5.0 s of which 3.7 s its server; login 5.5 s of which 4.3 s the server. Fixes:
+  - **A self-submitting field** (6 digits) left the screen as the last key went in: `type` said `not-found` and its fallback could have typed again. Now `ok` with a warning, never retyped.
+  - **A late push:** a list's rows idled >100 ms between the touch and the push and answered "unchanged"; a delivered tap that changed nothing now reads again for ≤1.2 s (one command, 1.9 s).
+  - **A spinner inside a table cell** (row "In progress") counts as a loading spinner (seen once, not caught live again).
+  - Agent docs: a full iPhone section in AGENTS.md and SKILL.md; iOS behaviour in the command help.
+  - Not droidctl: the app's test backend failed for a while ("Check your internet connection"); after a USB drop CoreDeviceService sat at ~100% CPU and every devicectl call (so `launch`/`apps`) timed out, while taps and snapshots kept working.
+- **I5:** not started (`IOS-INTEGRATION.md` §6).
+
 **Verification status (2026-09-27).** Everything above was verified on one device: the SM-N950F (Android 9 / API 28, rooted, USB passthrough into a VM). The API 30+ paths are **implemented but unverified**: device `takeScreenshot` (API 28 uses the host `screencap` fallback), `ime_enter` (API 28 uses `input keyevent 66`), `stateDescription`, `getUniqueId` (resolver tier 1), Android 13+ restricted settings, and API 34 `accessibilityDataSensitive`. Don't claim they work until they run on an API 30+ device or the (deferred) API 35 emulator.
 
 ## TODO
-- [ ] **Id-less, label-less nested lists can't be re-resolved by ref** (found 2026-10-08 on a Galaxy S25, API 35, Backend B, in a hardened investment app's home screen). Three RecyclerViews, the main list and two nested inside it, have no resource id, no label and an empty `ctx`; the screen has a live ticker, so `gen` changes every second and the tier-0 fast path never applies. A ref from a snapshot one second old (`scroll down 10`) fails as `ambiguous` between all three, and each snapshot renumbers them. Their tree paths do differ (`[0]`, `[0,7]`, `[0,8]` under the pager's id), but `class+path` is off inside adapter lists by design (recycled rows, android_world's "never by index"). Options to weigh: identity by contents for containers (the labels of their first items: content, not position, but a scrolled list's contents change); allow `class+path` for containers (not rows) whose path stays the same between two snapshots on a proven-same screen; or take the fast path when only text changed (`gen` changes, but the handle and the skeleton don't). Must stay "unique or a typed error, never a guess". Workaround meanwhile: `scroll down` (main list) or a locator (`--role list --below "TEXT"`). Needs a test-app scenario that reproduces it (nested id-less RecyclerViews plus a ticker) before any fix, since its real-app fixture can't be committed.
+- [ ] **Id-less, label-less nested lists can't be re-resolved by ref** (found 2026-10-08 on a Galaxy S25, API 35, Backend B, in a hardened app's home screen). Three RecyclerViews, the main list and two nested inside it, have no resource id, no label and an empty `ctx`; the screen has a live ticker, so `gen` changes every second and the tier-0 fast path never applies. A ref from a snapshot one second old (`scroll down 10`) fails as `ambiguous` between all three, and each snapshot renumbers them. Their tree paths do differ (`[0]`, `[0,7]`, `[0,8]` under the pager's id), but `class+path` is off inside adapter lists by design (recycled rows, android_world's "never by index"). Options to weigh: identity by contents for containers (the labels of their first items: content, not position, but a scrolled list's contents change); allow `class+path` for containers (not rows) whose path stays the same between two snapshots on a proven-same screen; or take the fast path when only text changed (`gen` changes, but the handle and the skeleton don't). Must stay "unique or a typed error, never a guess". Workaround meanwhile: `scroll down` (main list) or a locator (`--role list --below "TEXT"`). Needs a test-app scenario that reproduces it (nested id-less RecyclerViews plus a ticker) before any fix, since its real-app fixture can't be committed.
 - [ ] **A diff after `snapshot --system` lists the system bars as removed** (found 2026-10-08 on the Galaxy S25). `snapshot --system` saves the state *with* the status/navigation bar elements; the next action builds its post-action snapshot without them (`S.build(tree)`, no `system`), so `S.diff` reports every system element as `-` (the first `back` after it printed `- text "10:52"`, `- image "…bildirimi:"`, …) and buries the real change. Fix direction: save whether the state was built with `system`, and build the post-action snapshot the same way (or leave system elements out of the saved `lines`). Test: a real fixture with a status bar, `--system` snapshot, then an action whose tree is unchanged → `unchanged`, not a list of removals.
 
 ## Open questions and decision gates

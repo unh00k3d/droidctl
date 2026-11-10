@@ -1,0 +1,86 @@
+Command line invocation:
+    /Users/<user>/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -xctestrun /Users/<user>/.droidctl/ios/build/TEAMID0000/Build/Products/DroidctlRunner_iphoneos26.2-arm64.xctestrun -destination platform=iOS,id=00008101-0000000000000001 "-only-testing:DroidctlRunner/DroidctlRunner/testServe"
+
+2026-10-21 18:15:14.278 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-21 18:15:14.288 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-21 18:15:14.383 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-21 18:15:14.497 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-21 18:15:19.300 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS, arch:arm64e, id:00008101-0000000000000001, name:iPhone }
+{ platform:iOS, arch:arm64v8, id:00008101-0000000000000001, name:iPhone }
+{ platform:iOS, arch:arm64, id:00008101-0000000000000001, name:iPhone }
+{ platform:iOS, arch:armv8, id:00008101-0000000000000001, name:iPhone }
+2026-10-21 18:15:20.227 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-21 18:15:20.742 xcodebuild[24106:36388756] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-21 18:15:22.817 xcodebuild[24106:36388756] [MT] IDELaunchReport: 22ec37c1ded8edc0:22ec37c1ded8f280:Installing DroidctlRunner on iPhone Finished with error: Unable to Install “DroidctlRunner-Runner”
+Domain: MIInstallerErrorDomain
+Code: 13
+Recovery Suggestion: This device has reached the maximum number of installed apps using a free developer profile: {(
+    "TEAMID0000.dev.droidctl.s1.testapp",
+    "TEAMID0000.dev.droidctl.jl3.runner.xctrunner",
+    "TEAMID0000.dev.droidctl.s1.runner.xctrunner"
+)}
+--
+Failed to install the app on the device.
+Domain: com.apple.dt.CoreDeviceError
+Code: 3002
+User Info: {
+    NSURL = "file:///Users/<user>/.droidctl/ios/build/TEAMID0000/Build/Products/Debug-iphoneos/DroidctlRunner-Runner.app";
+}
+--
+Unable to Install “DroidctlRunner-Runner”
+Domain: IXUserPresentableErrorDomain
+Code: 14
+Failure Reason: This app cannot be installed because its integrity could not be verified.
+Recovery Suggestion: This device has reached the maximum number of installed apps using a free developer profile: {(
+    "TEAMID0000.dev.droidctl.s1.testapp",
+    "TEAMID0000.dev.droidctl.jl3.runner.xctrunner",
+    "TEAMID0000.dev.droidctl.s1.runner.xctrunner"
+)}
+--
+This device has reached the maximum number of installed apps using a free developer profile: {(
+    "TEAMID0000.dev.droidctl.s1.testapp",
+    "TEAMID0000.dev.droidctl.jl3.runner.xctrunner",
+    "TEAMID0000.dev.droidctl.s1.runner.xctrunner"
+)}
+Domain: MIInstallerErrorDomain
+Code: 13
+User Info: {
+    FunctionName = "-[MIFreeProfileValidatedAppTracker _onQueue_addReferenceForApplicationIdentifier:bundle:error:]";
+    LegacyErrorString = ApplicationVerificationFailed;
+    LibMISErrorNumber = "-402620383";
+    SourceFileLine = 171;
+}
+--
+
+2026-10-21 18:15:22.818 xcodebuild[24106:36388756] [MT] IDELaunchReport: 22ec37c1ded8edc0:22ec37c1ded8edc0: Finished with error: Unable to Install “DroidctlRunner-Runner”
+Domain: MIInstallerErrorDomain
+Code: 13
+Recovery Suggestion: This device has reached the maximum number of installed apps using a free developer profile: {(
+2026-10-21 18:15:23.032 xcodebuild[24106:36388756] [MT] IDETestOperationsObserverDebug: 2.802 elapsed -- Testing started completed.
+2026-10-21 18:15:23.032 xcodebuild[24106:36388756] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-21 18:15:23.032 xcodebuild[24106:36388756] [MT] IDETestOperationsObserverDebug: 2.802 sec, +2.802 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/<user>/Library/Developer/Xcode/DerivedData/DroidctlRunner-gugpyxmowbohlpahccbbifxylxrt/Logs/Test/Test-DroidctlRunner-2026.10.21_18-15-19-+0300.xcresult
+
+Testing failed:
+	Unable to Install “DroidctlRunner-Runner”
+	DroidctlRunner-Runner encountered an error (Failed to install or launch the test runner. (Underlying Error: Unable to Install “DroidctlRunner-Runner”. This device has reached the maximum number of installed apps using a free developer profile: {(
+    "TEAMID0000.dev.droidctl.s1.testapp",
+    "TEAMID0000.dev.droidctl.jl3.runner.xctrunner",
+    "TEAMID0000.dev.droidctl.s1.runner.xctrunner"
+)}. (Underlying Error: Failed to install the app on the device. (Underlying Error: Unable to Install “DroidctlRunner-Runner”. This app cannot be installed because its integrity could not be verified. This device has reached the maximum number of installed apps using a free developer profile: {(
+    "TEAMID0000.dev.droidctl.s1.testapp",
+    "TEAMID0000.dev.droidctl.jl3.runner.xctrunner",
+    "TEAMID0000.dev.droidctl.s1.runner.xctrunner"
+)}. (Underlying Error: This device has reached the maximum number of installed apps using a free developer profile: {(
+    "TEAMID0000.dev.droidctl.s1.testapp",
+    "TEAMID0000.dev.droidctl.jl3.runner.xctrunner",
+    "TEAMID0000.dev.droidctl.s1.runner.xctrunner"
+)})))))
+
+** TEST EXECUTE FAILED **
+
+Testing started

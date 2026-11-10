@@ -67,7 +67,7 @@ def add_parsers(sub, jsonopt, devopt):
         return sp
 
     # -- act on elements
-    sp = add("tap", "tap an element: ACTION_CLICK, verified by the click event and a diff", "cmd_tap")
+    sp = add("tap", "tap an element: ACTION_CLICK (iOS: its AX action, else one checked touch), verified by a diff", "cmd_tap")
     _locators(sp, scroll=True)
     sp.add_argument("--double", action="store_true", help="double-tap (a gesture)")
     _act_opts(sp)
@@ -76,7 +76,7 @@ def add_parsers(sub, jsonopt, devopt):
     _locators(sp, scroll=True)
     _act_opts(sp)
 
-    sp = add("type", "set an input's text (Unicode; set_text, then paste, then adb input)", "cmd_type")
+    sp = add("type", "set an input's text (Android: set_text, then paste, then adb input; iOS: keystrokes, then set_value)", "cmd_type")
     sp.add_argument("target", nargs="?", metavar="REF", help="the input's ref (default: the focused input)")
     sp.add_argument("content", nargs="?", metavar="TEXT", help="the text (or --stdin / --file to avoid shell quoting)")
     _locators(sp, positional=False)
@@ -136,7 +136,7 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--ms", type=int, default=500, metavar="MS", help="duration (500)")
     _act_opts(sp, method=False)
 
-    for name, fn, what in (("back", "cmd_back", "the system Back"),
+    for name, fn, what in (("back", "cmd_back", "the system Back (iOS: the screen's own back button)"),
                            ("home", "cmd_home", "go to the home screen"),
                            ("recents", "cmd_recents", "open the recent apps"),
                            ("notifications", "cmd_notifications", "open the notification shade"),
@@ -144,7 +144,11 @@ def add_parsers(sub, jsonopt, devopt):
         sp = add(name, what, fn)
         _act_opts(sp, method=False)
 
-    sp = add("press", "press a key via adb (enter, tab, del, search, KEYCODE_*, or a number)", "cmd_press")
+    sp = add("hide-keyboard", "hide the on-screen keyboard (iOS: its Return/Done key; Android: Back)",
+             "cmd_hide_keyboard")
+    _act_opts(sp, method=False)
+
+    sp = add("press", "press a key via adb (enter, tab, del, search, KEYCODE_*, or a number; iOS: enter only)", "cmd_press")
     sp.add_argument("key", help="key name or code")
     _act_opts(sp, method=False)
 
@@ -178,7 +182,7 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--events", metavar="TYPES", help="comma-separated event types (default all)")
     sp.add_argument("--all", action="store_true", help="include content/scroll churn")
 
-    sp = add("logs", "recent logcat lines, bounded", "cmd_logs")
+    sp = add("logs", "recent logcat lines, bounded (iOS: the phone's log stream)", "cmd_logs")
     sp.add_argument("--max", type=int, default=100, metavar="N", help="at most N lines (100)")
     sp.add_argument("--pkg", metavar="PKG", help="only this app's process, plus its crashes (stack traces) from the crash buffer")
     sp.add_argument("--level", choices=("V", "D", "I", "W", "E", "F"), help="minimum level")
@@ -197,7 +201,7 @@ def add_parsers(sub, jsonopt, devopt):
 
     # -- apps
     sp = add("launch", "start an app, wait for its window and settle; prints the new screen", "cmd_launch")
-    sp.add_argument("pkg", help="package name")
+    sp.add_argument("pkg", help="package name (iOS: bundle id)")
     sp.add_argument("--activity", metavar="CLASS", help="a specific activity (default: the launcher one)")
     sp.add_argument("--stop", action="store_true", help="force-stop it first (a cold start)")
     sp.add_argument("--clear", action="store_true", help="clear its data first (pm clear: destructive)")
@@ -211,7 +215,7 @@ def add_parsers(sub, jsonopt, devopt):
     sp.add_argument("--all", action="store_true", help="include system apps")
     sp.add_argument("--filter", metavar="TEXT", help="only packages containing TEXT")
 
-    sp = add("install", "install an APK (adb install -r)", "cmd_install")
+    sp = add("install", "install an APK (adb install -r; iOS: a .app or .ipa)", "cmd_install")
     sp.add_argument("apk", help="path to the .apk")
     sp.add_argument("--grant", action="store_true", help="grant all runtime permissions (-g)")
 

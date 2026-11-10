@@ -661,7 +661,7 @@ def test_a_window_without_bounds_after_a_rebind_is_the_main_screen():
 
 
 @pytest.mark.parametrize("input_type,secret", [
-    (18, True),      # number | number_password (a banking QA app login, no isPassword flag)
+    (18, True),      # number | number_password (a real app login, no isPassword flag)
     (129, True),     # text | password
     (225, True),     # text | web_password
     (145, False),    # text | visible_password: shown on screen, not a secret
@@ -706,7 +706,7 @@ def test_bidi_marks_are_dropped_but_zwj_is_kept():
 def test_a_closing_activity_window_is_recognised_as_leaving():
     """Right after `back` the closing activity window stays in the list, stacked
     over the returning one, unfocused (real capture: Settings > Display > back).
-    A locator on such a frame matched the old screen (a banking QA app)."""
+    A locator on such a frame matched the old screen (a real app)."""
     d = load("real-settings-back-transition")
     assert S.leaving_windows(d["tree"]) == {695}
     assert S.build(d["tree"]).leaving == {695}

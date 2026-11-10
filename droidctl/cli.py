@@ -27,12 +27,25 @@ def cmd_devices(a):
     rows = []
     for serial, state in dev.list_devices():
         row = {"serial": serial, "state": state}
-        if state == "device":
+        if dev.is_ios(serial):
+            row.update(platform="ios", backend="ios", setup=bool(dev.device_state(serial).get("team")))
+            row["model"] = _ios_model(serial)
+        elif state == "device":
+            row["platform"] = "android"
             row["model"] = dev.sh(dev.adb_device(serial), ["getprop", "ro.product.model"])
             row["setup"] = bool(dev.device_state(serial))
             row["backend"] = dev.backend_for(serial)
         rows.append(row)
     return {"ok": True, "devices": rows}
+
+
+def _ios_model(udid):
+    """The marketing name from devicectl ("iPhone 12"); None without Xcode (best effort)."""
+    try:
+        from droidctl.ios import devices
+        return next((d["model"] for d in devices.list_devices() if d["udid"] == udid), None)
+    except UserError:
+        return None
 
 
 def render_devices(p):
@@ -97,7 +110,52 @@ def _wait_for_windows(port, timeout=3.0):
     return False
 
 
+def _ios_setup_wanted(a):
+    if getattr(a, "ios", False) or getattr(a, "team", None):
+        return True
+    if a.device:
+        return dev.is_ios(a.device)
+    try:                                      # nothing named: an iPhone alone is the one to set up
+        return bool(dev.ios_devices()) and not [s for s, st in dev.list_devices() if not dev.is_ios(s)]
+    except UserError:
+        return bool(dev.ios_devices())
+
+
+def cmd_setup_ios(a):
+    import sys
+    from droidctl.ios import setup as ios_setup
+    udid = a.device if a.device and dev.is_ios(a.device) else None
+    if a.device and not udid:
+        raise UserError(f"{a.device} is not an iPhone", "bad-args")
+    interactive = sys.stderr.isatty() and not a.json
+    say = (lambda line: console.print(line, highlight=False, markup=False)) if interactive else (lambda line: None)
+    rerun = "droidctl setup " + (f"-d {udid}" if udid else "--ios") + (f" --team {a.team}" if a.team else "")
+    import getpass
+    tty = sys.stdin.isatty()
+    return ios_setup.run(udid=udid, team=a.team, interactive=interactive, say=say, rerun=rerun,
+                         ask=(lambda q: input(q)) if tty else None, secret=getpass.getpass if tty else None,
+                         anisette=getattr(a, "anisette", None))
+
+
+def _ask_for_iphone(a):
+    """No phone named and none attached: in a terminal, ask whether it's an iPhone to set up (on
+    Linux nothing lists one before usbmuxd and go-ios are there)."""
+    import sys
+    if a.device or a.json or not (sys.stdin.isatty() and sys.stderr.isatty()):
+        return False
+    try:
+        if dev.list_devices():
+            return False
+    except UserError:
+        pass
+    got = input("No phone is attached. Set up an iPhone? (droidctl checks what it needs and offers to get it) "
+                "[y/N] ").strip().lower()
+    return got in ("y", "yes")
+
+
 def cmd_setup(a):
+    if _ios_setup_wanted(a) or _ask_for_iphone(a):
+        return cmd_setup_ios(a)
     if not os.path.exists(dev.APK_PATH):
         raise UserError(f"the agent APK is not bundled ({dev.APK_PATH})", "missing-dep",
                         hint="run: make apk")
@@ -201,6 +259,14 @@ def _setup_ua(serial, d, keep_a11y=False):
 
 
 def render_setup(p):
+    if p.get("team") is not None and "udid" in p:     # the iPhone checklist already printed its steps
+        console.print(f"[green]ready[/green] {p.get('model') or p['udid']} (iOS {p.get('ios')}), team {p['team']}",
+                      highlight=False)
+        if p.get("profile_expires"):
+            console.print(f"  [dim]the runner's profile runs until {p['profile_expires'][:10]}; droidctl re-signs it "
+                          "by itself before then[/dim]", highlight=False)
+        console.print(f"next: {p['next']}", highlight=False)
+        return
     if p.get("backend") == "uiautomation":
         console.print(f"[green]ready[/green] {p['serial']}  agent {p['agent'].get('version')} over uiautomation "
                       f"(sdk {p['agent'].get('sdk')}, {p['agent'].get('model')})  tcp:{p['port']}")
@@ -220,7 +286,24 @@ def render_setup(p):
         console.print(f"  [dim]other accessibility services kept: {', '.join(others)}[/dim]")
 
 
+def _ios_target(a):
+    """An iPhone is the target: named by -d, or the only kind attached."""
+    if a.device:
+        return dev.is_ios(a.device)
+    try:
+        return bool(dev.ios_devices()) and not [s for s, st in dev.list_devices() if not dev.is_ios(s)]
+    except UserError:
+        return bool(dev.ios_devices())
+
+
 def cmd_teardown(a):
+    if _ios_target(a):
+        import sys
+        from droidctl.ios import manage
+        udid = dev.resolve_serial(a.device)
+        say = (lambda line: console.print(line, highlight=False, markup=False)) \
+            if sys.stderr.isatty() and not a.json else (lambda line: None)
+        return manage.teardown(udid, keep_app=a.keep_apk, say=say)
     serial = dev.resolve_serial(a.device)
     d = dev.adb_device(serial)
     which = getattr(a, "backend", None) or "all"
@@ -264,7 +347,63 @@ def cmd_teardown(a):
             "forward_removed": forward, "uninstalled": uninstalled, "uiautomation": ua}
 
 
+def cmd_login(a):
+    """droidctl's own Apple sign-in (iPhone signing without Xcode's account)."""
+    import getpass
+    import sys
+    from droidctl.ios import provision
+    if not sys.stdin.isatty():
+        raise UserError("login asks for a password and a 2FA code: run it in a terminal", "bad-args",
+                        hint="run: droidctl login  (in a terminal; an agent can't type the password)")
+    rec = provision.record() or {}
+    url = a.anisette or os.environ.get("DROIDCTL_ANISETTE") or rec.get("anisette")
+    if not url and sys.platform != "darwin":
+        from droidctl.ios.apple import anisette
+        url = anisette.choose_server(input, lambda line: print(line, file=sys.stderr))
+    apple_id = a.apple_id or (None if a.fresh else rec.get("apple_id")) or input("Apple ID (email): ").strip()
+    if not apple_id:
+        raise UserError("no Apple ID given", "bad-args")
+
+    def get_password():
+        print("droidctl uses the password only inside Apple's SRP sign-in (it never leaves this computer as is) "
+              "and keeps no copy; it keeps Apple's Xcode token in the keychain.", file=sys.stderr)
+        return getpass.getpass("Password (not shown): ")
+    return provision.login(apple_id, get_password, ask_code=input, team=a.team, ask=input,
+                           say=lambda line: print(line, file=sys.stderr), anisette_url=url, fresh=a.fresh)
+
+
+def render_login(p):
+    console.print(f"[green]signed in[/green] {p['apple_id']}: team {p['team_name']} ({p['team']})"
+                  + (" — free" if p.get("free") else ""), highlight=False)
+    where = {"keychain": "the macOS keychain", "secret-service": "the Secret Service keyring",
+             "file": "a private file under droidctl's home"}.get(p.get("stored"), p.get("stored"))
+    console.print(f"  [dim]Apple's token is kept in {where}"
+                  + (f"; it expires {p['token_expires']}" if p.get("token_expires") else "") + "[/dim]", highlight=False)
+    console.print("  next: droidctl setup --ios", highlight=False)
+
+
+def cmd_logout(a):
+    from droidctl.ios import provision
+    return provision.logout()
+
+
+def render_logout(p):
+    console.print(f"[green]signed out[/green] {p['apple_id']}" if p.get("signed_out") else "droidctl was not signed in",
+                  highlight=False)
+
+
 def render_teardown(p):
+    if p.get("platform") == "ios":
+        console.print(f"[green]done[/green] {p['serial']}: runner "
+                      f"{'stopped' if p['stopped'] else 'was not running'}, "
+                      + (f"uninstalled {', '.join(p['uninstalled'])}" if p["uninstalled"] else
+                         "app kept" if p["kept"] else "no droidctl app was installed"), highlight=False)
+        console.print("  not undone (by design):", highlight=False)
+        for line in p["not_undone"]:
+            console.print(f"  [dim]- {line}[/dim]", highlight=False)
+        if p.get("build_cache"):
+            console.print(f"  [dim]the runner's build cache on this Mac: {p['build_cache']}[/dim]", highlight=False)
+        return
     ua = p.get("uiautomation")
     if ua is not None:
         console.print(f"[green]done[/green] {p['serial']}: uiautomation agent "
@@ -312,6 +451,16 @@ def cmd_doctor(a):
                       f"  devices {len(st.get('devices') or [])}"
                       f"  cache {hits}/{hits + misses} ({rate})")
     check("daemon", daemon_check)
+
+    if _ios_target(a):
+        from droidctl.ios import manage
+        try:
+            udid = dev.resolve_serial(a.device)
+        except UserError as e:
+            checks.append({"name": "device", "ok": False, "detail": f"{e.kind}: {e}"})
+            return {"ok": False, "checks": checks}
+        extra = manage.doctor(udid, check, skip)
+        return dict(extra, ok=all(c["ok"] is not False for c in checks), serial=udid, checks=checks)
 
     later = ["backend", "apk", "service", "uiautomation", "socket", "peer-uid", "protocol", "rtt"]
     if not check("adb", lambda: (True, f"server version {int(dev._adb_host_query('host:version'), 16)}")):
@@ -442,6 +591,10 @@ def render_doctor(p):
         if isinstance(detail, dict):
             detail = "  ".join(f"{k}={v}" for k, v in detail.items()) + " ms"
         console.print(f"{marks[c['ok']]} {c['name']:<13} {detail}", highlight=False)
+    if p.get("not_undone_by_teardown"):
+        console.print("[dim]teardown removes droidctl's runner; it does not undo:[/dim]", highlight=False)
+        for line in p["not_undone_by_teardown"]:
+            console.print(f"[dim]  - {line}[/dim]", highlight=False)
 
 
 # --------------------------------------------------------------------------
@@ -698,6 +851,8 @@ def cmd_dump_fixture(a):
     if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", a.name):
         raise UserError(f"fixture name {a.name!r}: use lowercase letters, digits, '.', '_' and '-'", "bad-args")
     serial = dev.resolve_serial(a.device)
+    if dev.is_ios(serial):
+        return _dump_fixture_ios(a, serial)
     client, info = dev.connect(serial)
     try:
         focus = None
@@ -748,6 +903,39 @@ def cmd_dump_fixture(a):
     os.replace(path + ".tmp", path)
     return {"ok": True, "path": path, "bytes": len(text.encode()), **{k: meta[k] for k in
             ("package", "activity", "nodes", "dump_ms", "degraded", "settled")}}
+
+
+def _dump_fixture_ios(a, serial):
+    """The runner's own tree (not the mapped one), so mapping tests run on what the phone sent."""
+    import datetime
+    import json
+    client, info = dev.connect(serial)
+    try:
+        deadline = time.monotonic() + a.timeout
+        while True:
+            tree = client.native_tree({}, timeout=30)
+            if not a.pkg or tree.get("front") == a.pkg:
+                break
+            if time.monotonic() > deadline:
+                raise UserError(f"{a.pkg} is not in the foreground (front: {tree.get('front')})", "timeout")
+            time.sleep(0.5)
+    finally:
+        client.close()
+    meta = {
+        "name": a.name, "platform": "ios",
+        "captured": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "model": info.get("model"), "release": info.get("release"), "screen": info.get("screen"),
+        "runner": {"version": info.get("version"), "build": info.get("build")},
+        "package": tree.get("front"), "dump_ms": tree.get("ms"), "nodes": tree.get("nodes"),
+    }
+    os.makedirs(a.dir, exist_ok=True)
+    path = os.path.join(a.dir, a.name + ".json")
+    text = json.dumps({"meta": meta, "tree": tree}, ensure_ascii=False, indent=1) + "\n"
+    with open(path + ".tmp", "w", encoding="utf-8") as f:
+        f.write(text)
+    os.replace(path + ".tmp", path)
+    return {"ok": True, "path": path, "bytes": len(text.encode()), "package": meta["package"], "activity": None,
+            "nodes": meta["nodes"], "dump_ms": meta["dump_ms"], "degraded": False, "settled": True}
 
 
 def render_dump_fixture(p):
@@ -808,6 +996,9 @@ def cmd_snapshot(a):
         except OSError as e:
             raise UserError(f"cannot read {a.fixture}: {e.strerror}", "not-found")
         tree = doc.get("tree", doc)
+        if "apps" in tree:                      # an iOS runner fixture: map it like a live tree
+            from droidctl.ios import mapping
+            tree = mapping.convert(tree)
         activity = (doc.get("meta") or {}).get("activity")
     else:
         serial = dev.resolve_serial(a.device)
@@ -820,6 +1011,9 @@ def cmd_snapshot(a):
             while snap_mod.leaving_windows(tree) and time.monotonic() < deadline:
                 time.sleep(0.1)
                 tree = client.call("tree", {}, timeout=15)
+            if dev.is_ios(serial) and tree.get("dump") is not None:
+                from droidctl import act as act_mod
+                act_mod._TREE_CACHE[serial] = tree    # the next action resolves on it while nothing changed
             if not a.raw:
                 toast, evseq = _recent_toast(client, prev_state)
         finally:
@@ -1083,7 +1277,14 @@ def build_parser():
     sp.set_defaults(fn=cmd_devices, render=render_devices)
 
     sp = sub.add_parser("setup", parents=[jsonopt, devopt],
-                        help="install the agent APK and append its accessibility service (keeps the others)")
+                        help="install the agent APK and append its accessibility service (keeps the others); "
+                             "on an iPhone: a guided setup (Trust, Developer Mode, an Apple sign-in) that signs, installs and "
+                             "starts the runner")
+    sp.add_argument("--ios", action="store_true", help="set up the attached iPhone (implied by an iPhone's UDID in -d)")
+    sp.add_argument("--team", metavar="ID", help="(iPhone) the Apple signing team; asked only when the Mac has several")
+    sp.add_argument("--anisette", metavar="URL",
+                    help="(iPhone, Linux) the anisette-v3 server for Apple's sign-in (default: asked; the public "
+                         "https://new.ani.sidestore.io, or your own)")
     sp.add_argument("--reinstall", action="store_true", help="install even if the same version is present")
     sp.add_argument("--backend", choices=dev.BACKENDS,
                     help="a11y: the accessibility service (default); uiautomation: run the agent over adb with "
@@ -1093,15 +1294,31 @@ def build_parser():
                          "apps that hide from services hidden from Backend B too")
     sp.set_defaults(fn=cmd_setup, render=render_setup)
 
+    sp = sub.add_parser("login", parents=[jsonopt],
+                        help="(iPhone) sign in to Apple again (setup asks the first time), so droidctl signs and renews "
+                             "the runner itself; asks for the password, and a 2FA code if Apple wants one, in the terminal")
+    sp.add_argument("--apple-id", metavar="EMAIL", help="the Apple ID (asked when left out)")
+    sp.add_argument("--team", metavar="ID", help="the team to sign with, when the Apple ID has several")
+    sp.add_argument("--anisette", metavar="URL", help="(Linux) the anisette-v3 server (default: asked; the public "
+                                                    "https://new.ani.sidestore.io, or your own)")
+    sp.add_argument("--fresh", action="store_true", help="sign in again even if a saved sign-in still works")
+    sp.set_defaults(fn=cmd_login, render=render_login)
+
+    sp = sub.add_parser("logout", parents=[jsonopt], help="(iPhone) forget droidctl's Apple sign-in (the keychain entry)")
+    sp.set_defaults(fn=cmd_logout, render=render_logout)
+
     sp = sub.add_parser("teardown", parents=[jsonopt, devopt],
-                        help="remove only our service, restore the a11y settings, uninstall the agent")
-    sp.add_argument("--keep-apk", action="store_true", help="disable the service but keep the APK installed")
+                        help="remove only our service, restore the a11y settings, uninstall the agent "
+                             "(iPhone: stop and uninstall the runner, and list what it does not undo)")
+    sp.add_argument("--keep-apk", action="store_true",
+                    help="disable the service but keep the APK installed (iPhone: stop the runner, keep it installed)")
     sp.add_argument("--backend", choices=dev.BACKENDS + ("all",), default="all",
                     help="remove only this backend (default: all of droidctl)")
     sp.set_defaults(fn=cmd_teardown, render=render_teardown)
 
     sp = sub.add_parser("doctor", parents=[jsonopt, devopt],
-                        help="check adb, APK, service, socket, peer UID and round-trip latency")
+                        help="check adb, APK, service, socket, peer UID and round-trip latency "
+                             "(iPhone: Xcode, Developer Mode, team, runner, profile expiry, the Mac's sleep)")
     sp.set_defaults(fn=cmd_doctor, render=render_doctor)
 
     sp = sub.add_parser("diagnose", parents=[jsonopt, devopt],

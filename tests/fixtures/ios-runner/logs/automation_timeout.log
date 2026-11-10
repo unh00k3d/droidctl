@@ -1,0 +1,42 @@
+Command line invocation:
+    /Users/<user>/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project S1.xcodeproj -scheme Runner -destination platform=iOS,id=00008101-0000000000000001 -derivedDataPath /Users/<user>/Documents/droidctl/research/ios-spike/dd-dev "-only-testing:Runner/S2Server/testServe"
+
+2026-10-21 17:24:04.739880+0300 Runner-Runner[1771:490774] [Default] Running tests...
+2026-10-21 17:25:04.907362+0300 Runner-Runner[1771:490774] [Default] Failed to initialize for UI testing: Error Domain=com.apple.dt.XCTest.XCTFuture Code=1000 "Timed out while enabling automation mode." UserInfo={NSLocalizedDescription=Timed out while enabling automation mode.}
+
+
+*** If you believe this error represents a bug, please attach the result bundle at /Users/<user>/Documents/droidctl/research/ios-spike/dd-dev/Logs/Test/Test-Runner-2026.10.21_17-24-01-+0300.xcresult
+
+2026-10-21 17:25:05.271 xcodebuild[65292:36174650]  IDETestOperationsObserverDebug: Failure collecting diagnostics from devices: Process exited with error 1:
+ ERROR: The operation couldn?t be completed. (CoreDeviceCLISupport.DiagnoseError error 0.)
+This tool generates files that allow Apple to investigate issues with your
+computer and help improve Apple products. The files might contain personal
+information found on your device or associated with your Apple Account(s),
+including but not limited to your name, serial numbers of your device,
+your device name, your device's location over the last one to two days,
+your attached peripheral devices, your user name, your email address and
+email settings, file paths, file names, Siri suggestions, your computer's
+IP addresses, and network connection information.
+
+This information is used by Apple in accordance with its privacy policy
+(www.apple.com/privacy) and is not shared with any other company. By using
+this tool and sending the results to Apple, you consent to Apple using the
+contents of these files to improve Apple products.
+
+An error occurred while running devicectl diagnose. Will archive the diagnostics collected thus far.
+Wrote file to /Users/<user>/Documents/droidctl/research/ios-spike/dd-dev/Logs/Test/Test-Runner-2026.10.21_17-24-01-+0300.xcresult/Staging/1_Test/Diagnostics/devicectl_diagnostics.zip
+Partial devicectl diagnose bundle located here: /Users/<user>/Documents/droidctl/research/ios-spike/dd-dev/Logs/Test/Test-Runner-2026.10.21_17-24-01-+0300.xcresult/Staging/1_Test/Diagnostics/devicectl_diagnostics.zip
+
+2026-10-21 17:25:05.286 xcodebuild[65292:36170233] [MT] IDETestOperationsObserverDebug: 63.054 elapsed -- Testing started completed.
+2026-10-21 17:25:05.286 xcodebuild[65292:36170233] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-21 17:25:05.286 xcodebuild[65292:36170233] [MT] IDETestOperationsObserverDebug: 63.054 sec, +63.054 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/<user>/Documents/droidctl/research/ios-spike/dd-dev/Logs/Test/Test-Runner-2026.10.21_17-24-01-+0300.xcresult
+
+Testing failed:
+	Runner-Runner (1771) encountered an error (The test runner failed to initialize for UI testing. (Underlying Error: Timed out while enabling automation mode.))
+
+** TEST EXECUTE FAILED **
+
+Testing started

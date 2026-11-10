@@ -58,7 +58,7 @@ def short_class(c):
 
 
 # Invisible controls: zero-width space, word joiner, LRM/RLM/ALM, bidi
-# embeddings/overrides/isolates, BOM. Some apps pad labels with them (a banking app
+# embeddings/overrides/isolates, BOM. Some apps pad labels with them (an app
 # QA: "Use Device Settings" + 104 marks + "OFF"; "Values \u200b\u200bof").
 # ZWJ/ZWNJ stay: emoji sequences and Persian need them.
 _BIDI = re.compile("[\u200b\u2060\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069\ufeff]")
@@ -113,7 +113,7 @@ _NUMBER_PASSWORD = 0x10                 # TYPE_NUMBER_VARIATION_PASSWORD
 def is_password(raw):
     """A secret field: the platform's password flag, or a password inputType.
 
-    Apps with their own masking (a banking QA app: inputType 18, number|password)
+    Apps with their own masking (a real app: inputType 18, number|password)
     never set isPassword(), so the platform hands us the clear text."""
     if "password" in (raw.get("flags") or ()):
         return True
@@ -130,7 +130,7 @@ _IT_PHONE = 0x3
 def _prompt_in_numeric(raw):
     """An editable number/phone field whose text has letters is showing a prompt:
     such a field cannot hold letters. Some apps put the prompt in the text without
-    showingHint (a banking QA app OTP: "Enter the code received by SMS")."""
+    showingHint (a real app OTP: "Enter the code received by SMS")."""
     it, t = raw.get("inputType"), raw.get("text")
     return (isinstance(it, int) and it & _IT_CLASS in (_IT_NUMBER, _IT_PHONE) and t
             and "editable" in (raw.get("flags") or ()) and any(c.isalpha() for c in t))
@@ -341,7 +341,7 @@ def leaving_windows(tree):
     """Ids of activity windows on their way out (or in): during an activity
     transition the closing window stays in the list, stacked ABOVE the one that
     now has focus, for the length of the animation (~200 ms measured on the
-    SM-N950F, a banking QA app back navigation). Such a frame shows two screens at
+    SM-N950F, a real app back navigation). Such a frame shows two screens at
     once; a locator then matched the old screen's elements. A same-package,
     near-full-screen application window above the focused one that has neither
     focus nor the active flag is that transition (a real dialog takes focus)."""
@@ -447,7 +447,8 @@ def _classify(wins, snap, system):
         # and a modal dialog is often the only window it lists at all
         # a window from rootInActiveWindow (`unlisted`, no bounds) has no title to go by
         untitled = not w.title and not w.raw.get("unlisted") and w.raw.get("bounds") is not None
-        return popup(w) or untitled or sp.area(w.rect) < 0.7 * area_scr
+        # iOS marks a presented sheet modal (mapping._sheet_box): it can cover 93% and still be a dialog
+        return popup(w) or untitled or sp.area(w.rect) < 0.7 * area_scr or bool(w.raw.get("modal"))
 
     main = max((w for w in apps if not floating(w)), key=lambda w: (sp.area(w.rect), -w.layer), default=None)
     for w in apps:
@@ -484,7 +485,8 @@ def _make(raw, win, parent, index, clip, in_scroll):
     # a scrollable filling the window is usually a layout that merely claims to
     # scroll (Compose roots report ScrollView around their bars: Drive), unless
     # it holds a list's worth of content (an edge-to-edge ScrollView of rows)
-    n.scroll_like = bool(scrollish and n.rect and (not big or coll or _list_like(raw)))
+    # (`scrolls`: the iOS mapping saw its scroll bar say "N pages": a web page filling the screen)
+    n.scroll_like = bool(scrollish and n.rect and (not big or coll or _list_like(raw) or raw.get("scrolls")))
     n.tabstrip = rows == 1 and cols >= 2 and not n.scroll_like
     n.is_list = n.scroll_like or (bool(coll) and rows * cols >= 2 and not n.tabstrip)
     n.tab_item = bool(parent and raw.get("item") and any(a.tabstrip for a in [parent, *parent.ancestors()][:3]))
@@ -856,7 +858,7 @@ def _dedupe(elems):
                 continue
             # same label and either near (8 px) or one inside the other: a selected
             # tab is a non-clickable container labelled by its desc around a text
-            # child saying the same (a banking QA app "My Status" tabs), listed twice
+            # child saying the same (a real app "My Status" tabs), listed twice
             # (not when the outer one is a container: a WebView titled like its h1
             # keeps the heading, which is page structure, not a repeat)
             nested = ((a.node in b.node.ancestors() and a.role not in _CONTAINER_ROLES)
@@ -1369,7 +1371,7 @@ def _row_part(e, row, snap, opts):
     line = element_line(e, snap, opts, compact=True)
     if e.segments and e.role in ("switch", "checkbox", "toggle", "radio"):
         # whole labels or ` · ` segments only: a radio "Test" next to "Test Daily"
-        # is its own label, not a repeat (a banking QA app environment picker)
+        # is its own label, not a repeat (a real app environment picker)
         others = {s.lower() for o in row if o is not e for s in o.segments}
         if e.label_full.lower() in others:
             line = line.replace(f' "{_q(e.label)}"', "", 1)
@@ -1736,7 +1738,7 @@ def save_state(serial, state):
     path = snap_path(serial)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path + ".tmp", "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False)
+        f.write(json.dumps(state, ensure_ascii=False))     # one write: json.dump's many took 4x as long
     os.replace(path + ".tmp", path)
     return path
 

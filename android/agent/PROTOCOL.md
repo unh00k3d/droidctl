@@ -83,10 +83,14 @@ exit 3), `E socket: …` (another instance holds `droidctl_ua`: exit 4), `E fail
 | -32007 | timeout: a wait (`wait_for`, gesture completion, screenshot) ran out |
 | -32008 | secure window: a FLAG_SECURE window blocks the screenshot |
 | -32009 | cancelled: the system refused or cancelled a gesture |
+| -32010 | screen locked or off: the iOS runner refuses input while the phone is locked, on the cover sheet or with the screen off (its lock guard fails closed; IOS.md §10) |
+| -32011 | occluded (iOS runner): the hit-test at the touch point found another element, so nothing was touched (IOS.md §11.1) |
+| -32012 | not focused (iOS runner): no input has the keyboard focus, so keys were not sent (IOS.md §11.3) |
 
 Host mapping (droidctl `error.kind`): -32002/-32003 → `stale-ref`, -32004 → `disabled`,
 -32005 → `offscreen`, -32006 → `unsupported`, -32007 → `timeout`, -32008 →
-`secure-window`, everything else → `device`.
+`secure-window`, -32010 → `screen-off`, -32011 → `occluded`, -32012 → `not-focused`,
+everything else → `device`.
 
 ## Methods
 
@@ -239,7 +243,7 @@ action would end before anything is reported. The agent therefore waits up to
 happened, idle), then until no event has arrived for `quiet_ms`; `timeout_ms` caps the
 whole wait. A `clicked`/`focused` event alone does not open the quiet window (agent
 0.3.3): it says the click was handled, not that the screen is done changing. Measured
-on a banking app's QA build: Login → `clicked` at once, the next activity ~0.5 s later;
+on a real app: Login → `clicked` at once, the next activity ~0.5 s later;
 before this change settle returned on the old screen (3/3), after it 3/3 new screen.
 A click that changes nothing now settles at `first_ms` (600 ms) instead of ~250 ms.
 

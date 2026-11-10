@@ -60,7 +60,7 @@ actions, the daemon, MCP) is the same for both:
 `droidctl setup --backend uiautomation` selects it for a phone (`DROIDCTL_BACKEND` per call),
 and `doctor` shows which one answers. Use it where an accessibility service can't be enabled,
 or for apps that hide their UI while an unknown accessibility service is on (measured on a
-production banking app: with droidctl's service enabled its screens came back empty; with the
+hardened production app: with droidctl's service enabled its screens came back empty; with the
 service off, a UiAutomation client saw them). It needs exactly the trust droidctl already
 has (USB debugging and an authorized host): a UiAutomation is only available to the adb shell
 user, never to an installed app. droidctl never hides a service or spoofs anything to get past
@@ -89,6 +89,32 @@ pipx install git+https://github.com/unh00k3d/droidctl.git
 droidctl setup        # installs the agent APK on the phone and enables its service
 droidctl doctor       # checks adb, the agent, the socket and latency
 ```
+
+**iPhone** (a Mac with Xcode; iOS 17+; branch `ios-research` for now):
+
+```bash
+pipx install "git+https://github.com/unh00k3d/droidctl.git@ios-research"
+droidctl setup        # with the iPhone plugged in: a guided checklist
+```
+
+The first time, `setup` needs you for four things, and it says when and waits:
+1. Sign in to Xcode with your Apple ID (Xcode > Settings > Accounts; a free Apple ID works).
+   `setup` opens Xcode for you.
+2. On the iPhone, tap **Trust** on "Trust This Computer?". `setup` shows the prompt.
+3. Turn on **Developer Mode** in Settings > Privacy & Security. `setup` makes the switch appear;
+   the iPhone restarts.
+4. Trust your developer profile. `setup` opens Settings > General > VPN & Device Management
+   on the iPhone.
+
+Everything else is automatic:
+- finding your team;
+- the signing certificate and profile;
+- building, installing and starting droidctl's runner;
+- re-signing it before a free team's 7-day profile runs out.
+
+`droidctl doctor` checks it all, and `droidctl teardown` removes the runner.
+
+Agents using droidctl on an iPhone: the "iPhone" section of `AGENTS.md` (also in `droidctl skill print`).
 
 pipx puts `droidctl` on your PATH in an isolated env and pulls everything it needs:
 `adbutils` (which also brings an `adb` binary, used when you have no Android
@@ -164,7 +190,7 @@ Both talk to the same daemon, print the same compact text and use the same error
   (`EACCES`) before the uid check ran, so the check is a second layer.
 - Banking and other secure apps: screenshots of `FLAG_SECURE` windows fail with
   `secure-window` (the snapshot still works). Some apps refuse to run on rooted phones whatever
-  droidctl does (a banking app crashes at start on the rooted dev phone, with or without
+  droidctl does (a hardened app crashes at start on the rooted dev phone, with or without
   droidctl's service enabled).
 
 ## Benchmarks

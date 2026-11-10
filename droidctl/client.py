@@ -26,7 +26,7 @@ from droidctl import __version__
 
 # Commands that must run in the calling process: they manage the daemon itself
 # or own the process's stdio for their whole life.
-LOCAL = {"daemon", "serve", "mcp"}
+LOCAL = {"daemon", "serve", "mcp", "login", "logout"}
 
 RESTART = -32010          # the daemon's reply to a client from another build
 
@@ -383,12 +383,30 @@ def _print_result(res, argv, started):
         sys.stderr.write(err)
 
 
+def _ios_setup_here(argv):
+    """An iPhone's guided setup prints its steps and waits for the user: it runs in this
+    terminal, not in the daemon. Only when it is interactive and clearly about an iPhone."""
+    if "--json" in argv or not sys.stderr.isatty():
+        return False
+    if "--ios" in argv or "--team" in argv:
+        return True
+    from droidctl import device as dev
+    for i, t in enumerate(argv):
+        if t in ("-d", "--device") and i + 1 < len(argv):
+            return dev.is_ios(argv[i + 1])
+        if t.startswith("--device="):
+            return dev.is_ios(t.split("=", 1)[1])
+    if os.environ.get("ANDROID_SERIAL"):
+        return dev.is_ios(os.environ["ANDROID_SERIAL"])
+    return bool(dev.ios_devices())
+
+
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     no_daemon = "--no-daemon" in argv or os.environ.get("DROIDCTL_NO_DAEMON") == "1"
     argv = [t for t in argv if t != "--no-daemon"]
     cmd = _command(argv)
-    if no_daemon or cmd is None or cmd in LOCAL:
+    if no_daemon or cmd is None or cmd in LOCAL or (cmd == "setup" and _ios_setup_here(argv)):
         return _inprocess(argv)
     want_json = "--json" in argv
     stdin = sys.stdin.read() if _wants_stdin(argv) else None

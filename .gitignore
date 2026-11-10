@@ -21,3 +21,7 @@ bench/results/*.tmp
 *.log
 
 # built agent APK: not committed; `make apk` builds it, `make dist` ships it in the wheel
+
+# Xcode per-user and generated state (the iOS runner project)
+xcuserdata/
+*.xcodeproj/project.xcworkspace/

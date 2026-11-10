@@ -27,7 +27,7 @@ PROTOCOL = 3
 #                 installed) APK, holding a UiAutomation; nothing is enabled
 # The choice is explicit (`setup --backend`, or DROIDCTL_BACKEND per call) and
 # never switched silently.
-BACKENDS = ("a11y", "uiautomation")
+BACKENDS = ("a11y", "uiautomation")          # Android; an iPhone (by UDID) is always "ios"
 REMOTES = {"a11y": REMOTE, "uiautomation": "localabstract:droidctl_ua"}
 UA_MAIN = "dev.droidctl.agent.ShellMain"
 # for pgrep/pkill -f: the bracket keeps the pattern from matching the shell running it
@@ -155,14 +155,39 @@ def _adb_host_query(service, timeout=3.0, _started=False):
     return body
 
 
+IOS_UDID = re.compile(r"^(?:[0-9A-Fa-f]{8}-[0-9A-Fa-f]{16}|[0-9a-f]{40})$")
+
+
+def is_ios(serial):
+    """An iPhone's hardware UDID (00008101-001E… or the older 40-hex form). PURE."""
+    return bool(serial and IOS_UDID.match(serial))
+
+
+def ios_devices():
+    """UDIDs of iPhones attached over USB (usbmuxd); [] when there is no usbmuxd."""
+    from droidctl.ios import transport
+    try:
+        return [d["udid"] for d in transport.list_devices(timeout=2.0) if d["udid"]]
+    except UserError:
+        return []
+
+
 def list_devices():
-    """[(serial, state)] for everything adb sees, including unauthorized/offline."""
+    """[(serial, state)] for everything adb sees, including unauthorized/offline,
+    plus attached iPhones (by UDID, state "device")."""
     out = []
-    for line in _adb_host_query("host:devices").splitlines():
+    phones = [(u, "device") for u in ios_devices()]
+    try:
+        text = _adb_host_query("host:devices")
+    except UserError:
+        if phones:                      # an iPhone-only Mac needs no adb
+            return phones
+        raise
+    for line in text.splitlines():
         parts = line.split("\t")
         if len(parts) == 2:
             out.append((parts[0], parts[1]))
-    return out
+    return out + phones
 
 
 def select_serial(requested, devices):
@@ -196,6 +221,8 @@ def resolve_serial(requested):
 
 def backend_for(serial):
     """DROIDCTL_BACKEND, else the backend `setup --backend` recorded for this phone, else a11y."""
+    if is_ios(serial):
+        return "ios"
     b = os.environ.get("DROIDCTL_BACKEND") or device_state(serial).get("backend") or "a11y"
     if b not in BACKENDS:
         raise UserError(f"backend {b!r}: use one of {', '.join(BACKENDS)}", "bad-args")
@@ -290,6 +317,9 @@ DEVICE_ERRORS = {
     -32007: ("timeout", "timed out"),
     -32008: ("secure-window", "secure window"),
     -32009: ("device", "gesture cancelled"),
+    -32010: ("screen-off", "the screen is locked or off (iOS runner's lock guard)"),
+    -32011: ("occluded", "the touch point shows another element (iOS runner's hit-test)"),
+    -32012: ("not-focused", "no input has the keyboard focus (iOS runner)"),
 }
 
 
@@ -516,6 +546,10 @@ class AgentClient:
     def unsubscribe(self):
         return self.call("unsubscribe")
 
+    def clone(self, timeout=5.0):
+        """Another connection to the same agent (the daemon's event and side links)."""
+        return AgentClient(self.port, self.host, timeout=timeout)
+
     def close(self):
         self._drop()
 
@@ -557,10 +591,10 @@ def screenshot(client, serial, scale=0.5, quality=70, crop=None):
         p["crop"] = list(crop)
     try:
         r = client.call("screenshot", p, timeout=10.0)
-        r["source"] = "agent"
+        r["source"] = "runner" if is_ios(serial) else "agent"
         return r
     except UserError as e:
-        if e.kind != "unsupported":
+        if e.kind != "unsupported" or is_ios(serial):
             raise
     return screencap_jpeg(serial, scale, quality, crop)
 
@@ -680,6 +714,15 @@ def diagnose(serial):
 _connect_hook = None
 
 
+def open_client(serial, port, timeout=5.0):
+    """A new connection to the agent (or iOS runner) of a device that is already
+    connected: the daemon's event and side links, `watch`."""
+    if is_ios(serial):
+        from droidctl.ios.client import IosClient
+        return IosClient(serial, port, timeout=timeout)
+    return AgentClient(port, timeout=timeout)
+
+
 def connect(serial, timeout=5.0):
     """Open an AgentClient and ping it: -> (client, ping_result).
 
@@ -695,6 +738,9 @@ def connect(serial, timeout=5.0):
 
 def _connect(serial, timeout=5.0):
     backend = backend_for(serial)
+    if backend == "ios":
+        from droidctl.ios import runner
+        return runner.connect(serial, timeout)
     if backend == "uiautomation":
         return _connect_ua(serial, timeout)
     return _connect_remote(serial, REMOTE, timeout) or diagnose(serial)

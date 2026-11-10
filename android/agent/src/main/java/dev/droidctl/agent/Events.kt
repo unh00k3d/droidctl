@@ -223,7 +223,7 @@ class Events(private val svc: Host) {
                 val now = SystemClock.uptimeMillis()
                 // the first *change* opens the quiet window: a TYPE_VIEW_CLICKED alone
                 // says the click was handled, not that the screen is done changing
-                // (a banking QA app: Login -> clicked, then the next activity ~0.5 s later)
+                // (a real app: Login -> clicked, then the next activity ~0.5 s later)
                 val target = if (lastChange <= from) from + firstMs
                              else maxOf(lastEvent, lastChange) + quietMs
                 if (now >= target) return true

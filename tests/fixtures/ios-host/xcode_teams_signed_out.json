@@ -1,0 +1,15 @@
+{
+ "DVTDeveloperAccountManagerAppleIDLists": {
+  "IDE.Identifiers.Prod": []
+ },
+ "IDEProvisioningTeamByIdentifier": {
+  "00000000-0000-4000-8000-000000000001": [
+   {
+    "isFreeProvisioningTeam": true,
+    "teamID": "TEAMID0000",
+    "teamName": "Test Name 0 (Personal Team)",
+    "teamType": "Personal Team"
+   }
+  ]
+ }
+}

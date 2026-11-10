@@ -145,7 +145,7 @@ class Tree(private val svc: Host) {
         // Android's node cache is only invalidated by accessibility events, and a view
         // that moves without one (a translation animation: a list sliding down under a
         // search bar that appeared) keeps its old bounds in the cache indefinitely
-        // (measured on the SM-N950F, a banking QA app: a whole RecyclerView ~150 px off, so
+        // (measured on the SM-N950F, a real app: a whole RecyclerView ~150 px off, so
         // a visible row was dropped as hidden). Re-read a few nodes past the cache; if
         // any moved, rebuild the cache and read again once.
         var rebuilt = false

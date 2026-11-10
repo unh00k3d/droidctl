@@ -6,7 +6,10 @@ PYTHON ?= .venv/bin/python
 APK_OUT := android/agent/build/outputs/apk/release/agent-release.apk
 APK_ASSET := droidctl/assets/droidctl-agent.apk
 
-.PHONY: apk clean fixtures dist
+RUNNER_ASSET := droidctl/assets/droidctl-runner.zip
+export DEVELOPER_DIR ?= $(shell [ -d /Applications/Xcode.app ] || [ ! -d $(HOME)/Downloads/Xcode.app ] || echo $(HOME)/Downloads/Xcode.app/Contents/Developer)
+
+.PHONY: apk runner clean fixtures dist
 
 # The APK is committed (pipx/pip installs from git get it without an Android SDK);
 # the source hash next to it lets tests/test_packaging.py catch a stale APK.
@@ -15,6 +18,11 @@ apk:
 	cp $(APK_OUT) $(APK_ASSET)
 	$(PYTHON) scripts/agent_src_hash.py > $(APK_ASSET:.apk=.src.sha256)
 	@ls -l $(APK_ASSET)
+
+# The prebuilt iOS runner (unsigned, Apple's XCTest stripped) is committed too: Linux and Macs
+# without Xcode sign it per team instead of building it. Needs a Mac with Xcode.
+runner:
+	$(PYTHON) scripts/build_runner.py $(RUNNER_ASSET)
 
 clean:
 	cd android && ./gradlew -q clean
@@ -32,5 +40,5 @@ fixtures:
 dist: apk
 	rm -rf dist
 	$(PYTHON) -m build --outdir dist .
-	$(PYTHON) -c "import zipfile,glob,sys; n=zipfile.ZipFile(glob.glob('dist/*.whl')[0]).namelist(); sys.exit(0 if {'droidctl/assets/droidctl-agent.apk','droidctl/SKILL.md'} <= set(n) else 'APK or SKILL.md missing from the wheel')"
+	$(PYTHON) -c "import zipfile,glob,sys; n=zipfile.ZipFile(glob.glob('dist/*.whl')[0]).namelist(); sys.exit(0 if {'droidctl/assets/droidctl-agent.apk','droidctl/assets/droidctl-runner.zip','droidctl/SKILL.md'} <= set(n) else 'APK, runner or SKILL.md missing from the wheel')"
 	@ls -l dist

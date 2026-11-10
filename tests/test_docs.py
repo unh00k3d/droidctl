@@ -120,3 +120,29 @@ def test_notice_credits_what_the_source_credits():
         if project in src:
             assert project in notice, f"the source credits {project} but NOTICE does not"
     assert "AGPL" in notice and "not included" in notice.lower()
+
+
+def test_every_error_kind_the_code_raises_is_registered():
+    """A kind missing from ERROR_KINDS is undocumented in AGENTS.md (the iOS setup's `signing`,
+    `not-trusted` and `profile-expired` were, until 2026-10-22)."""
+    import ast
+    import pathlib
+    from droidctl.core import ERROR_KINDS
+    from droidctl.ios import runner
+    root = pathlib.Path(cli.__file__).parent
+    raised = set()
+    for p in root.rglob("*.py"):
+        for n in ast.walk(ast.parse(p.read_text())):
+            if not isinstance(n, ast.Call):
+                continue
+            name = getattr(n.func, "id", None) or getattr(n.func, "attr", None)
+            pos = {"UserError": 1, "Need": 0}.get(name)
+            if pos is None:
+                continue
+            args = [k.value for k in n.keywords if k.arg == "kind"] + n.args[pos:pos + 1]
+            raised |= {a.value for a in args if isinstance(a, ast.Constant) and isinstance(a.value, str)}
+    for text in ("has not been explicitly trusted", "profile has expired", "No Account for Team",
+                 "maximum number of apps", "Timed out while enabling automation mode",
+                 "Developer Mode is disabled", "encountered an error (x)"):
+        raised.add(runner.classify_output(text)[0])
+    assert raised - set(ERROR_KINDS) == set()

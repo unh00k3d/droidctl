@@ -21,11 +21,14 @@ PKG = "dev.droidctl.testapp"
 
 
 def pytest_collection_modifyitems(config, items):
-    if SERIAL:
-        return
     skip = pytest.mark.skip(reason="set DROIDCTL_SERIAL to run e2e tests on a device")
+    skip_ios = pytest.mark.skip(reason="set DROIDCTL_IOS_UDID to run the iPhone e2e tests")
     for it in items:
-        if "/e2e/" in str(it.fspath):
+        path = str(it.fspath)
+        if "/e2e/ios/" in path:
+            if not os.environ.get("DROIDCTL_IOS_UDID"):
+                it.add_marker(skip_ios)
+        elif "/e2e/" in path and not SERIAL:
             it.add_marker(skip)
 
 

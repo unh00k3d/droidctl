@@ -1,0 +1,24 @@
+{
+ "ax_press_return": [
+  "ok",
+  730,
+  false
+ ],
+ "tap_outside": [
+  398,
+  true
+ ],
+ "swipe_down_table": [
+  1138,
+  true
+ ],
+ "swipe_down_keyboard": [
+  843,
+  true
+ ],
+ "sendstring_return": [
+  "ok",
+  714,
+  false
+ ]
+}

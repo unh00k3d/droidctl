@@ -68,12 +68,16 @@ ERROR_KINDS = {
     "suppressed": "another UiAutomation client (Appium/uiautomator2) is suppressing accessibility services, or (uiautomation backend) holds the one UiAutomation",
     "screen-off": "the screen is off or locked",
     "secure-window": "the window is FLAG_SECURE, so it cannot be captured",
+    "signing": "the iPhone runner can't be signed or provisioned (no Apple sign-in, an expired one, no team, a free team's 3-app or certificate limit)",
+    "not-trusted": "the iPhone doesn't trust the developer certificate yet (Settings > General > VPN & Device Management)",
+    "profile-expired": "the iPhone runner's provisioning profile has expired and no new one could be issued (run: droidctl login)",
     # resolving and acting
     "stale-ref": "the ref no longer resolves (gone, shifted or occupied); re-run snapshot",
     "ambiguous": "the locator matched more than one element",
     "occluded": "the element is covered (by another window or the keyboard)",
     "offscreen": "the element is outside the visible area; scroll to it first",
     "disabled": "the element is disabled",
+    "not-focused": "no input field has the keyboard focus, so typed keys would go nowhere (tap the field first)",
     "no-change": "the action had no visible effect (with --expect-change)",
     "unsupported": "this device (API level) or element does not support the operation",
     # host daemon

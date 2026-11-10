@@ -1,0 +1,19 @@
+Oct 21 22:18:30 iPhone TestApp(Security)[2020] <Notice>: SecTaskLoadEntitlements: failed to get cs_flags, error=1, pid=2021
+Oct 21 22:18:30 iPhone DroidctlRunner-Runner(DroidctlRunner)[2019] <Notice>: droidctl-mark fixture step
+Oct 21 22:18:31 iPhone TestApp(TestApp.debug.dylib)[2020] <Notice>: DTA dta_button ax_activate
+Oct 21 22:18:31 iPhone TestApp(AXRuntime)[2020] <Error>: Unknown client: TestApp
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: TX focusApplication (peekAppEvent) stealKB:Y scene:dev.droidctl.s1.testapp-default
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 1; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Sending UIEvent type: 0; subtype: 0; to windows: 1
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Sending UIEvent type: 0; subtype: 0; to window: <UIWindow: 0x101199f40>; contextId: 0x843F6589
+Oct 21 22:18:31 iPhone TestApp(TestApp.debug.dylib)[2020] <Notice>: DTA dta_button touch_began
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 0; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 0; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 0; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 0; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 0; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 1; ignoreInteractionEvents: 0, systemGestureStateChange: 0
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Sending UIEvent type: 0; subtype: 0; to windows: 1
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Sending UIEvent type: 0; subtype: 0; to window: <UIWindow: 0x101199f40>; contextId: 0x843F6589
+Oct 21 22:18:31 iPhone TestApp(TestApp.debug.dylib)[2020] <Notice>: DTA dta_button action
+Oct 21 22:18:31 iPhone TestApp(UIKitCore)[2020] <Notice>: Evaluating dispatch of UIEvent: 0x1119300e0; type: 0; subtype: 0; backing type: 11; shouldSend: 0; ignoreInteractionEvents: 0, systemGestureStateChange: 1

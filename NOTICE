@@ -53,3 +53,25 @@ Not included
   is included in droidctl. Ideas documented in PLAN.md and research/ (e.g. the 10%
   visibility rule, tap-blocker geometry, degraded snapshots) were reimplemented from
   their descriptions only.
+
+--------------------------------------------------------------------------------
+PlumeImpactor (https://github.com/khcrysalis/PlumeImpactor)
+Copyright (c) 2025 Samara M. Licensed under the MIT License.
+
+  droidctl/ios/apple/gsa.py and devservices.py: the GrandSlam SRP sign-in, the Xcode app
+  token and the developer-services requests are ported from its Rust implementation.
+
+--------------------------------------------------------------------------------
+xtool (https://github.com/xtool-org/xtool)
+Licensed under the MIT License.
+
+  droidctl/ios/apple/anisette.py, V3Anisette: the anisette-v3 client (machine identity,
+  provisioning session, header set) is ported from OmnisetteADIProvider/ADIDataProvider.
+
+--------------------------------------------------------------------------------
+go-ios (https://github.com/danielpaulus/go-ios)
+Copyright (c) 2019 danielpaulus. Licensed under the MIT License.
+
+  Not shipped: droidctl downloads its official release (pinned version and sha256) and runs
+  it as a separate program for the iPhone without Xcode (droidctl/ios/goios.py). Signing
+  there uses its `sign app` (go-codesign, MIT, Copyright (c) 2025 aluedeke).

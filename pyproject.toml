@@ -19,6 +19,9 @@ dependencies = [
     "rich>=13",
     "pillow>=10",
     "mcp>=2.2",
+    # the iPhone sign-in without Xcode (ios/apple): GSA crypto and a CA store for python.org builds
+    "cryptography>=42",
+    "certifi",
 ]
 
 [project.optional-dependencies]
@@ -31,12 +34,17 @@ mcp = []
 droidctl = "droidctl.client:entry"
 
 [tool.setuptools]
-packages = ["droidctl", "droidctl.assets"]
+packages = ["droidctl", "droidctl.assets", "droidctl.ios", "droidctl.ios.apple"]
 
 [tool.setuptools.package-data]
-# the agent APK (built by `make apk`, committed) ships inside the wheel
+# the agent APK (`make apk`) and the prebuilt iOS runner (`make runner`), both committed, ship inside the wheel
 droidctl = ["SKILL.md"]
-"droidctl.assets" = ["*.apk"]
+"droidctl.assets" = ["*.apk", "*.zip"]
+"droidctl.ios.apple" = ["*.pem"]
+# the iOS runner's Xcode project: built on the user's Mac with their signing team (`droidctl setup`)
+"droidctl.ios" = ["xcode/DroidctlRunner.xcodeproj/project.pbxproj",
+                  "xcode/DroidctlRunner.xcodeproj/xcshareddata/xcschemes/*.xcscheme",
+                  "xcode/DroidctlRunner/*.m"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

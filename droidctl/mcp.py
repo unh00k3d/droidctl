@@ -27,21 +27,23 @@ TOOLS = [
     ("scroll", "scroll", None),
     ("swipe", "swipe", None),
     ("action", "action", None),
-    ("key", None, "Press a key: back, home, recents, notifications, quick-settings (system actions), "
-                  "or enter, tab, del, search, KEYCODE_* / a number (adb keyevent)."),
+    ("key", None, "Press a key: back, home, hide-keyboard, recents, notifications, quick-settings "
+                  "(system actions), or enter, tab, del, search, KEYCODE_* / a number (adb). iPhone: back "
+                  "taps the screen's back button; keys: enter only."),
     ("wait", "wait", None),
     ("launch", "launch", None),
     ("shot", "shot", "A screenshot of the screen as a JPEG image (downscaled), optionally with ref marks."),
     ("logs", "logs", None),
     ("devices", "devices", None),
 ]
-GLOBAL_KEYS = ["back", "home", "recents", "notifications", "quick-settings"]
+GLOBAL_KEYS = ["back", "home", "hide-keyboard", "recents", "notifications", "quick-settings"]
 # options that make no sense for a tool call (shell quoting helpers, output modes)
 SKIP_DESTS = {"help", "json", "stdin", "file", "fixture", "raw", "out", "base64", "no_daemon"}
 
 GUIDE = """# droidctl (MCP)
 
-Drive an Android phone through its accessibility tree.
+Drive an Android phone or an iPhone through its accessibility tree (the same tools for both;
+`devices` lists them, `device` picks one).
 
 1. Call `snapshot` first. Each line is one element with a [ref]:
    `[4] row "Ada Lovelace · Lunch?"  actions=[Archive, Delete]`
@@ -60,6 +62,9 @@ Drive an Android phone through its accessibility tree.
    likely hides its UI from accessibility services (common in banking/finance). Tell the
    user to run `droidctl diagnose --fix` in a shell (switches to the uiautomation backend
    and disables the service), then relaunch the app; MCP cannot change the backend itself.
+8. iPhone: there is no system Back (`key back` taps the screen's own back button, or fails);
+   `key hide-keyboard` closes the keyboard; web content that loads after the screen settles
+   needs `wait {text: ...}`. A first use needs `droidctl setup` in a terminal (it guides you).
 """
 
 
@@ -113,7 +118,7 @@ def tool_specs():
             if not any(k in choices for k in GLOBAL_KEYS + ["press"]):
                 continue
             schema = {"type": "object", "properties": {
-                "key": {"type": "string", "description": "back, home, recents, notifications, "
+                "key": {"type": "string", "description": "back, home, hide-keyboard, recents, notifications, "
                                                          "quick-settings, enter, tab, del, search, KEYCODE_* or a number"},
                 "device": {"type": "string", "description": "device serial (default: the only attached device)"}},
                 "required": ["key"]}

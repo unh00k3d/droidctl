@@ -265,6 +265,7 @@ class Session:
         self.sub_alive = False
         self.side_lock = threading.Lock()    # the cache's gen checks: never behind an action
         self.side_client = None
+        self.syslog = None                   # iPhone: droidctl.ios.syslog.Ring
         self.stats = collections.Counter()
         self.last_call_end = time.monotonic()
         self.last_used = time.monotonic()
@@ -278,13 +279,18 @@ class Session:
         self.client, self.info, self.port = client, info, client.port
         self.entry, self.alive = None, True
         self._start_subscription()
+        if dev.is_ios(self.serial) and getattr(self, "syslog", None) is None:
+            # an iPhone's log is a live stream with no history: keep the recent lines for `logs`
+            from droidctl.ios import syslog
+            # read only while droidctl is in use: an open log stream keeps Xcode off the iPhone
+            self.syslog = syslog.Ring(self.serial, active=lambda: time.monotonic() - self.last_used < LOG_ACTIVE_S)
         log.info("device %s: connected on tcp:%s (agent %s)", self.serial, self.port, info.get("version"))
 
     def _start_subscription(self):
         from droidctl import device as dev
         from droidctl.core import UserError
         try:
-            sc = dev.AgentClient(self.port, timeout=5.0)
+            sc = dev.open_client(self.serial, self.port, timeout=5.0)
             res = sc.subscribe()
             self.last_seq = (res or {}).get("next", self.last_seq)
         except UserError as e:
@@ -381,7 +387,7 @@ class Session:
         with self.side_lock:
             for attempt in (0, 1):
                 if self.side_client is None:
-                    self.side_client = dev.AgentClient(self.port, timeout=timeout)
+                    self.side_client = dev.open_client(self.serial, self.port, timeout=timeout)
                 try:
                     return self.side_client.call(method, params or {}, timeout=timeout)
                 except UserError as e:
@@ -398,10 +404,10 @@ class Session:
         params = params or {}
         if method == "tree":
             return self.tree(params, timeout)
-        if method in ("wait_for", "wait_idle"):
+        if method in ("wait_for", "wait_idle", "wait_change"):
             # device-side blocking waits get their own connection: they must
             # not hold the main one (and every other caller) for seconds
-            with dev.AgentClient(self.port, timeout=5.0) as c:
+            with dev.open_client(self.serial, self.port, timeout=5.0) as c:
                 return c.call(method, params, timeout=timeout)
         if method in ("ping", "echo", "gen", "current", "events", "screenshot"):
             return self._read(method, params, timeout)
@@ -424,7 +430,7 @@ class Session:
     def tree(self, params, timeout):
         """The latest dump, from the cache when it is provably still current."""
         ni = bool(params.get("not_important"))
-        if params.get("windows") is False:
+        if params.get("windows") is False or params.get("native"):
             self.entry = None
             return self._read("tree", params, timeout)
         e = self.entry
@@ -486,9 +492,12 @@ class Pool:
             sessions, self.sessions = list(self.sessions.values()), {}
         for s in sessions:
             s.close()
+            if s.syslog is not None:
+                s.syslog.close()
 
 
 POOL = Pool()
+LOG_ACTIVE_S = 60.0          # an iPhone's log is read for this long after the last command
 
 
 class PooledClient:
@@ -527,6 +536,16 @@ class PooledClient:
             return {"events": evs, "next": max(self._sess.last_seq, since)}
         return self._sess.call(method, params, timeout)
 
+    def log_history(self):
+        """An iPhone's recent syslog lines from the session's ring (None for Android)."""
+        ring = getattr(self._sess, "syslog", None)
+        if ring is None:
+            return None
+        self._sess.last_used = time.monotonic()
+        import datetime
+        since = datetime.datetime.fromtimestamp(ring.started, datetime.timezone.utc).isoformat(timespec="seconds")
+        return {"lines": ring.snapshot(), "since": since, "alive": ring.alive, "error": ring.error}
+
     def notifications(self, timeout=1.0):
         while self._q is not None:
             try:
@@ -546,9 +565,11 @@ class PooledClient:
         self.close()
 
     def __getattr__(self, name):
-        # the typed wrappers (tree, act, gesture, ...) of AgentClient, bound to us
+        # the typed wrappers (tree, act, gesture, ...) of the device's client class, bound
+        # to us: AgentClient, or IosClient (its own settle, wait_for, type_text, ...)
         from droidctl import device as dev
-        fn = getattr(dev.AgentClient, name)
+        cls = type(self._sess.client) if self._sess.client is not None else dev.AgentClient
+        fn = getattr(cls, name)
         return fn.__get__(self, PooledClient)
 
 

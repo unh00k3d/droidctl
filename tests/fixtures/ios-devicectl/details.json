@@ -1,0 +1,72 @@
+{
+ "info": {
+  "commandType": "devicectl.device.info.details",
+  "jsonVersion": 3,
+  "outcome": "success",
+  "version": "506.6"
+ },
+ "result": {
+  "connectionProperties": {
+   "authenticationType": "manualPairing",
+   "isMobileDeviceOnly": false,
+   "pairingState": "paired",
+   "transportType": "wired",
+   "tunnelState": "connected",
+   "tunnelTransportProtocol": "tcp"
+  },
+  "deviceProperties": {
+   "bootState": "booted",
+   "bootedFromSnapshot": true,
+   "ddiServicesAvailable": true,
+   "developerModeStatus": "enabled",
+   "hasInternalOSBuild": false,
+   "name": "Test iPhone 1",
+   "osBuildUpdate": "22H352",
+   "osVersionNumber": "18.7.8",
+   "providerSpecificValues": {
+    "hasAMRestorableDeviceRef": "true"
+   },
+   "rootFileSystemIsWritable": false,
+   "supportsCheckedAllocations": false
+  },
+  "hardwareProperties": {
+   "cpuType": {
+    "name": "arm64e",
+    "subType": 2,
+    "type": 16777228
+   },
+   "deviceType": "iPhone",
+   "hardwareModel": "D53gAP",
+   "internalStorageCapacity": 128000000000,
+   "isProductionFused": true,
+   "marketingName": "iPhone 12",
+   "platform": "iOS",
+   "productType": "iPhone13,2",
+   "reality": "physical",
+   "supportedCPUTypes": [
+    {
+     "name": "arm64e",
+     "subType": 2,
+     "type": 16777228
+    },
+    {
+     "name": "arm64",
+     "subType": 0,
+     "type": 16777228
+    },
+    {
+     "name": "unknown-12-13",
+     "subType": 13,
+     "type": 12
+    }
+   ],
+   "supportedDeviceFamilies": [
+    1
+   ],
+   "thinningProductType": "iPhone13,2",
+   "udid": "00008101-0000000000000001"
+  },
+  "identifier": "00000000-0000-4000-8000-000000000001",
+  "visibilityClass": "default"
+ }
+}

@@ -35,7 +35,7 @@ SETTLE_FIRST_MS = 600
 SETTLE_CAP_MS = 2000
 # A gesture tap has no clicked event to anchor the settle, and the target's own
 # feedback (a tab turning selected) is the first change; an activity the app then
-# starts can come after 150 ms of quiet (a banking QA app bottom tabs: START ~400 ms
+# starts can come after 150 ms of quiet (a real app bottom tabs: START ~400 ms
 # later, missed 1 in 3). Gesture taps are the rare path, so they wait longer.
 GESTURE_TAP_QUIET_MS = 450
 
@@ -43,6 +43,9 @@ GESTURE_TAP_QUIET_MS = 450
 # --------------------------------------------------------------------------
 # session: one warm agent connection + the saved snapshot, per device
 # --------------------------------------------------------------------------
+_TREE_CACHE = {}    # serial -> the last iOS tree read in this process (the daemon keeps it between commands)
+
+
 class Session:
     def __init__(self, serial, auto_setup=True):
         self.serial = serial
@@ -51,6 +54,7 @@ class Session:
         self.info = None
         self._state = None
         self._state_loaded = False
+        self.from_cache = False                # the target was resolved on _TREE_CACHE's tree
 
     # -- connection
     @property
@@ -60,6 +64,9 @@ class Session:
         return self._client
 
     def _connect(self):
+        if dev.is_ios(self.serial):             # the runner adopts or starts itself; setup is guided
+            self._client, self.info = dev.connect(self.serial)
+            return
         try:
             self._client, self.info = dev.connect(self.serial)
         except UserError as e:
@@ -79,6 +86,10 @@ class Session:
     def _setup(self, reinstall=False):
         from droidctl import cli
         cli.cmd_setup(argparse.Namespace(device=self.serial, reinstall=reinstall, json=True))
+
+    @property
+    def ios(self):
+        return dev.is_ios(self.serial)
 
     @property
     def sdk(self):
@@ -124,17 +135,38 @@ class Session:
         return self._state
 
     # -- device reads
-    def tree(self):
-        """The current tree, never a frame mid-activity-transition (bounded wait)."""
+    def tree(self, cached=False):
+        """The current tree, never a frame mid-activity-transition (bounded wait).
+
+        ``cached`` (iOS, for resolving an action's target): the last tree this process read, when the
+        runner has seen no change (its `gen`) and taken no other dump since: a full read costs 250-460 ms
+        on a 300-450-node screen (real apps, 2026-10-26), `gen` ~20 ms. Never for `snapshot`/`wait`: a
+        label can change without a notification (a live price)."""
+        if cached and self.ios:
+            c = _TREE_CACHE.get(self.serial)
+            if c is not None:
+                g = self.call("gen")
+                if g.get("gen") == c.get("gen") and g.get("dump") == c.get("dump"):
+                    self.from_cache = True
+                    return c
         t = self.call("tree", timeout=15.0)
         deadline = time.monotonic() + TRANSITION_WAIT_S
         while S.leaving_windows(t) and time.monotonic() < deadline:
             time.sleep(0.1)
             t = self.call("tree", timeout=15.0)
+        self.remember(t)
         return t
 
-    def snap(self):
-        return self.build(self.tree())
+    def remember(self, tree):
+        if self.ios and isinstance(tree, dict) and tree.get("dump") is not None:
+            _TREE_CACHE[self.serial] = tree
+
+    def forget(self):
+        _TREE_CACHE.pop(self.serial, None)
+        self.from_cache = False
+
+    def snap(self, cached=False):
+        return self.build(self.tree(cached=cached))
 
     def build(self, tree):
         """A snapshot numbered like the saved state (carry_refs), so every number an
@@ -148,6 +180,9 @@ class Session:
     # -- adb (setup-type work; lazy adbutils)
     def adb(self, *cmd, timeout=30, check=True):
         """`adb -s SERIAL shell ...` via the adb binary (stdlib; no adbutils import)."""
+        if self.ios:
+            raise UserError("this command is not available on iOS yet", "unsupported",
+                            hint="IOS-INTEGRATION.md §6 lists what works on an iPhone")
         try:
             out = subprocess.run([dev.adb_path(), "-s", self.serial, *cmd],
                                  capture_output=True, text=True, timeout=timeout)
@@ -283,7 +318,7 @@ def resolve_target(sess, a, fast=True):
         except UserError as e:
             raise _locked(e, S.build(tree))
     else:
-        snap = sess.snap()
+        snap = sess.snap(cached=fast)
         _awake(snap)
         scrolls = 0
         try:
@@ -389,7 +424,7 @@ QUICK_DUMP_MS = 800         # a no-root dump faster than this was a window not r
 def _moved_on(events, pre):
     """The events say another activity came to the front, but the settled tree
     still shows the old screen: on Android 9 the window list can lag the
-    TYPE_WINDOW_STATE_CHANGED event (a banking QA app: Home tab -> DashboardActivity)."""
+    TYPE_WINDOW_STATE_CHANGED event (a real app: Home tab -> DashboardActivity)."""
     was = pre.get("activity") or ""
     for e in events:
         cls = e.get("class") or ""
@@ -412,6 +447,89 @@ def _catch_up(sess, pre, post):
     return post, changes, new_screen
 
 
+LOADING_WAIT_S = 8.0        # iOS: a spinner the action brought up (a real app's login: 6 s; rates: < 1 s)
+_PROGRESS_LINE = re.compile(r"^\s*\[\d+\] progress\b")
+
+
+def _spinners(snap):
+    """Indeterminate spinners on screen, also one a row swallowed (a table cell holding only a spinner
+    reads as row "In progress": a real app's Transactions, 2026-10-26)."""
+    def spins(n):
+        return n.cls.endswith("ProgressBar") and not n.raw.get("range")
+
+    def inside(n):
+        return any(spins(c) or inside(c) for c in n.children)
+    return sum(1 for e in snap.elements
+               if (e.role == "progress" and not e.node.raw.get("range")) or (e.role != "progress" and inside(e.node)))
+
+
+SPLASH_WAIT_S = 3.0         # iOS: a splash (a logo and a name, nothing to act on); a real app's: ~1 s
+
+
+def _actionable(snap):
+    return sum(1 for e in snap.elements if e.node.actionable)
+
+
+def _loading_catch_up(sess, pre, post):
+    """iOS: the action settled on a loading spinner it brought up (the run loop idles while a request is
+    out), or on a splash (nothing to act on where the screen before had something): read again until
+    that is over, bounded -> (post, waited ms, still loading). A spinner that was there before the
+    action (a banner's) is not waited for."""
+    had_spinner = any(_PROGRESS_LINE.match(ln) for ln in pre.get("lines") or [])
+    spinner = _spinners(post) and not had_spinner
+    splash = not _actionable(post) and any(re.search(r"\] (button|input|row|switch|link)\b", ln)
+                                           for ln in pre.get("lines") or [])
+    if not (spinner or splash):
+        return post, 0, False
+    cap = LOADING_WAIT_S if spinner else SPLASH_WAIT_S
+    t0 = time.monotonic()
+    while time.monotonic() - t0 < cap:
+        time.sleep(0.15)
+        post = sess.build(sess.tree())
+        if (had_spinner or not _spinners(post)) and _actionable(post):
+            return post, int((time.monotonic() - t0) * 1000), False
+    return post, int((time.monotonic() - t0) * 1000), True
+
+
+TRANSITION_OVERLAPS = 3     # iOS: overlapping pairs that mean two screens are drawn at once
+TRANSITION_CATCH_UP_S = 1.5
+
+
+def _transition_catch_up(sess, post):
+    """iOS: the settle ended while the app waited for its server, and the push that followed was read
+    half-way: the old and the new screen overlapping (a real app's calculator, 2026-10-26). Read
+    again until the screen stops changing, bounded -> (post, waited ms)."""
+    if len(getattr(post, "overlaps", [])) < TRANSITION_OVERLAPS:
+        return post, 0
+    t0 = time.monotonic()
+    while time.monotonic() - t0 < TRANSITION_CATCH_UP_S:
+        time.sleep(0.15)
+        nxt = sess.build(sess.tree())
+        if nxt.sig == post.sig and len(nxt.overlaps) == len(post.overlaps):
+            break                              # stable: laid out like that, not moving
+        post = nxt
+        if len(post.overlaps) < TRANSITION_OVERLAPS:
+            break
+    return post, int((time.monotonic() - t0) * 1000)
+
+
+LATE_CHANGE_S = 1.2
+
+
+def _late_change_catch_up(sess, pre, post):
+    """iOS: a delivered tap settled with nothing changed, but the app was only waiting a moment before
+    pushing (idle >100 ms between the touch and the push: a real app's Discover rows answered
+    "unchanged" and the next screen came ~0.45 s later, 2026-10-26). Read again, bounded -> (post, ms)."""
+    t0 = time.monotonic()
+    while time.monotonic() - t0 < LATE_CHANGE_S:
+        time.sleep(0.15)
+        nxt = sess.build(sess.tree())
+        if nxt.sig != pre.get("sig") or S.diff(pre, nxt):
+            post, moving_ms = _transition_catch_up(sess, nxt)
+            return post, int((time.monotonic() - t0) * 1000)
+    return post, int((time.monotonic() - t0) * 1000)
+
+
 def _transitional(snap):
     """A frame mid-transition: an app window with no root yet, nothing drawn, or
     a closing activity window still stacked over the new one."""
@@ -428,10 +546,12 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     tree = (reply or {}).get("tree")
     if tree is None or S.leaving_windows(tree):   # settled mid-transition: read again
         tree = sess.tree()
+    else:
+        sess.remember(tree)                       # the runner's latest dump: the next action resolves on it
     post = sess.build(tree)
     # Settled on a frame the new screen has not drawn into yet, or whose root the
     # agent could not fetch in time (after `back` the returning activity came back
-    # degraded:no-root in 4 of 5, a banking QA app, and no later event re-dumps it):
+    # degraded:no-root in 4 of 5, a real app, and no later event re-dumps it):
     # read again, bounded, until something is drawn. A screen that really is empty
     # (a canvas, a splash) costs TRANSITION_WAIT_S once and is reported as it is.
     # Not with --settle 0 (the caller asked for the frame as it is), and a no-root
@@ -448,6 +568,11 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
         time.sleep(0.12)
         raw = sess.tree()
         post = sess.build(raw)
+    loading_ms, still_loading = 0, False
+    if sess.ios and getattr(a, "settle", None) != 0 and pre.get("lines"):
+        post, loading_ms, still_loading = _loading_catch_up(sess, pre, post)
+        post, moving_ms = _transition_catch_up(sess, post)
+        loading_ms += moving_ms
     events = (reply or {}).get("events") or []
     seqs = [e["seq"] for e in events if isinstance(e.get("seq"), int)]
     # the toasts this result reports must not come back in the next snapshot's header
@@ -455,6 +580,14 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     changes = S.diff(pre, post) if pre.get("lines") else []
     new_screen = bool(pre.get("sig")) and pre.get("sig") != post.sig
     changed = bool(changes) or new_screen
+    if (not changed and sess.ios and (reply or {}).get("delivered") and getattr(a, "settle", None) != 0
+            and pre.get("lines")):
+        post, late_ms = _late_change_catch_up(sess, pre, post)
+        changes = S.diff(pre, post)
+        new_screen = pre.get("sig") != post.sig
+        changed = bool(changes) or new_screen
+        if changed:
+            loading_ms += late_ms
     if not changed and _moved_on(events, pre):
         post, changes, new_screen = _catch_up(sess, pre, post)
         changed = bool(changes) or new_screen
@@ -463,7 +596,9 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
     # logs, starts work in the background, or opens a share sheet later). A bare
     # "unchanged" read as "missed" to agents: in the spatial A/B 12 of 13 failures
     # were a correct tap followed by a second one (`--method gesture`) to be sure.
-    handled = bool((reply or {}).get("clicked_event")) or any(
+    # iOS has no click event: the runner's `delivered` (an AX press that ran, or a touch that passed
+    # its hit-test) is the same "the app got it" signal (IOS-INTEGRATION.md §5)
+    handled = bool((reply or {}).get("clicked_event") or (reply or {}).get("delivered")) or any(
         e.get("type") in ("clicked", "long_clicked") for e in events)
     opts = S.Opts.from_env()
     if new_screen:
@@ -485,9 +620,11 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
         "text": text,
     }
     if reply:
-        for k in ("performed", "clicked_event", "idle", "settle_ms"):
+        for k in ("performed", "clicked_event", "idle", "settle_ms", "hit_test", "system_alert"):
             if k in reply:
                 out[k] = reply[k]
+        if reply.get("method") and sess.ios:
+            out["via"] = reply["method"]        # ax | touch | keys | set_value
     if handled and not changed:
         out["handled"] = True             # delivered; don't repeat it
     if t is not None:
@@ -496,6 +633,11 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
         out["warning"] = warning
     if post.warnings:
         out["screen_warnings"] = post.warnings
+    if loading_ms:
+        out["loading_ms"] = loading_ms             # waited for a spinner the action brought up
+    if still_loading:
+        out["warning"] = (out.get("warning") + "; " if out.get("warning") else "") + \
+            f"still loading after {LOADING_WAIT_S:.0f} s (a spinner is on screen): wait --role progress --gone"
     if extra:
         out.update(extra)
     if getattr(a, "expect_change", False) and not changed:
@@ -509,7 +651,9 @@ def finish(sess, a, method, reply, pre, t=None, warning=None, extra=None):
 # node actions with the fast-path retry
 # --------------------------------------------------------------------------
 def _act(sess, t, action=None, custom=None, args=None, settle=None, force=False, use_click=False, a=None):
-    """One `act` on the target; a stale fast-path handle is re-resolved once."""
+    """One `act` on the target; a stale handle is re-resolved once, on a fresh read (by its locator or the
+    ref's fingerprint: unique or an error). An app that reloads its table on every price tick replaces
+    each cell's element between the read and the act (a real app, 2026-10-26)."""
     handle = (t.click if use_click else t.handle)
     if handle is None:
         return None
@@ -517,9 +661,10 @@ def _act(sess, t, action=None, custom=None, args=None, settle=None, force=False,
         return sess.call("act", t.dump, handle, action=action, custom=custom, args=args,
                          settle=settle, force=force, retry=False)
     except UserError as e:
-        if e.kind != "stale-ref" or t.tier != 0 or a is None:
+        if e.kind != "stale-ref" or a is None:
             raise
     # the device re-dumped or the node went away since the snapshot: resolve properly
+    sess.forget()
     fresh = resolve_target(sess, a, fast=False)
     t.__dict__.update(fresh.__dict__)
     handle = (t.click if use_click else t.handle)
@@ -566,7 +711,7 @@ def cmd_tap(a):
     if method == "action" or r is None:
         return finish(sess, a, "action", r, pre, t)
     # auto: the event-gated single fallback
-    if r.get("performed") and r.get("clicked_event"):
+    if r.get("performed") and (r.get("clicked_event") or r.get("delivered")):
         return finish(sess, a, "action", r, pre, t)
     if r.get("performed"):
         # performed:true means Android already ran the view's click handler. A
@@ -781,7 +926,7 @@ def cmd_scroll(a):
     if acts & _SCROLL_ACTIONS and action not in acts:
         # the container scrolls, just not this way: it is at that edge. A swipe
         # would do nothing here at best, and inside a pager or a pull-to-refresh
-        # it would switch pages or refresh (a banking QA app tour)
+        # it would switch pages or refresh (a real app tour)
         edge = "end" if action in ("scroll_forward", "scroll_down", "scroll_right") else "start"
         out = finish(sess, a, "none", {"performed": False}, pre, t,
                      warning=f"already at the {edge}: the list offers no {action}")
@@ -831,7 +976,13 @@ def _screen_box(sess):
 def _swipe(sess, a, direction, box, pre, why=None):
     box = box or _screen_box(sess)
     pts = _swipe_points(direction, box)
-    g = _gesture(sess, "swipe", pts, _settle(a), ms=getattr(a, "ms", None) or 400)
+    if sess.ios:
+        # a drag that rests before lifting: no fling, so the page stops where the finger did and the
+        # settle doesn't wait out a deceleration (2.6 s on Safari, 2026-10-22)
+        g = sess.call("gesture", "swipe", pts, ms=getattr(a, "ms", None) or 400, settle=_settle(a),
+                      hold_end_ms=SCROLL_DRAG_HOLD_MS, retry=False)
+    else:
+        g = _gesture(sess, "swipe", pts, _settle(a), ms=getattr(a, "ms", None) or 400)
     return finish(sess, a, "gesture", g, pre, None, warning=why)
 
 
@@ -978,6 +1129,7 @@ def _scroll_into_view(sess, a, loc, first):
 
 
 SCROLL_INTO_VIEW_MAX = 15
+SCROLL_DRAG_HOLD_MS = 150
 
 
 # --------------------------------------------------------------------------
@@ -1100,7 +1252,7 @@ _NUMERIC_TYPED = re.compile(r"[\d\s()+\-./]+")
 
 def _same_digits(val, target):
     """A phone/number formatter added punctuation: "(555) 123 45 67" is what the
-    field shows for a typed "5551234567" (a banking QA app login). Only for a typed
+    field shows for a typed "5551234567" (a real app login). Only for a typed
     value that is itself digits and separators."""
     if not val or not target or not _NUMERIC_TYPED.fullmatch(target):
         return False
@@ -1111,6 +1263,26 @@ def _same_digits(val, target):
 def _input_text_arg(s):
     """`adb shell input text` escaping: spaces as %s, shell metacharacters quoted."""
     return shlex.quote(s.replace(" ", "%s"))
+
+
+def _ios_keys(sess, t, want, target, text, force, a, steps):
+    """iOS: focus the field, delete what it holds, type the keys -> (value, node, snap), or None when
+    the field won't take the focus or the keys fail (the caller then sets the value)."""
+    val, node, snap = _readback(sess, want)
+    if node is None:
+        return None
+    focused, node, snap = _give_focus(sess, snap, node, want, force)
+    if not focused:
+        steps.append({"method": "keys", "skipped": "the field did not take input focus"})
+        return None
+    cur = "" if a.append else (_field_value(node) or "")
+    try:
+        sess.client.type_text("\b" * len(cur) + (text if a.append else target))
+    except UserError as e:
+        steps.append({"method": "keys", "error": e.kind})
+        return None
+    steps.append({"method": "keys", "performed": True})
+    return _readback(sess, want)
 
 
 def _type(sess, a, t):
@@ -1138,7 +1310,7 @@ def _type(sess, a, t):
         return val == target or _same_digits(val, target)
 
     # 0. --enter needs the input focus. Take it BEFORE the text, the order a person
-    #    uses: some fields rewrite their value when they gain focus (a banking QA app
+    #    uses: some fields rewrite their value when they gain focus (a real app
     #    calculator: focusing a field holding "250" turned it into "25").
     if a.enter and not (t.node is not None and "focused" in t.node.flags):
         try:
@@ -1147,17 +1319,34 @@ def _type(sess, a, t):
         except UserError as e:
             steps.append({"method": "focus", "error": e.kind})
 
-    # 1. ACTION_SET_TEXT (no tap, Unicode-safe)
-    r = _act(sess, t, action="set_text", args={"text": target}, force=force,
-             settle={"quiet_ms": 150, "first_ms": 400, "timeout_ms": 1500}, a=a)
-    want = _want(t) if t.node is not None else want
-    steps.append({"method": "set_text", "performed": bool(r and r.get("performed"))})
-    val, node, snap = _readback(sess, want, (r or {}).get("tree"))
-    method, reply = "set_text", r
-    ignored = not (r and r.get("performed")) or (val == before and target != before)
+    # 1 (iOS). Keys into the focused field, as a person types, so the app's own input handling runs.
+    #    AX set_value changed a formatted amount field's shown value but not the app's model, which
+    #    put it back when editing ended (a real app's calculator, 2026-10-26); keys stuck
+    #    ("10000" shown as "10.000", "100,00" after editing). set_value stays the fallback.
+    got = _ios_keys(sess, t, want, target, text, force, a, steps) if sess.ios and t.node is not None else None
+    # the keys went in and the field left the screen: the app took them and moved on (a login field
+    # that submits itself at 6 digits, 2026-10-26). Never fall back: that would type them again.
+    gone = got is not None and got[1] is None
+    if gone:
+        val, node, snap = got
+        method, reply, ignored = "keys", None, False
+    elif got is not None and ok(got[0]):
+        val, node, snap = got
+        method, reply, ignored = "keys", None, False
+    else:
+        # 1. ACTION_SET_TEXT (no tap, Unicode-safe)
+        r = _act(sess, t, action="set_text", args={"text": target}, force=force,
+                 settle={"quiet_ms": 150, "first_ms": 400, "timeout_ms": 1500}, a=a)
+        want = _want(t) if t.node is not None else want
+        steps.append({"method": "set_text", "performed": bool(r and r.get("performed"))})
+        val, node, snap = _readback(sess, want, (r or {}).get("tree"))
+        method, reply = "set_text", r
+        ignored = not (r and r.get("performed")) or (val == before and target != before)
     # 2. focus + clipboard paste (the field refused set_text). Never for a password:
     #    the clipboard is readable by other apps and Samsung keeps a clipboard history.
-    if ignored and not ok(val) and node is not None and want["password"]:
+    if ignored and not ok(val) and node is not None and sess.ios:
+        pass                                    # no clipboard on iOS: keys into the focused field (3.)
+    elif ignored and not ok(val) and node is not None and want["password"]:
         steps.append({"method": "paste", "skipped": "password field: never via the clipboard"})
     elif ignored and not ok(val) and node is not None:
         prev = None
@@ -1191,7 +1380,7 @@ def _type(sess, a, t):
                     pass
     # 3. adb input text (ASCII only): only once this field verifiably holds input focus
     unfocused = False
-    if not ok(val) and (val == before and target != before) and text.isascii() and text:
+    if not gone and not ok(val) and (val == before and target != before) and (text.isascii() or sess.ios) and text:
         try:
             focused = False
             if node is not None:
@@ -1201,8 +1390,12 @@ def _type(sess, a, t):
                 steps.append({"method": "input", "skipped": "the field did not take input focus: "
                                                             "the keys would go to another field"})
             else:
-                sess.shell("input", "text", _input_text_arg(text if a.append or not before else target))
-                steps.append({"method": "input", "performed": True})
+                keys = text if a.append or not before else target
+                if sess.ios:
+                    sess.client.type_text(keys)
+                else:
+                    sess.shell("input", "text", _input_text_arg(keys))
+                steps.append({"method": "keys" if sess.ios else "input", "performed": True})
                 val, node, snap = _readback(sess, want)
                 method, reply = "input", None
         except UserError as e:
@@ -1210,7 +1403,9 @@ def _type(sess, a, t):
     hint = ("the app refused set_text and the field would not take focus: tap it "
             "(droidctl tap REF), then type again" if unfocused else "")
     warning = None
-    if want["password"] and not ok(val):
+    if gone:
+        warning = "the field left the screen once the keys were in (the app submitted it?): not verified"
+    elif want["password"] and not ok(val):
         n_now, n_want = len(val or ""), len(target)
         if (val or "") == (before or "") and target != (before or ""):
             raise UserError(f"the password field did not take the text ({n_now} characters, not {n_want})",
@@ -1221,11 +1416,15 @@ def _type(sess, a, t):
             raise UserError(f"the field did not take the text (it still shows {val!r})", "no-change",
                             hint=hint, data={"steps": steps, "value": val})
         warning = f"the field shows {val!r}, not {target!r} (a formatter, a length limit or auto-advance?)"
-    if a.enter:
+    if a.enter and gone:
+        steps.append({"method": "enter", "skipped": "the field already left the screen"})
+    elif a.enter:
         steps.append(dict(_enter(sess, node, snap), method="enter"))
         reply = None
     extra = {"value": None if want["password"] else val, "verified": ok(val),
              "steps": steps}
+    if method == "keys":
+        extra["via"] = "keys"
     if want["password"]:
         extra["value_hidden"] = True
     return finish(sess, a, method, reply, pre, t, warning=warning, extra=extra)
@@ -1233,6 +1432,8 @@ def _type(sess, a, t):
 
 def _enter(sess, node, snap):
     """Press the IME action on `node`; returns how it was delivered."""
+    if sess.ios:
+        return _enter_ios(sess, node, snap)
     if sess.sdk >= 30 and node is not None:
         try:
             r = sess.call("act", snap.dump, node.raw["handle"], action="ime_enter", retry=False)
@@ -1243,7 +1444,7 @@ def _enter(sess, node, snap):
                 raise
     # A key event goes to whatever has input focus, and ACTION_SET_TEXT does not
     # give the field focus: without this, --enter on API < 30 went nowhere
-    # (a banking QA app calculator: the amount was never submitted).
+    # (a real app calculator: the amount was never submitted).
     focused = node is not None and "focused" in node.flags
     if node is not None and not focused:
         try:
@@ -1254,6 +1455,30 @@ def _enter(sess, node, snap):
     sess.shell("input", "keyevent", "66")
     sess.call("wait_idle", 150, 2000)
     return {"via": "keyevent", "focused": focused}
+
+
+def _enter_ios(sess, node, snap):
+    """Return into the focused field (a typed newline). setAttribute already focused it; if
+    not, a checked touch on the field gives focus first."""
+    if node is None:
+        r = sess.client.type_text("\n", settle={})
+        return {"via": "return", "idle": r.get("idle")}
+    try:
+        r = sess.call("act", snap.dump, node.raw["handle"], action="ime_enter", settle={}, retry=False)
+        return {"via": "return", "idle": r.get("idle")}
+    except UserError as e:
+        if e.kind not in ("not-focused", "stale-ref"):
+            raise
+    snap = sess.snap()
+    n = _refind_field(snap, {"id": node.raw.get("id"), "rect": node.rect}, focused_ok=False)
+    if n is None:
+        raise UserError("--enter: the field is gone", "stale-ref")
+    if "focused" not in n.flags:
+        sess.call("act", snap.dump, n.raw["handle"], action="focus", settle={}, retry=False)
+        snap = sess.snap()
+        n = _refind_field(snap, {"id": node.raw.get("id"), "rect": node.rect}) or n
+    r = sess.call("act", snap.dump, n.raw["handle"], action="ime_enter", settle={}, retry=False)
+    return {"via": "return", "focused_first": True, "idle": r.get("idle")}
 
 
 def cmd_type(a):
@@ -1288,7 +1513,19 @@ def cmd_type(a):
         res = R.Resolution(e, snap, "locator", via="focused")
         t = Target(handle=res.handle, click=res.click, dump=snap.dump, tap=res.tap, res=res, pre=snap)
     else:
-        t = resolve_target(sess, a)
+        try:
+            t = resolve_target(sess, a)
+        except UserError as e:
+            # `type --text Amount`: a form row and its own input share the label (a real app's
+            # calculator, 2026-10-26). Only an input takes text: if exactly one of them is, it is meant.
+            if e.kind != "ambiguous" or getattr(a, "role", None) is not None or not _locator(a):
+                raise
+            a.role = "input"
+            try:
+                t = resolve_target(sess, a)
+            except UserError:
+                a.role = None
+                raise e from None
     return _type(sess, a, t)
 
 
@@ -1305,7 +1542,74 @@ def _global(a, name):
 
 
 def cmd_back(a):
+    if session_for(a).ios:
+        return _back_ios(a)
     return _global(a, "back")
+
+
+def _back_ios(a):
+    """iOS has no system Back: tap the navigation bar's back button (UIKit marks it with a
+    private trait), the way a person goes back."""
+    sess = session_for(a)
+    snap = sess.snap(cached=True)
+    backs = [e for e in snap.elements if e.node.raw.get("nav_back")]
+    if not backs:
+        _awake(snap)
+        if snap.dialog:
+            # a dialog over the screen hides its back button: name the way out (a real app's validation
+            # pop-up, 2026-10-26)
+            btns = [e.label for e in snap.elements if e.region in ("dialog", "popup") and e.role == "button"
+                    and e.label]
+            raise UserError("a dialog is open (iOS has no system Back)", "unsupported",
+                            hint="tap one of its buttons: " + (", ".join(f'"{b}"' for b in btns[:4]) or
+                                                               "see droidctl snapshot"),
+                            data={"buttons": btns})
+        raise UserError("this screen has no back button (iOS has no system Back)", "unsupported",
+                        hint="tap the screen's own close/cancel button, or: droidctl hide-keyboard")
+    e = min(backs, key=lambda x: (x.rect[1], x.rect[0]))
+    res = R.Resolution(e, snap, "locator", via="back-button")
+    t = Target(handle=res.handle, click=res.click, dump=snap.dump, tap=res.tap, res=res, pre=snap)
+    pre = {"lines": S.flat_lines(snap), "sig": snap.sig}
+    try:
+        r = _act(sess, t, action="click", settle=_settle(a), use_click=True)
+    except UserError as e:
+        if e.kind != "stale-ref" or not sess.from_cache:
+            raise
+        sess.forget()                             # something re-dumped since: once more, on a fresh read
+        return _back_ios(a)
+    return finish(sess, a, "back", r, pre, t)
+
+
+def cmd_hide_keyboard(a):
+    sess = session_for(a)
+    pre = _pre_lines(sess, None)
+    if sess.ios:
+        try:
+            r = sess.client.hide_keyboard(settle=_settle(a))
+        except UserError as e:
+            if e.kind != "unsupported":
+                raise
+            raise UserError(f"hide-keyboard: {e}".replace("hide_keyboard: ", ""), "unsupported",
+                            hint="tap a label or another field (apps end editing on a tap elsewhere), or the "
+                                 "screen's own Done/OK button; a typed newline would go into the field") from None
+        if r.get("already"):
+            return {"ok": True, "changed": False, "already": True, "text": "the keyboard is not shown"}
+        # Judged on the mapped screen, not the runner's `hidden`: it counts a keyboard still sliding off
+        # (S1: Return dismissed it, the runner said hidden 0). Once more after the animation if needed.
+        kb = r.get("tree") is not None and bool(sess.build(r["tree"]).keyboard)
+        if kb:
+            time.sleep(0.3)
+            kb = bool(sess.snap().keyboard)
+            r = dict(r, tree=None)                  # finish reads the screen again
+        if kb:
+            raise UserError("the keyboard is still shown (the field takes Return as a new line?)", "no-change",
+                            hint="tap outside the field, or the screen's own Done button",
+                            data={"method": r.get("method")})
+        return finish(sess, a, "hide-keyboard", r, pre, extra={"via": r.get("method")})
+    if not (sess.call("current") or {}).get("keyboard"):
+        return {"ok": True, "changed": False, "already": True, "text": "the keyboard is not shown"}
+    r = sess.call("global_action", "back", settle=_settle(a), retry=False)
+    return finish(sess, a, "hide-keyboard", r, pre, extra={"via": "back"})
 
 
 def cmd_home(a):
@@ -1333,6 +1637,13 @@ KEYS = {"enter": 66, "back": 4, "home": 3, "del": 67, "backspace": 67, "delete":
 def cmd_press(a):
     sess = session_for(a)
     key = a.key.strip()
+    if sess.ios:
+        if key.lower() not in ("enter", "return"):
+            raise UserError(f"press {key}: on iOS only enter is available", "unsupported",
+                            hint="back: droidctl back (the screen's back button); the keyboard: droidctl hide-keyboard")
+        pre = _pre_lines(sess, None)
+        r = sess.client.type_text("\n", settle=_settle(a))
+        return finish(sess, a, "key", r, pre, extra={"key": "enter"})
     code = KEYS.get(key.lower().replace("-", "_"))
     if code is None:
         if re.fullmatch(r"\d+", key):
@@ -1355,7 +1666,7 @@ def cmd_press(a):
 def _wait_role(sess, a):
     """`wait --role progress --gone`: a condition on the snapshot's roles, which the
     device can't evaluate (a loading dialog is often a bare spinner with no text or
-    id; a banking QA app login). Snapshots between device idle waits, bounded by
+    id; a real app login). Snapshots between device idle waits, bounded by
     --timeout; a rootless or degraded frame is not "gone", it is not loaded yet."""
     if a.id or a.desc or a.activity or a.window or a.pkg or a.toast is not None:
         raise UserError("--role combines only with --text and --gone", "bad-args")
@@ -1408,6 +1719,9 @@ def _wait_idle(sess, a):
         raise UserError(f"the screen kept changing for {a.timeout:g} s (an animation or a live value?)",
                         "timeout", hint="snapshot anyway, or wait for a specific --text/--gone",
                         data={"ms": r.get("ms")})
+    if sess.ios:                                # the runner's rule: idle callbacks, then 100 ms quiet
+        from droidctl.ios.client import QUIET_MS
+        quiet = QUIET_MS
     return {"ok": True, "idle": True, "ms": r.get("ms"), "quiet_ms": quiet,
             "text": f"idle after {r.get('ms')} ms (quiet for {quiet} ms)"}
 
@@ -1447,6 +1761,10 @@ def cmd_mark(a):
     """A marker line in the device's logcat (tag `droidctl`), stamped on the host
     clock too, to cut a capture (logcat, a proxy's history) into steps."""
     sess = session_for(a)
+    if sess.ios:
+        sess.call("mark", {"label": a.label})
+        return {"ok": True, "label": a.label, "tag": MARK_TAG,
+                "text": f"marked {a.label!r} (the iPhone's log; droidctl logs --marks)"}
     sess.shell("log", "-t", MARK_TAG, shlex.quote(a.label))   # adb shell re-splits its args
     return {"ok": True, "label": a.label, "tag": MARK_TAG,
             "text": f"marked {a.label!r} (logcat tag {MARK_TAG})"}
@@ -1467,7 +1785,7 @@ def cmd_current(a):
     r = sess.call("current")
     act = r.get("activity")
     pkg = r.get("pkg")
-    if not act:
+    if not act and not sess.ios:
         comp = _dumpsys_activity(sess)
         if comp:
             pkg, _, cls = comp.partition("/")
@@ -1511,8 +1829,137 @@ def _after_launch(sess, a, pkg, pre, t0):
     return out
 
 
+# --------------------------------------------------------------------------
+# iPhone: apps through devicectl and the runner, logs through syslog_relay
+# --------------------------------------------------------------------------
+def _cdid(sess):
+    from droidctl.ios import devices
+    return devices.find(sess.serial)["cdid"]
+
+
+def _ios_app(sess, bundle):
+    from droidctl.ios import devices
+    app = devices.app(_cdid(sess), bundle)
+    if app is None:
+        raise UserError(f"{bundle} is not installed on the iPhone", "not-found", hint="see: droidctl apps")
+    return app
+
+
+def _launch_ios(sess, a):
+    from droidctl.ios import devices
+    if a.clear:
+        raise UserError("iOS has no 'clear data': uninstall and reinstall the app instead", "unsupported")
+    if a.activity:
+        raise UserError("iOS apps have no activities to start: launch the bundle id", "bad-args")
+    app = _ios_app(sess, a.pkg)
+    pre = _pre_lines(sess, None)
+    t0 = time.monotonic()
+    stopped = []
+    if a.stop:
+        cdid = _cdid(sess)
+        for pid in devices.pids_of(app, devices.processes(cdid)):
+            devices.terminate(cdid, pid)
+            stopped.append(pid)
+    s = _settle(a) or {"quiet_ms": SETTLE_QUIET_MS, "timeout_ms": SETTLE_CAP_MS}
+    from droidctl.ios.client import ios_settle
+    r = sess.call("launch", {"pkg": a.pkg, "settle": ios_settle(s)},
+                  timeout=max(a.timeout, 10) + 20, retry=False)
+    out = finish(sess, a, "launch", r, pre,
+                 extra={"pkg": a.pkg, "launch_ms": round((time.monotonic() - t0) * 1000), "stopped": stopped})
+    if not out["new_screen"]:
+        out["text"] = S.render(sess.build(sess.tree()), S.Opts.from_env())
+    return out
+
+
+def _stop_app_ios(sess, a):
+    from droidctl.ios import devices
+    app = _ios_app(sess, a.pkg)
+    cdid = _cdid(sess)
+    pids = devices.pids_of(app, devices.processes(cdid))
+    for pid in pids:
+        devices.terminate(cdid, pid)
+    return {"ok": True, "pkg": a.pkg, "pids": pids,
+            "text": f"stopped {a.pkg}" if pids else f"{a.pkg} was not running"}
+
+
+def _apps_ios(sess, a):
+    from droidctl.ios import devices
+    found = [x for x in devices.apps(_cdid(sess), all_apps=a.all) if a.all or not x["system"]]
+    if a.filter:
+        f = a.filter.lower()
+        found = [x for x in found if f in x["bundle"].lower() or f in (x["name"] or "").lower()]
+    found.sort(key=lambda x: x["bundle"])
+    return {"ok": True, "apps": [x["bundle"] for x in found], "count": len(found),
+            "names": {x["bundle"]: x["name"] for x in found},
+            "text": "\n".join(f"{x['bundle']}  {x['name']}" for x in found) or "(none)"}
+
+
+def _install_ios(sess, a):
+    from droidctl.ios import devices
+    path = a.apk.rstrip("/")
+    if not os.path.exists(path):
+        raise UserError(f"{a.apk} does not exist", "not-found")
+    if not (path.endswith(".app") or path.endswith(".ipa")):
+        raise UserError("an iPhone installs a .app (a device build) or an .ipa", "bad-args")
+    if a.grant:
+        raise UserError("iOS has no install-time permission grants: the app asks when it needs them", "bad-args")
+    if path.endswith(".app"):
+        import plistlib
+        from droidctl.ios.manage import ours
+        try:
+            with open(os.path.join(path, "Info.plist"), "rb") as f:
+                bundle = plistlib.load(f).get("CFBundleIdentifier")
+        except (OSError, plistlib.InvalidFileException):
+            bundle = None
+        if ours(bundle):
+            # replacing it under a running session ended the session (2026-10-21)
+            raise UserError("that is droidctl's own runner: droidctl setup installs and starts it", "bad-args")
+    devices.install(_cdid(sess), path)
+    return {"ok": True, "apk": a.apk, "text": f"installed {os.path.basename(path)}"}
+
+
+def _open_url_ios(sess, a):
+    pre = _pre_lines(sess, None)
+    t0 = time.monotonic()
+    s = _settle(a) or {"quiet_ms": SETTLE_QUIET_MS, "timeout_ms": SETTLE_CAP_MS}
+    from droidctl.ios.client import ios_settle
+    r = sess.call("open_url", {"url": a.url, "settle": ios_settle(s)},
+                  timeout=30, retry=False)
+    return finish(sess, a, "open-url", r, pre, extra={"url": a.url, "ms": round((time.monotonic() - t0) * 1000)})
+
+
+LOG_LISTEN_S = 2.0      # without the daemon there is no history: listen this long
+
+
+def _logs_ios(sess, a):
+    from droidctl.ios import devices, syslog
+    hist = sess.client.log_history() if hasattr(sess.client, "log_history") else None
+    note = None
+    if hist is None:
+        lines = syslog.listen(sess.serial, LOG_LISTEN_S)
+        note = (f"an iPhone's log is live only: these are the {LOG_LISTEN_S:g} s after the call "
+                "(the daemon keeps a history of recent lines)")
+    else:
+        lines = hist["lines"]
+        note = f"since the daemon connected ({hist['since']})" + ("" if hist["alive"] else
+                                                                  f"; the log stream is down: {hist['error']}")
+    proc, pids = None, []
+    if a.pkg:
+        app = _ios_app(sess, a.pkg)
+        procs = devices.processes(_cdid(sess))
+        pids = devices.pids_of(app, procs)
+        exe = next((p["path"] for p in procs if p["pid"] in pids), None)
+        proc = os.path.basename(exe) if exe else os.path.basename((app.get("url") or "").rstrip("/"))[:-4]
+    tags = list(getattr(a, "tag", None) or []) + (["droidctl-mark"] if getattr(a, "marks", False) else [])
+    kept = [x for x in lines if syslog.keep(syslog.parse(x), proc, pids, a.level, tags)][-a.max:]
+    return {"ok": True, "lines": kept, "crash": [], "pid": pids[0] if pids else None, "note": note,
+            "text": "\n".join(kept) or "(no lines)"}
+
+
 def cmd_launch(a):
     sess = session_for(a)
+    if sess.ios:
+        return _launch_ios(sess, a)
     pkg = a.pkg
     if not _installed(sess, pkg):
         raise UserError(f"{pkg} is not installed", "not-found", hint="see: droidctl apps")
@@ -1543,6 +1990,8 @@ def cmd_launch(a):
 
 def cmd_open_url(a):
     sess = session_for(a)
+    if sess.ios:
+        return _open_url_ios(sess, a)
     pre = _pre_lines(sess, None)
     t0 = time.monotonic()
     out = sess.shell("am", "start", "-a", "android.intent.action.VIEW", "-d", shlex.quote(a.url), check=False)
@@ -1556,6 +2005,8 @@ def cmd_open_url(a):
 
 def cmd_stop_app(a):
     sess = session_for(a)
+    if sess.ios:
+        return _stop_app_ios(sess, a)
     sess.shell("am", "force-stop", a.pkg)
     return {"ok": True, "pkg": a.pkg, "text": f"stopped {a.pkg}"}
 
@@ -1563,6 +2014,8 @@ def cmd_stop_app(a):
 def cmd_apps(a):
     serial = dev.resolve_serial(a.device)
     sess = get_session(serial, auto_setup=False)
+    if sess.ios:
+        return _apps_ios(sess, a)
     flag = [] if a.all else ["-3"]
     out = sess.shell("pm", "list", "packages", *flag)
     pkgs = sorted(x.split(":", 1)[1].strip() for x in out.splitlines() if x.startswith("package:"))
@@ -1574,6 +2027,8 @@ def cmd_apps(a):
 def cmd_install(a):
     serial = dev.resolve_serial(a.device)
     sess = get_session(serial, auto_setup=False)
+    if sess.ios:
+        return _install_ios(sess, a)
     if not os.path.exists(a.apk):
         raise UserError(f"{a.apk} does not exist", "not-found")
     out = sess.adb("install", "-r", *(["-g"] if a.grant else []), a.apk, timeout=300, check=False)
@@ -1604,6 +2059,8 @@ def crash_blocks(crash_log, pkg):
 def cmd_logs(a):
     serial = dev.resolve_serial(a.device)
     sess = get_session(serial, auto_setup=False)
+    if sess.ios:
+        return _logs_ios(sess, a)
     tags = list(getattr(a, "tag", None) or []) + ([MARK_TAG] if getattr(a, "marks", False) else [])
     # logcat filterspecs: only these tags (at --level), everything else silent
     spec = ([f"{t}:{a.level or 'V'}" for t in dict.fromkeys(tags)] + ["*:S"] if tags
@@ -1643,7 +2100,7 @@ def cmd_watch(a):
     port = sess.client.port
     events = []
     types = [t.strip() for t in a.events.split(",")] if a.events else None
-    with dev.AgentClient(port) as c:
+    with dev.open_client(sess.serial, port) as c:
         c.subscribe(types)
         deadline = time.monotonic() + a.timeout
         while len(events) < a.max and time.monotonic() < deadline:

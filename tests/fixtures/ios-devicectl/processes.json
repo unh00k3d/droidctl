@@ -1,0 +1,176 @@
+{
+ "info": {
+  "commandType": "devicectl.device.info.processes",
+  "jsonVersion": 3,
+  "outcome": "success",
+  "version": "506.6"
+ },
+ "result": {
+  "runningProcesses": [
+   {
+    "executable": "file:///sbin/launchd",
+    "processIdentifier": 1
+   },
+   {
+    "executable": "file:///usr/libexec/UserEventAgent",
+    "processIdentifier": 31
+   },
+   {
+    "executable": "file:///usr/libexec/logd",
+    "processIdentifier": 32
+   },
+   {
+    "executable": "file:///usr/libexec/runningboardd",
+    "processIdentifier": 33
+   },
+   {
+    "executable": "file:///System/Library/CoreServices/SpringBoard.app/SpringBoard",
+    "processIdentifier": 34
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/AssistantServices.framework/assistantd",
+    "processIdentifier": 36
+   },
+   {
+    "executable": "file:///usr/libexec/routined",
+    "processIdentifier": 37
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/MediaRemote.framework/Support/mediaremoted",
+    "processIdentifier": 38
+   },
+   {
+    "executable": "file:///System/Library/Frameworks/Accounts.framework/accountsd",
+    "processIdentifier": 39
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/AXAssetLoader.framework/Support/axassetsd",
+    "processIdentifier": 40
+   },
+   {
+    "executable": "file:///System/Library/Frameworks/HealthKit.framework/healthd",
+    "processIdentifier": 42
+   },
+   {
+    "executable": "file:///usr/libexec/configd",
+    "processIdentifier": 43
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/TCC.framework/Support/tccd",
+    "processIdentifier": 45
+   },
+   {
+    "executable": "file:///System/Library/CoreServices/powerd.bundle/powerd",
+    "processIdentifier": 46
+   },
+   {
+    "executable": "file:///usr/libexec/atc",
+    "processIdentifier": 47
+   },
+   {
+    "executable": "file:///usr/sbin/WirelessRadioManagerd",
+    "processIdentifier": 48
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/BiomeStreams.framework/Support/biomed",
+    "processIdentifier": 49
+   },
+   {
+    "executable": "file:///usr/sbin/wifid",
+    "processIdentifier": 50
+   },
+   {
+    "executable": "file:///usr/libexec/remoted",
+    "processIdentifier": 51
+   },
+   {
+    "executable": "file:///usr/libexec/seld",
+    "processIdentifier": 56
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/MobileTimer.framework/Executables/mobiletimerd",
+    "processIdentifier": 57
+   },
+   {
+    "executable": "file:///usr/libexec/watchdogd",
+    "processIdentifier": 59
+   },
+   {
+    "executable": "file:///usr/libexec/nfcd",
+    "processIdentifier": 60
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/identityservicesd",
+    "processIdentifier": 61
+   },
+   {
+    "executable": "file:///usr/libexec/remotepairingdeviced",
+    "processIdentifier": 62
+   },
+   {
+    "executable": "file:///usr/libexec/thermalmonitord",
+    "processIdentifier": 64
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/contextstored",
+    "processIdentifier": 65
+   },
+   {
+    "executable": "file:///usr/libexec/cameracaptured",
+    "processIdentifier": 66
+   },
+   {
+    "executable": "file:///usr/libexec/appprotectiond",
+    "processIdentifier": 67
+   },
+   {
+    "executable": "file:///usr/libexec/backboardd",
+    "processIdentifier": 68
+   },
+   {
+    "executable": "file:///usr/libexec/aonsensed",
+    "processIdentifier": 70
+   },
+   {
+    "executable": "file:///usr/libexec/timed",
+    "processIdentifier": 71
+   },
+   {
+    "executable": "file:///usr/libexec/sharingd",
+    "processIdentifier": 72
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/IMCore.framework/imagent.app/imagent",
+    "processIdentifier": 75
+   },
+   {
+    "executable": "file:///usr/libexec/containermanagerd",
+    "processIdentifier": 76
+   },
+   {
+    "executable": "file:///usr/libexec/audioaccessoryd",
+    "processIdentifier": 77
+   },
+   {
+    "executable": "file:///usr/libexec/dasd",
+    "processIdentifier": 80
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+    "processIdentifier": 81
+   },
+   {
+    "executable": "file:///System/Library/PrivateFrameworks/PassKitCore.framework/passd",
+    "processIdentifier": 83
+   },
+   {
+    "executable": "file:///usr/libexec/lockdownd",
+    "processIdentifier": 84
+   },
+   {
+    "executable": "file:///private/var/containers/Bundle/Application/00000000-0000-4000-8000-000000000001/TestApp.app/TestApp",
+    "processIdentifier": 2020
+   }
+  ]
+ }
+}

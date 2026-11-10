@@ -1,0 +1,8 @@
+# Per-run state and outputs of the spike: never commit
+.token
+dd-*/
+*.log
+__pycache__/
+qa/
+*.png
+.cdid

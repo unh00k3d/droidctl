@@ -1,0 +1,2201 @@
+{
+ "meta": {
+  "name": "settings_general",
+  "platform": "ios",
+  "captured": "2026-10-21T15:11:24+00:00",
+  "model": "iPhone13,2",
+  "release": "18.7.8",
+  "screen": {
+   "locked": false,
+   "rotation": 0,
+   "on": true,
+   "h": 844,
+   "w": 390,
+   "state": "clear",
+   "scale": 3
+  },
+  "runner": {
+   "version": "0.1.0",
+   "build": "i1k"
+  },
+  "package": "com.apple.Preferences",
+  "dump_ms": 148,
+  "nodes": 151
+ },
+ "tree": {
+  "screen": {
+   "locked": false,
+   "rotation": 0,
+   "on": true,
+   "h": 844,
+   "w": 390,
+   "state": "clear",
+   "scale": 3
+  },
+  "gen": 45,
+  "ms": 148,
+  "front": "com.apple.Preferences",
+  "keyboard": false,
+  "dump": 517748673,
+  "nodes": 151,
+  "apps": [
+   {
+    "bundle": "com.apple.Preferences",
+    "root": {
+     "handle": 0,
+     "uid": "1411/app",
+     "children": [
+      {
+       "children": [
+        {
+         "children": [
+          {
+           "children": [
+            {
+             "traits": 8589934592,
+             "uid": "1411/4338059392.6",
+             "handle": 4,
+             "frame": [
+              0,
+              0,
+              390,
+              844
+             ],
+             "children": [
+              {
+               "traits": 8589934592,
+               "uid": "1411/21124043136.7",
+               "handle": 5,
+               "frame": [
+                0,
+                0,
+                390,
+                844
+               ],
+               "children": [
+                {
+                 "traits": 8589934592,
+                 "uid": "1411/21116601216.8",
+                 "handle": 6,
+                 "frame": [
+                  0,
+                  0,
+                  390,
+                  844
+                 ],
+                 "children": [
+                  {
+                   "traits": 8589934592,
+                   "uid": "1411/21116601664.9",
+                   "handle": 7,
+                   "frame": [
+                    0,
+                    0,
+                    390,
+                    844
+                   ],
+                   "children": [
+                    {
+                     "traits": 8589934592,
+                     "uid": "1411/21116607936.10",
+                     "handle": 8,
+                     "frame": [
+                      0,
+                      0,
+                      390,
+                      844
+                     ],
+                     "children": [
+                      {
+                       "traits": 8589934592,
+                       "uid": "1411/21109509248.11",
+                       "handle": 9,
+                       "id": "General",
+                       "frame": [
+                        0,
+                        47,
+                        390,
+                        44
+                       ],
+                       "children": [
+                        {
+                         "traits": 8724152321,
+                         "uid": "1411/21134724672.325",
+                         "handle": 10,
+                         "frame": [
+                          0,
+                          47,
+                          93.33333333333333,
+                          44
+                         ],
+                         "class": "UIAccessibilityElement",
+                         "label": "Settings",
+                         "type": 9
+                        },
+                        {
+                         "traits": 8590000128,
+                         "uid": "1411/21157193344.10373",
+                         "handle": 11,
+                         "frame": [
+                          164,
+                          59,
+                          62,
+                          20.33333333333333
+                         ],
+                         "class": "UILabel",
+                         "label": "General",
+                         "type": 48
+                        }
+                       ],
+                       "class": "UINavigationBar",
+                       "type": 21
+                      },
+                      {
+                       "traits": 8589934592,
+                       "uid": "1411/21108435456.12",
+                       "handle": 12,
+                       "frame": [
+                        0,
+                        0,
+                        390,
+                        844
+                       ],
+                       "children": [
+                        {
+                         "traits": 8589934592,
+                         "uid": "1411/21116611968.15",
+                         "handle": 13,
+                         "frame": [
+                          0,
+                          0,
+                          390,
+                          844
+                         ],
+                         "children": [
+                          {
+                           "traits": 8589934592,
+                           "uid": "1411/21116589312.196",
+                           "handle": 14,
+                           "frame": [
+                            0,
+                            0,
+                            390,
+                            844
+                           ],
+                           "children": [
+                            {
+                             "traits": 8589934592,
+                             "uid": "1411/21166362368.10374",
+                             "handle": 15,
+                             "frame": [
+                              0,
+                              0,
+                              390,
+                              844
+                             ],
+                             "children": [
+                              {
+                               "traits": 8589934592,
+                               "uid": "1411/21159800448.10375",
+                               "handle": 16,
+                               "frame": [
+                                0,
+                                0,
+                                390,
+                                844
+                               ],
+                               "children": [
+                                {
+                                 "traits": 8589934592,
+                                 "uid": "1411/21118839296.10376",
+                                 "handle": 17,
+                                 "frame": [
+                                  0,
+                                  0,
+                                  390,
+                                  844
+                                 ],
+                                 "children": [
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    91,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164667632.10377",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 18
+                                  },
+                                  {
+                                   "traits": 146028888064,
+                                   "uid": "1411/21164662352.10378",
+                                   "handle": 19,
+                                   "frame": [
+                                    16,
+                                    108.66666603088379,
+                                    358,
+                                    214.6666717529297
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934592,
+                                     "uid": "1411/21164663552.10421",
+                                     "handle": 20,
+                                     "frame": [
+                                      16,
+                                      108.66666603088379,
+                                      358,
+                                      214.6666717529297
+                                     ],
+                                     "children": [
+                                      {
+                                       "traits": 8589934592,
+                                       "uid": "1411/21166584000.10505",
+                                       "handle": 21,
+                                       "frame": [
+                                        16,
+                                        108.66666603088379,
+                                        358,
+                                        214.6666717529297
+                                       ],
+                                       "children": [
+                                        {
+                                         "class": "UIResponder",
+                                         "frame": [
+                                          165,
+                                          133.99999936421713,
+                                          60,
+                                          59.99999999999997
+                                         ],
+                                         "uid": "1411/21166583520.10507",
+                                         "type": 43,
+                                         "traits": 8589934596,
+                                         "handle": 22
+                                        },
+                                        {
+                                         "traits": 8590000192,
+                                         "uid": "1411/21166576800.10508",
+                                         "handle": 23,
+                                         "frame": [
+                                          155,
+                                          203.83333524068198,
+                                          80,
+                                          26.333333333333343
+                                         ],
+                                         "class": "UIResponder",
+                                         "label": "General",
+                                         "type": 48
+                                        },
+                                        {
+                                         "traits": 8589934656,
+                                         "uid": "1411/21166579200.10509",
+                                         "handle": 24,
+                                         "frame": [
+                                          33.5,
+                                          240.16666857401532,
+                                          323,
+                                          58
+                                         ],
+                                         "class": "UIResponder",
+                                         "label": "Manage your overall setup and preferences for iPhone, such as software updates, device language, CarPlay, AirDrop, and more.",
+                                         "type": 48
+                                        }
+                                       ],
+                                       "class": "UIResponder",
+                                       "type": 1
+                                      }
+                                     ],
+                                     "class": "UIAccessibilityElement",
+                                     "type": 1
+                                    },
+                                    {
+                                     "traits": 8589934592,
+                                     "uid": "1411/21167029760.10420",
+                                     "handle": 25,
+                                     "frame": [
+                                      16,
+                                      108.66666603088379,
+                                      358,
+                                      214.66666666666663
+                                     ],
+                                     "children": [
+                                      {
+                                       "class": "UIView",
+                                       "frame": [
+                                        16,
+                                        108.66666603088379,
+                                        358,
+                                        214.66666666666663
+                                       ],
+                                       "uid": "1411/21124717312.10504",
+                                       "type": 1,
+                                       "traits": 8589934592,
+                                       "handle": 26
+                                      }
+                                     ],
+                                     "class": "_UISystemBackgroundView",
+                                     "type": 1
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      16,
+                                      323.0000044504801,
+                                      358,
+                                      0.3333333333333144
+                                     ],
+                                     "uid": "1411/21139403456.10422",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 27
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    323.3333384195963,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164664992.10379",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 28
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    340.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164661952.10380",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 29
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164667312.10381",
+                                   "handle": 30,
+                                   "frame": [
+                                    16,
+                                    358.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      365.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21164773888.10423",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 31
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139269248.10424",
+                                     "handle": 32,
+                                     "id": "About",
+                                     "frame": [
+                                      76,
+                                      370.3333377838135,
+                                      46,
+                                      20.333333333333314
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "About",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      76,
+                                      402.00000445048016,
+                                      298,
+                                      0.3333333333333144
+                                     ],
+                                     "uid": "1411/21159361408.10425",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 33
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167594240.10426",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      373.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 34,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "About",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164658992.10382",
+                                   "handle": 35,
+                                   "frame": [
+                                    16,
+                                    402.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      409.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167796736.10427",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 36
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157194240.10372",
+                                     "handle": 37,
+                                     "id": "SOFTWARE_UPDATE_LINK",
+                                     "frame": [
+                                      76,
+                                      414.3333377838135,
+                                      128.33333333333334,
+                                      20.333333333333314
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Software Update",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      76,
+                                      446.00000445048016,
+                                      298,
+                                      0.3333333333333144
+                                     ],
+                                     "uid": "1411/21152093888.10428",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 38
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157195136.10429",
+                                     "handle": 39,
+                                     "frame": [
+                                      305.6666666666667,
+                                      412.3333377838135,
+                                      24,
+                                      24
+                                     ],
+                                     "class": "UILabel",
+                                     "label": "1",
+                                     "type": 48
+                                    },
+                                    {
+                                     "traits": 8589934596,
+                                     "uid": "1411/21167795712.10430",
+                                     "handle": 40,
+                                     "id": "UnreadBubble",
+                                     "frame": [
+                                      305.6666666666667,
+                                      412.3333377838135,
+                                      24,
+                                      24
+                                     ],
+                                     "class": "UIImageView",
+                                     "type": 43
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21166455040.10431",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      417.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 41,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Software Update",
+                                   "value": "1 update available",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164660912.10383",
+                                   "handle": 42,
+                                   "frame": [
+                                    16,
+                                    446.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      16,
+                                      490.00000445048016,
+                                      358,
+                                      0.3333333333333144
+                                     ],
+                                     "uid": "1411/21145955712.10433",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 43
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      453.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167785472.10432",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 44
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139272832.10434",
+                                     "handle": 45,
+                                     "id": "STORAGE_MGMT",
+                                     "frame": [
+                                      76,
+                                      458.3333377838135,
+                                      116.33333333333331,
+                                      20.333333333333314
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "iPhone Storage",
+                                     "type": 48
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167598848.10435",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      461.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 46,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "iPhone Storage",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    490.3333384195964,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164655872.10384",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 47
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    507.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164668192.10385",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 48
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164670032.10386",
+                                   "handle": 49,
+                                   "frame": [
+                                    16,
+                                    525.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      16,
+                                      569.0000044504802,
+                                      358,
+                                      0.33333333333337123
+                                     ],
+                                     "uid": "1411/21145944512.10437",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 50
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      532.6666711171467,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167787008.10436",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 51
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139274624.10438",
+                                     "handle": 52,
+                                     "id": "COVERAGE",
+                                     "frame": [
+                                      75.99999999999999,
+                                      537.3333377838135,
+                                      169.66666666666663,
+                                      20.33333333333337
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "AppleCare & Warranty",
+                                     "type": 48
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167599616.10439",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      540.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 53,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "AppleCare & Warranty",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    569.3333384195964,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164664672.10387",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 54
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    586.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164659632.10388",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 55
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164669712.10389",
+                                   "handle": 56,
+                                   "frame": [
+                                    16,
+                                    604.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      611.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167788544.10440",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 57
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157184384.10441",
+                                     "handle": 58,
+                                     "id": "AIRDROP_LINK",
+                                     "frame": [
+                                      76,
+                                      616.3333377838135,
+                                      58.33333333333334,
+                                      20.33333333333337
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "AirDrop",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      76,
+                                      648.0000044504801,
+                                      298,
+                                      0.33333333333337123
+                                     ],
+                                     "uid": "1411/21152103296.10442",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 59
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167600384.10443",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      619.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 60,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "AirDrop",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164669312.10390",
+                                   "handle": 61,
+                                   "frame": [
+                                    16,
+                                    648.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      655.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167790080.10444",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 62
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157186176.10445",
+                                     "handle": 63,
+                                     "id": "CONTINUITY_SPEC",
+                                     "frame": [
+                                      75.99999999999999,
+                                      660.3333377838135,
+                                      150.66666666666663,
+                                      20.33333333333337
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "AirPlay & Continuity",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      76,
+                                      692.0000044504801,
+                                      298,
+                                      0.33333333333337123
+                                     ],
+                                     "uid": "1411/21152089856.10446",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 64
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167601152.10447",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      663.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 65,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "AirPlay & Continuity",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164660992.10391",
+                                   "handle": 66,
+                                   "frame": [
+                                    16,
+                                    692.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      699.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167791616.10448",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 67
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157187968.10449",
+                                     "handle": 68,
+                                     "id": "PiP_SPEC",
+                                     "frame": [
+                                      76,
+                                      704.3333377838135,
+                                      129.66666666666666,
+                                      20.33333333333337
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Picture in Picture",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      76,
+                                      736.0000044504801,
+                                      298,
+                                      0.33333333333337123
+                                     ],
+                                     "uid": "1411/21152093440.10450",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 69
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167601920.10451",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      707.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 70,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Picture in Picture",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164662432.10392",
+                                   "handle": 71,
+                                   "frame": [
+                                    16,
+                                    736.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      16,
+                                      780.0000044504801,
+                                      358,
+                                      0.33333333333337123
+                                     ],
+                                     "uid": "1411/21152099712.10453",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 72
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      743.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167793152.10452",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 73
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157189760.10454",
+                                     "handle": 74,
+                                     "id": "CARPLAY",
+                                     "frame": [
+                                      76,
+                                      748.3333377838135,
+                                      58.66666666666666,
+                                      20.33333333333337
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "CarPlay",
+                                     "type": 48
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167602688.10455",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      751.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 75,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "CarPlay",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    780.3333384195964,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164665472.10393",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 76
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    797.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164670272.10394",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 77
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164667392.10395",
+                                   "handle": 78,
+                                   "frame": [
+                                    16,
+                                    815.3333377838135,
+                                    358,
+                                    52
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      32,
+                                      826.6666711171468,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167794688.10456",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 79
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157191552.10457",
+                                     "handle": 80,
+                                     "id": "AUTOFILL",
+                                     "frame": [
+                                      76.00000000000001,
+                                      831.3333377838135,
+                                      158.33333333333337,
+                                      20.33333333333337
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "AutoFill & Passwords",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      76,
+                                      867.0000044504801,
+                                      298,
+                                      0.33333333333337123
+                                     ],
+                                     "uid": "1411/21152097472.10458",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 81
+                                    },
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21166451968.10459",
+                                     "enabled": false,
+                                     "frame": [
+                                      347.6666666666667,
+                                      834.3333377838135,
+                                      10.333333333333314,
+                                      14
+                                     ],
+                                     "handle": 82,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "AutoFill & Passwords",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164670192.10396",
+                                   "handle": 83,
+                                   "frame": [
+                                    16,
+                                    867.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21166455808.10460",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 84,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      298,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21125342848.10461",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 85
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157196928.10462",
+                                     "handle": 86,
+                                     "id": "AUTO_CONTENT_DOWNLOAD",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      189.66666666666666,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Background App Refresh",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167798784.10463",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 87
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Background App Refresh",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164666512.10397",
+                                   "handle": 88,
+                                   "frame": [
+                                    16,
+                                    911.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167592704.10464",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 89,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      298,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21133248704.10465",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 90
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21157198720.10466",
+                                     "handle": 91,
+                                     "id": "DATE_AND_TIME",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      94,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Date & Time",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21159556096.10467",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 92
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Date & Time",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164657632.10398",
+                                   "handle": 93,
+                                   "frame": [
+                                    16,
+                                    955.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167593472.10468",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 94,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      298,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21148497472.10469",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 95
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139263872.10470",
+                                     "handle": 96,
+                                     "id": "DICTIONARY",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      77.66666666666667,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Dictionary",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21165007872.10471",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 97
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Dictionary",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164669152.10399",
+                                   "handle": 98,
+                                   "frame": [
+                                    16,
+                                    999.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167588096.10472",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 99,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      298,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21148498368.10473",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 100
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139265664.10474",
+                                     "handle": 101,
+                                     "id": "FONT_SETTING",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      42.666666666666664,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Fonts",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21165008384.10475",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 102
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Fonts",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164662912.10400",
+                                   "handle": 103,
+                                   "frame": [
+                                    16,
+                                    1043.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167588864.10476",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 104,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      298,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21139390464.10477",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 105
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139262080.10478",
+                                     "handle": 106,
+                                     "id": "Keyboard",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      72.66666666666667,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Keyboard",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21166218240.10479",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 107
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Keyboard",
+                                   "type": 75
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164666432.10401",
+                                   "handle": 108,
+                                   "frame": [
+                                    16,
+                                    1087.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167589632.10480",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 109,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      358,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21140599936.10481",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 110
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21139259392.10482",
+                                     "handle": 111,
+                                     "id": "INTERNATIONAL",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      148.33333333333334,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Language & Region",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21166222848.10483",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 112
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Language & Region",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    815.3333377838135,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164667072.10402",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 113
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1148.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164657152.10403",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 114
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164668752.10404",
+                                   "handle": 115,
+                                   "frame": [
+                                    16,
+                                    1166.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167590400.10484",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 116,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      358,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21140591424.10485",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 117
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21116594688.10486",
+                                     "handle": 118,
+                                     "id": "TV_PROVIDER",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      89.33333333333333,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "TV Provider",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21166223872.10487",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 119
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "TV Provider",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1166.3333377838135,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164665952.10405",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 120
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1227.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164664512.10406",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 121
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164660752.10407",
+                                   "handle": 122,
+                                   "frame": [
+                                    16,
+                                    1245.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167591168.10488",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 123,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      358,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21140598144.10489",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 124
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21116586624.10490",
+                                     "handle": 125,
+                                     "id": "ManagedConfigurationList",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      210.33333333333334,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "VPN & Device Management",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167026688.10491",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 126
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "VPN & Device Management",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1245.3333377838135,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164668032.10408",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 127
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1306.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164669792.10409",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 128
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164667552.10410",
+                                   "handle": 129,
+                                   "frame": [
+                                    16,
+                                    1324.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21167591936.10492",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 130,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      358,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21155984512.10493",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 131
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21116598272.10494",
+                                     "handle": 132,
+                                     "id": "LEGAL_AND_REGULATORY",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      143.33333333333334,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Legal & Regulatory",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167025152.10495",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 133
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Legal & Regulatory",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1324.3333377838135,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164670592.10411",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 134
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1385.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164665152.10412",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 135
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164655312.10413",
+                                   "handle": 136,
+                                   "frame": [
+                                    16,
+                                    1403.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "traits": 8589934849,
+                                     "uid": "1411/21165816064.10496",
+                                     "enabled": false,
+                                     "frame": [
+                                      0,
+                                      91,
+                                      10.333333333333334,
+                                      14
+                                     ],
+                                     "handle": 137,
+                                     "class": "_UITableCellAccessoryButton",
+                                     "label": "chevron",
+                                     "type": 9
+                                    },
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      358,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21155982272.10497",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 138
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21116593792.10498",
+                                     "handle": 139,
+                                     "id": "Reset",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      187,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Transfer or Reset iPhone",
+                                     "type": 48
+                                    },
+                                    {
+                                     "class": "UIImageView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      29,
+                                      29
+                                     ],
+                                     "uid": "1411/21167022080.10499",
+                                     "type": 43,
+                                     "traits": 8589934596,
+                                     "handle": 140
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Transfer or Reset iPhone",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1403.3333377838135,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164658352.10414",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 141
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1464.6666717529297,
+                                    390,
+                                    17.66666603088379
+                                   ],
+                                   "uid": "1411/21164660272.10415",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 142
+                                  },
+                                  {
+                                   "traits": 146028888065,
+                                   "uid": "1411/21164656352.10416",
+                                   "handle": 143,
+                                   "frame": [
+                                    16,
+                                    1482.3333377838135,
+                                    358,
+                                    44
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "_UITableViewCellSeparatorView",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      358,
+                                      0.3333333333333286
+                                     ],
+                                     "uid": "1411/21155972864.10500",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 144
+                                    },
+                                    {
+                                     "traits": 8589934656,
+                                     "uid": "1411/21116592896.10501",
+                                     "handle": 145,
+                                     "id": "SHUTDOWN_LABEL",
+                                     "frame": [
+                                      0,
+                                      91,
+                                      83,
+                                      20.33333333333333
+                                     ],
+                                     "class": "UITableViewLabel",
+                                     "label": "Shut Down",
+                                     "type": 48
+                                    }
+                                   ],
+                                   "class": "UIAccessibilityElement",
+                                   "label": "Shut Down",
+                                   "type": 75
+                                  },
+                                  {
+                                   "class": "UIAccessibilityElement",
+                                   "frame": [
+                                    0,
+                                    1482.3333377838135,
+                                    390,
+                                    17.33333396911621
+                                   ],
+                                   "uid": "1411/21164666672.10417",
+                                   "type": 1,
+                                   "traits": 8589934592,
+                                   "handle": 146
+                                  },
+                                  {
+                                   "traits": 8589938688,
+                                   "uid": "1411/21148496576.10418",
+                                   "handle": 147,
+                                   "frame": [
+                                    357,
+                                    91,
+                                    30,
+                                    711
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIView",
+                                     "frame": [
+                                      384,
+                                      94,
+                                      3,
+                                      391.6666666666667
+                                     ],
+                                     "uid": "1411/21150813952.10502",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 148
+                                    }
+                                   ],
+                                   "class": "_UIScrollViewScrollIndicator",
+                                   "label": "Vertical scroll bar, 3 pages",
+                                   "value": "%0",
+                                   "type": 1
+                                  },
+                                  {
+                                   "traits": 8589938688,
+                                   "uid": "1411/21148486720.10419",
+                                   "handle": 149,
+                                   "frame": [
+                                    41.333333333333336,
+                                    811,
+                                    307,
+                                    30
+                                   ],
+                                   "children": [
+                                    {
+                                     "class": "UIView",
+                                     "frame": [
+                                      44.33333333333334,
+                                      838,
+                                      301,
+                                      3
+                                     ],
+                                     "uid": "1411/21150810496.10503",
+                                     "type": 1,
+                                     "traits": 8589934592,
+                                     "handle": 150
+                                    }
+                                   ],
+                                   "class": "_UIScrollViewScrollIndicator",
+                                   "label": "Horizontal scroll bar, 1 page",
+                                   "value": "%0",
+                                   "type": 1
+                                  }
+                                 ],
+                                 "class": "UITableView",
+                                 "type": 26
+                                }
+                               ],
+                               "class": "UIView",
+                               "type": 1
+                              }
+                             ],
+                             "class": "UIResponder",
+                             "type": 1
+                            }
+                           ],
+                           "class": "UIView",
+                           "type": 1
+                          }
+                         ],
+                         "class": "UIViewControllerWrapperView",
+                         "type": 1
+                        }
+                       ],
+                       "class": "UINavigationTransitionView",
+                       "type": 1
+                      }
+                     ],
+                     "class": "UILayoutContainerView",
+                     "type": 1
+                    }
+                   ],
+                   "class": "_UIPanelControllerContentView",
+                   "type": 1
+                  }
+                 ],
+                 "class": "_UISplitViewControllerPanelImplView",
+                 "type": 1
+                }
+               ],
+               "class": "UIResponder",
+               "type": 1
+              }
+             ],
+             "class": "UIView",
+             "type": 1
+            }
+           ],
+           "frame": [
+            0,
+            0,
+            390,
+            844
+           ],
+           "uid": "1411/21109507968.5",
+           "type": 1,
+           "class": "UIDropShadowView",
+           "handle": 3
+          }
+         ],
+         "frame": [
+          0,
+          0,
+          390,
+          844
+         ],
+         "uid": "1411/21109344768.4",
+         "type": 1,
+         "class": "UITransitionView",
+         "handle": 2
+        }
+       ],
+       "frame": [
+        0,
+        0,
+        390,
+        844
+       ],
+       "uid": "1411/4338033552.3",
+       "type": 4,
+       "class": "UIWindow",
+       "handle": 1
+      }
+     ],
+     "frame": [
+      0,
+      0,
+      390,
+      844
+     ],
+     "class": "UIApplication",
+     "label": "Settings",
+     "type": 2
+    }
+   }
+  ]
+ }
+}
