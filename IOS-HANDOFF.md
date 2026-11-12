@@ -54,7 +54,7 @@ You are picking up droidctl's iOS workstream. **droidctl drives a real iPhone to
 - **Settling:** run-loop idle + animations idle, re-armed on focus or keyboard-shown, a 200 ms floor after AX scrolls, 100 ms quiet, a 3 s cap.
 - **The lock guard** fails closed (`screen-off`).
 
-**Commits on `ios-research`** (not pushed, not merged into `main`):
+**Commits on `ios-research`** (historical; the branch was squash-merged into `main` as `2c4a288` on 2026-11-10 and deleted):
 - `b39437f` I1, `7580086` I2, `284f253` I3, `cc51b6a` I4.
 - **Uncommitted when this was written:** the 2026-10-22 round (real apps, MCP, easier setup; PLAN.md "Real apps, MCP and an easier setup"), the 2026-10-26 second-app round (PLAN.md "A second real app") and this file. Commit when the user asks.
 
@@ -65,7 +65,7 @@ You are picking up droidctl's iOS workstream. **droidctl drives a real iPhone to
 
 ## 3. User decisions and preferences (from the user, 2026-10-19 … 22)
 - **iOS is wanted, real iPhone first.** The simulator is secondary; no decision may rest on simulator-only behaviour.
-- **Work stays on the branch `ios-research`:** no merge into `main`, no push, until the user says so. **Commit only when asked.**
+- **Branch:** the work stayed on `ios-research` until the user merged it into `main` (2026-11-10); it now continues on `main`. **Commit only when asked.**
 - **Supported:** iOS 17+. Free and paid Apple teams; the free team is the documented path.
 - **Integration decisions (2026-10-21):**
   - the runner speaks the Android agent protocol;
@@ -187,7 +187,7 @@ droidctl dump-fixture <name> -d <UDID> --dir tests/fixtures/ios-runner --pkg <bu
   - a paid team;
   - other iPhones, iOS versions and Xcode versions (`doctor` flags untested Xcode/iOS pairs: `manage.TESTED`);
   - whether the user's own Xcode is blocked for 60 s after a droidctl command (§8).
-- **Merge / push of `ios-research`:** the user's call.
+- **Merge / push of `ios-research`:** done 2026-11-10 (squash-merged into `main`, branch deleted).
 
 ### 7.5 I5 (optional)
 The simulator as a target (the same runner, `simctl`, a prebuilt unsigned runner), then go-ios for Linux / no Xcode.

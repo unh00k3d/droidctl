@@ -855,7 +855,7 @@ Each ends with measured numbers recorded in PLAN.md, as on Android.
 - **I5 (optional):** the simulator as a target (same runner, `simctl`, prebuilt unsigned runner), then go-ios for Linux / no Xcode, then the S5 in-simulator helper if simulator speed matters.
 
 **Before I1 (housekeeping): done 2026-10-21.**
-- The work stays on the branch `ios-research` (user decision); it is not merged into `main`.
+- The work stayed on the branch `ios-research` (user decision) until it was squash-merged into `main` on 2026-11-10.
 - CLAUDE.md has the iOS lines in "Read first" and an updated Environment section.
 
 ---

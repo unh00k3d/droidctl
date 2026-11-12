@@ -5,7 +5,7 @@ An agent-first Android automation CLI: a compact UI snapshot with refs, element-
 ## Read first
 - `PLAN.md`: **the source of truth.** It holds the decisions, architecture, device API, snapshot/resolver/actions design, daemon, MCP, milestones, open questions and verification. Start with "Decisions at a glance" and "Milestones".
 - `TESTAPP.md`: the edge-case test app spec (scenarios, expected behaviour, logcat ground truth).
-- **iOS (the active workstream, branch `ios-research`):** `IOS-HANDOFF.md` (state, rules, next steps), then `IOS.md` (the implementation spec, the iOS counterpart of PLAN.md), then `research/ios-decision.md` (the measured evidence), and `IOS-INTEGRATION.md` (the plan for wiring iOS into the code, I1 → I4). Spike code: `research/ios-spike/`.
+- **iOS (merged into `main` 2026-11-10; the `ios-research` branch is deleted):** `IOS-HANDOFF.md` (state, rules, next steps), then `IOS.md` (the implementation spec, the iOS counterpart of PLAN.md), then `research/ios-decision.md` (the measured evidence), and `IOS-INTEGRATION.md` (the plan for wiring iOS into the code, I1 → I4). Spike code: `research/ios-spike/`.
 - `research/`: prior-art reports (Artemis, droidrun/mobilerun, mobile-use, mobile-mcp, uiautomator2, android_world, Maestro, agent-device, …) with file:line references. Consult them before re-inventing a heuristic.
 
 ## Status

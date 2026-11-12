@@ -90,12 +90,17 @@ droidctl setup        # installs the agent APK on the phone and enables its serv
 droidctl doctor       # checks adb, the agent, the socket and latency
 ```
 
-**iPhone** (a Mac with Xcode; iOS 17+; branch `ios-research` for now):
+**iPhone** (iOS 17+; a Mac with Xcode, or Linux / a Mac without Xcode):
 
 ```bash
-pipx install "git+https://github.com/unh00k3d/droidctl.git@ios-research"
+pipx install git+https://github.com/unh00k3d/droidctl.git
 droidctl setup        # with the iPhone plugged in: a guided checklist
 ```
+
+Without Xcode, run `droidctl setup --ios` instead: it offers to install usbmuxd and download
+go-ios, and signs in to Apple itself (your password is never stored, only Apple's token, in the
+system keyring). The steps below describe the Xcode path; the other one asks for the same
+Trust, Developer Mode and profile steps.
 
 The first time, `setup` needs you for four things, and it says when and waits:
 1. Sign in to Xcode with your Apple ID (Xcode > Settings > Accounts; a free Apple ID works).
