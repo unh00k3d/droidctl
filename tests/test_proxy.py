@@ -23,7 +23,9 @@ PREFIX = ("am broadcast -a com.enesb.proxyapp.CMD -n "
 @pytest.fixture
 def phone(tmp_path, monkeypatch):
     agent = FakeAgent()
-    app = FakeProxyApp(profiles=[USER, USER2], selected_id="u-1", active_id="u-1")
+    # the phone already has the bundled version: setup and on install nothing unless a test says so
+    app = FakeProxyApp(profiles=[USER, USER2], selected_id="u-1", active_id="u-1",
+                       installed=proxy.bundled()["versionCode"])
     adb = FakeAdb({SERIAL: agent}, shell=app)
     monkeypatch.setenv("ANDROID_ADB_SERVER_PORT", str(adb.port))
     monkeypatch.setenv("DROIDCTL_HOME", str(tmp_path))
@@ -104,7 +106,7 @@ def test_mask_hides_the_password_everywhere():
 def test_setup_is_a_noop_on_the_same_version(phone, capsys):
     adb, app = phone
     r = run(capsys, "proxy", "setup")
-    assert r["installed"] is False and r["version"] == 1 and app.installs == 0
+    assert r["installed"] is False and r["version"] == proxy.bundled()["versionCode"] and app.installs == 0
     assert not adb.pushed
 
 
