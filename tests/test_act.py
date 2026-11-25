@@ -838,7 +838,7 @@ def test_two_fields_with_one_id_are_ambiguous_for_type(home, monkeypatch):
 def test_logs_filter_by_tag_and_marks(home, monkeypatch):
     s = session(monkeypatch, tree("cart_inc-a"))
     calls = []
-    s.adb = lambda *cmd, **kw: (calls.append(cmd), "")[1]
+    s.logcat = lambda *cmd, **kw: (calls.append(cmd), "")[1]
     monkeypatch.setattr(act, "get_session", lambda serial, auto_setup=True: s)
     monkeypatch.setattr(act.dev, "resolve_serial", lambda d: "FAKE")
     act.cmd_logs(args(max=50, pkg=None, level=None, tag=None, marks=True))

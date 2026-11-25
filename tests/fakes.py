@@ -155,35 +155,89 @@ class _RpcError(Exception):
 
 
 class FakeAdb:
-    """{serial: FakeAgent}: every serial is 'device' and has a droidctl forward."""
+    """{serial: FakeAgent}: every serial is 'device' and has a droidctl forward.
 
-    def __init__(self, agents):
+    With `shell` (a function: command line -> (stdout bytes, stderr bytes, exit code))
+    it also serves what adbutils sends for device work: `host:tport:serial`,
+    `features`, `shell,v2:` (stdout/stderr/exit packets) and `sync:` (STAT, SEND).
+    Every shell line lands in `shell_lines`, every pushed file in `pushed` {path: bytes}."""
+
+    def __init__(self, agents, shell=None):
         self.agents = agents
+        self.shell = shell
+        self.shell_lines = []
+        self.pushed = {}
         self.sock = socket.socket()
         self.sock.bind(("127.0.0.1", 0))
         self.sock.listen(16)
         self.port = self.sock.getsockname()[1]
         _serve(self.sock, self._conn)
 
+    @staticmethod
+    def _read(conn, n):
+        buf = b""
+        while len(buf) < n:
+            got = conn.recv(n - len(buf))
+            if not got:
+                raise OSError("closed")
+            buf += got
+        return buf
+
     def _conn(self, conn):
         try:
-            n = int(conn.recv(4), 16)
-            service = conn.recv(n).decode()
-            if service == "host:devices":
-                body = "".join(f"{s}\tdevice\n" for s in self.agents)
-            elif service == "host:list-forward":
-                body = "".join(f"{s} tcp:{a.port} localabstract:droidctl\n" for s, a in self.agents.items())
-            elif service == "host:version":
-                body = "0029"
-            else:
-                conn.sendall(b"FAIL" + b"0007unknown")
+            while True:     # a transport switch keeps the connection for the next service
+                service = self._read(conn, int(self._read(conn, 4), 16)).decode()
+                if service.startswith("host:tport:serial:") and self.shell:
+                    conn.sendall(b"OKAY" + b"\x01" + bytes(7))     # OKAY + the transport id
+                    continue
+                if service.startswith("host-serial:") and service.endswith(":features") and self.shell:
+                    body = "shell_v2,cmd,stat_v2"
+                elif service.startswith("shell,v2:") and self.shell:
+                    line = service[len("shell,v2:"):]
+                    self.shell_lines.append(line)
+                    out, err, rc = self.shell(line)
+                    conn.sendall(b"OKAY")
+                    for pid, data in ((1, out), (2, err)):
+                        if data:
+                            conn.sendall(bytes([pid]) + len(data).to_bytes(4, "little") + data)
+                    conn.sendall(bytes([3]) + (1).to_bytes(4, "little") + bytes([rc]))
+                    return
+                elif service == "sync:" and self.shell:
+                    conn.sendall(b"OKAY")
+                    self._sync(conn)
+                    return
+                elif service == "host:devices":
+                    body = "".join(f"{s}\tdevice\n" for s in self.agents)
+                elif service == "host:list-forward":
+                    body = "".join(f"{s} tcp:{a.port} localabstract:droidctl\n" for s, a in self.agents.items())
+                elif service == "host:version":
+                    body = "0029"
+                else:
+                    conn.sendall(b"FAIL" + b"0007unknown")
+                    return
+                data = body.encode()
+                conn.sendall(b"OKAY" + f"{len(data):04x}".encode() + data)
                 return
-            data = body.encode()
-            conn.sendall(b"OKAY" + f"{len(data):04x}".encode() + data)
         except (OSError, ValueError):
             pass
         finally:
             conn.close()
+
+    def _sync(self, conn):
+        import struct
+        cmd = self._read(conn, 4)
+        path = self._read(conn, struct.unpack("<I", self._read(conn, 4))[0]).decode()
+        if cmd == b"STAT":
+            conn.sendall(b"STAT" + bytes(12))                     # does not exist
+        elif cmd == b"SEND":
+            path, data = path.rsplit(",", 1)[0], b""
+            while True:
+                kind, n = self._read(conn, 4), struct.unpack("<I", self._read(conn, 4))[0]
+                if kind == b"DONE":
+                    break
+                data += self._read(conn, n)
+            self.pushed[path] = data
+            conn.sendall(b"OKAY" + bytes(4))
 
     def close(self):
         self.sock.close()
