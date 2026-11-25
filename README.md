@@ -122,11 +122,13 @@ Everything else is automatic:
 Agents using droidctl on an iPhone: the "iPhone" section of `AGENTS.md` (also in `droidctl skill print`).
 
 pipx puts `droidctl` on your PATH in an isolated env and pulls everything it needs:
-`adbutils` (which also brings an `adb` binary, used when you have no Android
-platform-tools), `rich`, Pillow (screenshots on Android < 11, `shot --marks`) and the MCP SDK
+`adbutils` (which also brings an `adb` binary, used only to start an adb server when none
+is running), `rich`, Pillow (screenshots on Android < 11, `shot --marks`) and the MCP SDK
 (`droidctl mcp`). The prebuilt agent APK ships inside the package, so no Android SDK or JDK is
 needed. Heavy libraries are imported lazily, so commands stay fast. If no adb server is
-running, droidctl starts one.
+running, droidctl starts one. Everything else speaks the adb server's protocol, so droidctl
+needs no `adb` executable at all when a server (or a relay to one, e.g. in a container)
+answers on `ANDROID_ADB_SERVER_PORT`.
 
 To work on droidctl itself:
 

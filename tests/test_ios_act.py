@@ -166,7 +166,7 @@ def test_hide_keyboard_asks_the_runner_and_judges_the_screen(make_phone):
 def test_adb_is_unsupported_on_an_iphone_not_an_adb_error(make_phone):
     make_phone()
     with pytest.raises(UserError) as e:
-        act.get_session(UDID).adb("shell", "true")
+        act.get_session(UDID).shell("true")
     assert e.value.kind == "unsupported"
     act.close_sessions()
 

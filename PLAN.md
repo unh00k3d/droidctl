@@ -151,7 +151,8 @@ droidctl/
   bench/           # latency, token, tap-accuracy and spatial benchmarks; results/*.json
   droidctl/
     cli.py  core.py      # core ported from chromectl (UserError/ERROR_KINDS/emit/die, _surface/cheat/skill, run)
-    device.py            # adbutils: device select, forward, install/enable/upgrade, JSON-RPC client
+    device.py            # adb server protocol (stdlib + adbutils; never an `adb` binary except
+                         # start-server when none answers): select, forward, shell_v2, install, JSON-RPC client
     snapshot.py          # PURE: raw tree -> prune -> refs/lines; signature; diff
     resolve.py           # PURE: fingerprint -> candidate handle (tiers, scoring, failure reasons)
     act.py               # action policy, verify/settle, text ladder

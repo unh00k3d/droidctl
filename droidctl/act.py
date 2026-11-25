@@ -20,7 +20,6 @@ import argparse
 import os
 import re
 import shlex
-import subprocess
 import sys
 import time
 
@@ -55,6 +54,7 @@ class Session:
         self._state = None
         self._state_loaded = False
         self.from_cache = False                # the target was resolved on _TREE_CACHE's tree
+        self._adb_device = None
 
     # -- connection
     @property
@@ -177,23 +177,56 @@ class Session:
         S.carry_refs(self.state, snap)
         return snap
 
-    # -- adb (setup-type work; lazy adbutils)
-    def adb(self, *cmd, timeout=30, check=True):
-        """`adb -s SERIAL shell ...` via the adb binary (stdlib; no adbutils import)."""
+    # -- adb (setup-type work; lazy adbutils). Only the adb server's protocol, never
+    # an `adb` executable: inside a container the server can be a relay to the
+    # host's, with no binary on purpose (a client of another version kills it).
+    @property
+    def adb_device(self):
+        """The adbutils device, kept per session: it caches the shell_v2 feature check."""
         if self.ios:
             raise UserError("this command is not available on iOS yet", "unsupported",
                             hint="IOS-INTEGRATION.md §6 lists what works on an iPhone")
-        try:
-            out = subprocess.run([dev.adb_path(), "-s", self.serial, *cmd],
-                                 capture_output=True, text=True, timeout=timeout)
-        except (subprocess.SubprocessError, OSError) as e:
-            raise UserError(f"adb {' '.join(cmd[:3])}: {e}", "adb")
-        if check and out.returncode != 0:
-            raise UserError(f"adb {' '.join(cmd[:3])} failed: {(out.stderr or out.stdout).strip()[:300]}", "adb")
-        return out.stdout
+        if self._adb_device is None:
+            self._adb_device = dev.adb_device(self.serial)
+        return self._adb_device
 
     def shell(self, *cmd, timeout=30, check=True):
-        return self.adb("shell", *cmd, timeout=timeout, check=check)
+        """`adb shell CMD...` over the server's shell_v2 protocol: stdout, with a real
+        exit status. The words are joined with spaces exactly as the adb client
+        does, so callers keep quoting what the device shell must not re-split."""
+        return self._run(" ".join(cmd), "shell " + " ".join(cmd[:2]), timeout, check)
+
+    def logcat(self, *args, timeout=30, check=True):
+        """`adb logcat ARGS...`: what the adb client sends (its args quoted, the
+        host's ANDROID_LOG_TAGS cleared), over the shell protocol."""
+        line = 'export ANDROID_LOG_TAGS=""; exec logcat ' + " ".join(shlex.quote(x) for x in args)
+        return self._run(line, "logcat " + " ".join(args[:2]), timeout, check)
+
+    def _run(self, line, label, timeout, check):
+        r = dev.shell_v2(self.adb_device, line, timeout=timeout, label=label)
+        if check and r.returncode != 0:
+            raise UserError(f"adb {label} failed: {(r.stderr or r.stdout).strip()[:300]}", "adb")
+        return r.stdout
+
+    def install(self, apk, grant=False, timeout=300):
+        """`adb install -r [-g] APK`: push it, `pm install` it, remove the copy.
+        -> pm's output (stdout and stderr: a `Failure [...]` lands on stderr)."""
+        import adbutils
+        remote = f"/data/local/tmp/droidctl-install-{os.getpid()}.apk"
+        d = self.adb_device
+        try:
+            d.sync.push(apk, remote)
+        except (adbutils.AdbError, adbutils.AdbTimeout, OSError) as e:
+            raise UserError(f"adb push {apk}: {e}", "adb")
+        try:
+            r = dev.shell_v2(d, " ".join(["pm", "install", "-r", *(["-g"] if grant else []),
+                                          shlex.quote(remote)]), timeout=timeout, label="install")
+            return r.stdout + r.stderr
+        finally:
+            try:
+                dev.shell_v2(d, f"rm -f {shlex.quote(remote)}", timeout=30, label="shell rm")
+            except UserError:
+                pass
 
 
 _SESSIONS = {}
@@ -2031,7 +2064,7 @@ def cmd_install(a):
         return _install_ios(sess, a)
     if not os.path.exists(a.apk):
         raise UserError(f"{a.apk} does not exist", "not-found")
-    out = sess.adb("install", "-r", *(["-g"] if a.grant else []), a.apk, timeout=300, check=False)
+    out = sess.install(a.apk, grant=a.grant, timeout=300)
     if "Success" not in out:
         raise UserError(f"install failed: {out.strip()[-300:]}", "adb")
     return {"ok": True, "apk": a.apk, "text": f"installed {os.path.basename(a.apk)}"}
@@ -2065,7 +2098,7 @@ def cmd_logs(a):
     # logcat filterspecs: only these tags (at --level), everything else silent
     spec = ([f"{t}:{a.level or 'V'}" for t in dict.fromkeys(tags)] + ["*:S"] if tags
             else ["*:" + a.level] if a.level else [])
-    cmd = ["logcat", "-d", "-v", "threadtime"]
+    cmd = ["-d", "-v", "threadtime"]
     if not (spec or a.pkg):
         # `-t N` counts the buffer's last N lines BEFORE any filter: with a tag, a
         # level or a pid it returned nothing on a busy phone (a mark 7 s old, Galaxy
@@ -2074,18 +2107,18 @@ def cmd_logs(a):
     if a.pkg:
         pid = sess.shell("pidof", a.pkg, check=False).strip().split()
         # its crashes, from the crash buffer: they survive the process and log noise
-        crash = crash_blocks(sess.adb("logcat", "-d", "-b", "crash", "-v", "threadtime",
-                                      timeout=30), a.pkg)[-a.max:]
+        crash = crash_blocks(sess.logcat("-d", "-b", "crash", "-v", "threadtime",
+                                         timeout=30), a.pkg)[-a.max:]
         if not pid:
             # not running (maybe it crashed): lines that mention the package, plus its crashes
             cmd += spec or ["*:V"]
-            lines = [x for x in sess.adb(*cmd, timeout=30).splitlines() if a.pkg in x]
+            lines = [x for x in sess.logcat(*cmd, timeout=30).splitlines() if a.pkg in x]
             lines = lines[-a.max:]
             text = "\n".join(lines + (["-- crash --"] + crash if crash else [])) or "(no lines)"
             return {"ok": True, "lines": lines, "crash": crash, "pid": None, "text": text}
         cmd += ["--pid", pid[0]]
     cmd += spec
-    lines = sess.adb(*cmd, timeout=30).splitlines()
+    lines = sess.logcat(*cmd, timeout=30).splitlines()
     lines = [x for x in lines if x and not x.startswith("--------- beginning")][-a.max:]
     if a.pkg:
         text = "\n".join(lines + (["-- crash --"] + crash if crash else [])) or "(no lines)"

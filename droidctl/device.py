@@ -244,8 +244,10 @@ def find_forward(serial, forwards_text=None, remote=REMOTE):
 # adb via adbutils (lazy): shell, install, forward
 # --------------------------------------------------------------------------
 def adb_device(serial):
+    """The adbutils device, on a client made now: `adbutils.adb` froze the server's
+    host/port (ANDROID_ADB_SERVER_*) at import, and _adb_host_query reads them per call."""
     import adbutils
-    return adbutils.adb.device(serial)
+    return adbutils.AdbClient().device(serial)
 
 
 def sh(d, cmd, timeout=30):
@@ -255,6 +257,19 @@ def sh(d, cmd, timeout=30):
         return d.shell2(cmd, timeout=timeout).output.strip()
     except (adbutils.AdbError, adbutils.AdbTimeout, OSError) as e:
         raise UserError(f"adb shell {cmd!r}: {e}", "adb")
+
+
+def shell_v2(d, line, timeout=30, label=None, encoding="utf-8"):
+    """`adb shell LINE` over the adb server's shell_v2 protocol (no `adb` binary):
+    -> adbutils ShellReturn (returncode, stdout, stderr). LINE goes to the device
+    shell as is, as `adb shell` sends its space-joined words. adb failures become
+    kind `adb`, named by `label` (default: the line's first two words);
+    `encoding=None` keeps the output bytes."""
+    import adbutils
+    try:
+        return d.shell2(line, timeout=timeout, encoding=encoding, v2=True)
+    except (adbutils.AdbError, adbutils.AdbTimeout, OSError) as e:
+        raise UserError(f"adb {label or 'shell ' + ' '.join(line.split()[:2])}: {e}", "adb")
 
 
 def _free_port():
@@ -621,22 +636,22 @@ def secure_windows(dumpsys_text):
 def screencap_jpeg(serial, scale=0.5, quality=70, crop=None):
     import base64
     import io
-    import subprocess
+    d = adb_device(serial)
     try:
-        dump = subprocess.run([adb_path(), "-s", serial, "shell", "dumpsys", "window", "windows"],
-                              capture_output=True, text=True, timeout=15).stdout
-    except (subprocess.SubprocessError, OSError):
+        dump = shell_v2(d, "dumpsys window windows", timeout=15).stdout
+    except UserError:
         dump = ""
     secure = secure_windows(dump)
     if secure:
         raise UserError(f"a FLAG_SECURE window is on screen ({secure[0]}); screencap would return "
                         "a black image, not the screen", "secure-window",
                         hint="snapshot still works on secure windows")
-    try:
-        png = subprocess.run([adb_path(), "-s", serial, "exec-out", "screencap", "-p"],
-                             capture_output=True, timeout=15, check=True).stdout
-    except (subprocess.SubprocessError, OSError) as e:
-        raise UserError(f"screencap failed: {e}", "adb")
+    # `adb exec-out screencap -p`: shell_v2 keeps stdout binary-clean and apart from stderr
+    r = shell_v2(d, "screencap -p", timeout=15, label="screencap", encoding=None)
+    png = r.stdout
+    if r.returncode != 0 or not png.startswith(b"\x89PNG\r\n\x1a\n"):
+        why = (r.stderr.decode(errors="replace").strip() or f"exit {r.returncode}, {len(png)} bytes, not a PNG")
+        raise UserError(f"screencap failed: {why[:300]}", "adb")
     try:
         from PIL import Image
     except ImportError:
@@ -682,7 +697,10 @@ def _bundled_adb():
 
 def start_adb_server():
     """`adb start-server` with adb_path(); True if it ran. Only when none answers,
-    so an existing server (whatever its version) is never replaced."""
+    so an existing server (whatever its version) is never replaced. This is the one
+    use of an `adb` executable: everything else speaks the server's protocol, so
+    with a server (or a relay to one) on the port no binary is ever looked for,
+    and without a binary this just returns False."""
     import subprocess
     try:
         return subprocess.run([adb_path(), "start-server"], capture_output=True, timeout=20).returncode == 0
