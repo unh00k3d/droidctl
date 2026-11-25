@@ -290,7 +290,10 @@ droidctl proxy setup                             # install the bundled proxy-app
   and password must be letters and digits. Results show the URL with the password as `***`.
 - **The phone's owner may use proxy-app for their own work.** `on` records which of their
   profiles was selected and whether it was connected (once; a second `on` keeps the first
-  record), and `off` puts exactly that back: it reconnects their profile if it was on. Their
+  record), and `off` puts exactly that back: it reconnects their profile if it was on. The
+  record is kept on the phone, in `droidctl-pt`'s tag (`droidctl-restore:v1:<id>:<connected|off>`,
+  shown as a chip on that card), so it survives a new host or a recreated container;
+  `~/.droidctl/state.json` keeps a copy as the fallback. Their
   profiles are never edited. If they switched to their own profile meanwhile, `off` leaves it.
   proxy-app has no select-only command, so a profile of theirs that was selected but off is
   re-selected by connecting and disconnecting it (`off` says so in a `warning`).

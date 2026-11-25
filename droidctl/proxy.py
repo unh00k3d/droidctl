@@ -12,8 +12,11 @@ LAST `"`. No data means no receiver ran. result=1 carries {"error": ...}.
 
 The phone's owner uses proxy-app for their own work, so droidctl owns exactly one
 profile (`droidctl-pt`), records what was selected and whether it was connected
-before `proxy on` (in ~/.droidctl/state.json), and `proxy off` puts that back.
-Other profiles are never edited or removed. Everything goes over the adb server's
+before `proxy on`, and `proxy off` puts that back. The record lives ON THE PHONE, in
+droidctl-pt's own `tag` (`droidctl-restore:v1:<profile id or ->:<connected|off>`), so it
+survives a new host or a recreated container (pt runs droidctl in a disposable one);
+~/.droidctl/state.json keeps a copy as the fallback. (`tag`, not `note`: the receiver
+stores a note but `list` never returns it.) Other profiles are never edited or removed. Everything goes over the adb server's
 protocol (Session.shell / Session.install): no `adb` binary.
 """
 import hashlib
@@ -40,6 +43,7 @@ MANIFEST_PATH = os.path.join(ASSETS, "proxy-app.json")
 CONSENT_PKGS = ("com.android.vpndialogs",)
 CONSENT_LABELS = ("ok", "allow", "tamam", "izin ver")
 POLL_S = 0.5
+TAG_PREFIX = "droidctl-restore:v1:"          # droidctl-pt's tag: the user's pre-`on` state
 ACTIVE = ("connected", "connecting")
 _PKG_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$")
 _SECRET_RE = re.compile(r"(://[^:/@\s\"']*:)[^@\s\"']*@")
@@ -247,10 +251,42 @@ def accept_consent(a, timeout=10.0):
 def _status_record(st, profiles):
     """What the user had before `proxy on`: the selected profile (by id) and its state."""
     sel = next((p for p in profiles if p.get("selected")), None)
+    state = st.get("state")
     if sel is not None and str(sel.get("name", "")).lower() == PROFILE.lower():
-        sel = None
-    return {"state": st.get("state"), "profile_id": sel and sel.get("id"), "profile": sel and sel.get("name"),
+        sel, state = None, "off"                # droidctl's own: nothing of the user's to put back
+    return {"state": state, "profile_id": sel and sel.get("id"), "profile": sel and sel.get("name"),
             "recorded": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+
+
+def _encode_record(rec):
+    """The restore record as droidctl-pt's tag: only the id and on/off (names may hold `:`)."""
+    return f"{TAG_PREFIX}{rec.get('profile_id') or '-'}:{'connected' if rec.get('state') in ACTIVE else 'off'}"
+
+
+def _device_record(profiles):
+    """The restore record kept in droidctl-pt's tag, or None (no droidctl-pt, no or a foreign
+    tag, or one that points at droidctl-pt itself). The name is looked up by id."""
+    ours = _ours(profiles)
+    tag = str((ours or {}).get("tag") or "")
+    if not tag.startswith(TAG_PREFIX):
+        return None
+    pid, _, state = tag[len(TAG_PREFIX):].rpartition(":")
+    if not pid or state not in ("connected", "off"):
+        return None
+    pid = None if pid == "-" else pid
+    if pid is not None and pid == ours.get("id"):
+        return None
+    prof = next((p for p in profiles if pid is not None and p.get("id") == pid), None)
+    return {"state": state, "profile_id": pid, "profile": prof.get("name") if prof else None,
+            "source": "device"}
+
+
+def _local_record(serial, ours):
+    """state.json's copy, unless it points at droidctl-pt itself."""
+    rec = dev.device_state(serial).get("proxy_restore")
+    if rec and ours is not None and rec.get("profile_id") == ours.get("id"):
+        return None
+    return rec
 
 
 # --------------------------------------------------------------------------
@@ -304,13 +340,15 @@ def _on(a):
     sess = _session(a)
     if not sess.shell("pm", "path", a.app, check=False).strip().startswith("package:"):
         raise UserError(f"{a.app} is not installed", "not-found", hint="see: droidctl apps")
-    # what the user had, read before any install and recorded once: a second `on` must
-    # not overwrite it with ours
+    # what the user had, read before any install and recorded once: a second `on` (also
+    # from a new host or container, with no state.json) must not overwrite it with ours.
+    # The phone's copy (droidctl-pt's tag) wins, then state.json, then the state just read.
     setup, pre, profiles = _install_keeping_state(sess, install=not getattr(a, "no_auto_setup", False),
                                                   timeout=a.timeout)
-    if "proxy_restore" not in dev.device_state(sess.serial):
-        dev.update_device_state(sess.serial, proxy_restore=_status_record(pre or {"state": "off"}, profiles))
-    previous = dev.device_state(sess.serial)["proxy_restore"]
+    previous = (_device_record(profiles) or _local_record(sess.serial, _ours(profiles))
+                or _status_record(pre or {"state": "off"}, profiles))
+    previous = {k: v for k, v in previous.items() if k != "source"}
+    dev.update_device_state(sess.serial, proxy_restore=previous)
     st = call(sess, "status")
     try:
         return _switch_on(a, sess, url, dns, st, setup, previous)
@@ -320,9 +358,10 @@ def _on(a):
 
 
 def _switch_on(a, sess, url, dns, st, setup, previous):
+    # the record goes on the phone in the same `add`: a failed connect still leaves it there
     saved = call(sess, "add", ("--es", "name", PROFILE), ("--es", "url", url), ("--es", "apps", a.app),
                  ("--es", "mode", "only"), ("--es", "dns", dns), ("--ez", "blockquic", True),
-                 ("--ez", "select", True))["saved"]
+                 ("--es", "tag", _encode_record(previous)), ("--ez", "select", True))["saved"]
     # a running VPN (the user's, or ours with the old settings) is stopped first, so the new one applies
     if st.get("state") in ACTIVE:
         call(sess, "disconnect")
@@ -345,9 +384,10 @@ def _switch_on(a, sess, url, dns, st, setup, previous):
 
 def _off(a):
     sess = _session(a)
-    rec = dev.device_state(sess.serial).get("proxy_restore")
     st, profiles = call(sess, "status"), call(sess, "list")
     ours = _ours(profiles)
+    # the phone's record first (it survives a recreated container), else this host's copy
+    rec = _device_record(profiles) or _local_record(sess.serial, ours)
     if rec is None and ours is None:
         return {"ok": True, "changed": False, "state": st.get("state"), "profile": st.get("profile"),
                 "text": "droidctl's proxy was not on; nothing changed"}
@@ -371,7 +411,8 @@ def _off(a):
     data["devices"].get(sess.serial, {}).pop("proxy_restore", None)
     dev.save_state(data)
     out.update(state=st.get("state"), profile=st.get("profile"),
-               restored={k: (rec or {}).get(k) for k in ("state", "profile")})
+               restored={k: (rec or {}).get(k) for k in ("state", "profile")},
+               restored_from=rec and rec.get("source", "local"))
     if warning:
         out["warning"] = warning
     out["text"] = (f"proxy off; restored {out['restored']['profile'] or 'no selection'} "
@@ -388,7 +429,7 @@ def _restore(sess, rec, timeout):
     profiles = call(sess, "list")
     prof = next((p for p in profiles if p.get("id") == pid), None)
     if prof is None:
-        return f"the previous profile {rec.get('profile')!r} no longer exists; nothing selected"
+        return f"the previous profile {rec.get('profile') or pid!r} no longer exists; nothing selected"
     if rec.get("state") in ACTIVE:
         call(sess, "connect", ("--es", "profile", pid))
         _wait_state(sess, prof["name"], timeout)

@@ -164,7 +164,7 @@ def test_on_routes_the_app_and_off_restores_the_users_connected_profile(phone, c
     add = next(l for l in app.broadcasts if "--es cmd add" in l)
     assert add == (PREFIX + "add --es name 'droidctl-pt' --es url 'http://phone:pt@127.0.0.1:8080' "
                    "--es apps 'com.android.chrome' --es mode 'only' --es dns 'direct' "
-                   "--ez blockquic true --ez select true")
+                   "--ez blockquic true --es tag 'droidctl-restore:v1:u-1:connected' --ez select true")
     ours = next(p for p in app.profiles if p["name"] == "droidctl-pt")
     assert app.active_id == ours["id"] and ours["packages"] == ["com.android.chrome"]
     assert app.profiles[:2] == [USER, USER2]                # the user's profiles untouched
@@ -209,6 +209,91 @@ def test_a_second_on_keeps_the_first_record(phone, capsys):
     assert [p["name"] for p in app.profiles].count("droidctl-pt") == 1
     run(capsys, "proxy", "off")
     assert app.snapshot() == before
+
+
+# --- the record lives on the phone: a recreated container (no state.json) still restores
+def _recreate():
+    """pt runs droidctl in a disposable container: a new one has no ~/.droidctl."""
+    act.close_sessions()
+    dev.save_state({"devices": {}})
+
+
+def _our_tag(app):
+    return next(p for p in app.profiles if p["name"] == "droidctl-pt").get("tag")
+
+
+def test_off_after_a_container_recreate_restores_the_users_connected_profile(phone, capsys):
+    _, app = phone
+    before = app.snapshot()
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    _recreate()
+    r = run(capsys, "proxy", "off")
+    assert r["restored"] == {"state": "connected", "profile": "Work"} and r["restored_from"] == "device"
+    assert r["state"] == "connected" and r["profile"] == "Work" and "warning" not in r
+    assert app.snapshot() == before
+
+
+def test_on_again_after_a_recreate_keeps_the_phones_record(phone, capsys):
+    _, app = phone
+    before = app.snapshot()
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    _recreate()
+    r = run(capsys, "proxy", "on", "--app", "com.android.chrome", "--to", "socks5://127.0.0.1:1080")
+    assert r["previous"] == {"state": "connected", "profile": "Work"}
+    assert _our_tag(app) == "droidctl-restore:v1:u-1:connected"
+    assert dev.device_state(SERIAL)["proxy_restore"]["profile_id"] == "u-1"
+    _recreate()
+    r = run(capsys, "proxy", "off")
+    assert r["restored_from"] == "device" and app.snapshot() == before
+
+
+def test_the_phones_record_wins_over_a_stale_local_one(phone, capsys):
+    _, app = phone
+    before = app.snapshot()
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    dev.update_device_state(SERIAL, proxy_restore={"state": "off", "profile_id": "u-2", "profile": "Home"})
+    r = run(capsys, "proxy", "off")
+    assert r["restored"] == {"state": "connected", "profile": "Work"} and app.snapshot() == before
+
+
+def test_the_record_never_points_at_droidctl_pt(phone, capsys):
+    """A droidctl-pt left selected and connected with no record anywhere (a pre-fix
+    droidctl, then a recreate): the record is 'nothing', never droidctl-pt itself, and a
+    second `on` keeps it."""
+    _, app = phone
+    app.profiles.append({"id": "d-1", "name": "droidctl-pt", "mode": "only", "packages": ["com.android.chrome"]})
+    app.selected_id = app.active_id = "d-1"
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    assert _our_tag(app) == "droidctl-restore:v1:-:off"
+    _recreate()
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    assert _our_tag(app) == "droidctl-restore:v1:-:off"
+    r = run(capsys, "proxy", "off")
+    assert r["restored_from"] == "device" and r["restored"] == {"state": "off", "profile": None}
+    assert "droidctl-pt" not in [p["name"] for p in app.profiles] and app.active_id is None
+
+
+@pytest.mark.parametrize("tag", ["droidctl-restore:v1:d-1:connected", "droidctl-restore:v1:u-1:bogus",
+                                 "droidctl-restore:v9:u-1:connected", "my own tag"])
+def test_a_tag_that_is_not_a_record_is_ignored(phone, capsys, tag):
+    """Pointing at droidctl-pt itself, malformed, another version, or the user's: the
+    next source (state.json, then the state read) is used, and it is overwritten."""
+    _, app = phone
+    app.profiles.append({"id": "d-1", "name": "droidctl-pt", "mode": "only", "packages": ["com.android.chrome"],
+                         "tag": tag})
+    app.selected_id = app.active_id = "u-2"
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    assert _our_tag(app) == "droidctl-restore:v1:u-2:connected"
+
+
+def test_a_record_for_a_deleted_profile_warns(phone, capsys):
+    _, app = phone
+    run(capsys, "proxy", "on", "--app", "com.android.chrome")
+    _recreate()
+    app.profiles.remove(next(p for p in app.profiles if p["id"] == "u-1"))
+    r = run(capsys, "proxy", "off")
+    assert "'u-1' no longer exists" in r["warning"]
+    assert "droidctl-pt" not in [p["name"] for p in app.profiles]
 
 
 def test_off_leaves_a_vpn_the_user_switched_to_alone(phone, capsys):

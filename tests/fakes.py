@@ -493,7 +493,7 @@ class FakeProxyApp:
 
     def profile_json(self, p):
         return {"id": p["id"], "name": p["name"], "type": p.get("type", "http"), "host": p.get("host", "h"),
-                "port": p.get("port", 1), "auth": bool(p.get("user")), "tag": "",
+                "port": p.get("port", 1), "auth": bool(p.get("user")), "tag": p.get("tag", ""),
                 "apps": {"only": "only_selected", "all": "all", "except": "except_selected"}[p.get("mode", "all")],
                 "mode": p.get("mode", "all"), "packages": sorted(p.get("packages", [])),
                 "dns": p.get("dns", "auto"), "blockQuic": p.get("blockQuic", False)}
@@ -534,6 +534,11 @@ class FakeProxyApp:
                             password=u.password, mode=extras.get("mode", "all"),
                             packages=extras["apps"].split(","), dns=extras.get("dns", "auto"),
                             blockQuic=flags.get("blockquic", False))
+            # as the receiver's arg(): a blank extra is absent, so an omitted (or blank) tag
+            # keeps the profile's old one; `note` is stored but `list` never returns it
+            for key in ("tag", "note"):
+                if (extras.get(key) or "").strip():
+                    existing[key] = extras[key]
             if flags.get("select"):
                 self.selected_id = existing["id"]
             return 0, {"saved": self.profile_json(existing), "updated": existing["id"] != f"id-new-{self._n}"}
