@@ -152,6 +152,19 @@ and starts droidctl's runner; keep the phone unlocked.
 - Xcode can't reach the iPhone while droidctl reads its log (≤60 s after the last command):
   `droidctl daemon stop` releases it.
 
+## Proxying an app's traffic (`proxy`, Android)
+
+- `droidctl proxy on --app PKG [--to URL] [--dns auto|proxy|direct] --json` routes only that app
+  through the bundled per-app VPN proxy-app to the proxy (default `$DROIDCTL_PROXY_URL`, else
+  `http://phone:pt@127.0.0.1:8080`; user and password letters and digits only; the password
+  shows as `***`). It installs proxy-app when needed, accepts the system's VPN consent dialog
+  itself, and returns once `state` is `connected`. `--dns direct` (default) keeps DNS off the proxy.
+- `droidctl proxy off --json` disconnects and **puts the phone owner's own proxy-app profile and
+  state back** (reconnecting it if it was on). Always run it when done; their profiles are never
+  edited. `proxy status` / `proxy log [--limit N] [--failed]` pass proxy-app's JSON through.
+- Errors: `proxy` (`data.reason`: `no-receiver` = not installed, `rejected`, `consent`,
+  `connect-failed`), `timeout` while connecting (`data.status`).
+
 ## All commands
 
 Every device command also takes `--json`, `-d SERIAL` and `--no-auto-setup`. `LOCATOR` is

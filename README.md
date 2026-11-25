@@ -172,6 +172,25 @@ Both talk to the same daemon, print the same compact text and use the same error
   `droidctl mcp --install claude|codex|cursor|all` (it keeps your other servers and backs up
   the config file; `--dry-run` shows the change).
 
+## Proxying one app's traffic
+
+`droidctl proxy` routes a single app's traffic to an HTTP or SOCKS proxy (an intercepting proxy
+on the host behind `adb reverse`, say) through **proxy-app**, a per-app VPN that ships inside
+droidctl:
+
+| command | what |
+|---|---|
+| `droidctl proxy setup` | install the bundled proxy-app, only if it is missing or older |
+| `droidctl proxy on --app PKG [--to URL] [--dns auto\|proxy\|direct]` | route only PKG to the proxy (default `$DROIDCTL_PROXY_URL`, else `http://phone:pt@127.0.0.1:8080`; DNS `direct` by default) and wait until connected |
+| `droidctl proxy off` | disconnect and put your own proxy-app profile and state back |
+| `droidctl proxy status` / `proxy log [--limit N] [--failed]` | proxy-app's own status and connection log, as JSON |
+
+If you use proxy-app yourself, droidctl touches only its own profile (`droidctl-pt`): `on`
+records which of your profiles was selected and whether it was connected, and `off` restores
+it, reconnecting it if it was on. A profile that was selected but off is restored by connecting
+and at once disconnecting it, because proxy-app has no select-only command. droidctl never
+reinstalls the same proxy-app version, since that would cut a running VPN.
+
 ## What it does to your phone
 
 - `setup` installs `dev.droidctl.agent` and **appends** its service to the secure setting
@@ -183,6 +202,8 @@ Both talk to the same daemon, print the same compact text and use the same error
   phone: the secure settings end up byte-for-byte identical.
 - droidctl never switches or leaves behind a keyboard (IME) and never uninstalls other tools.
   `launch --clear` (which wipes an app's data) is the one destructive option, and it is opt-in.
+- `proxy setup` / `proxy on` install proxy-app (`com.proxyapp.mobile`) when it is missing or
+  older; `proxy off` puts its previous selection back but leaves the app installed.
 
 ## Security
 
