@@ -445,3 +445,176 @@ class FakeRunner:
 
     def close(self):
         self.sock.close()
+
+
+def broadcast_reply(code, data=None):
+    """What `am broadcast` prints for an ordered broadcast. Like the real one, the data
+    is NOT escaped: a JSON value with quotes in it goes between the quotes as is."""
+    out = "Broadcasting: Intent { act=com.enesb.proxyapp.CMD flg=0x400000 cmp=com.proxyapp.mobile/... }\n"
+    out += f"Broadcast completed: result={code}"
+    if data is not None:
+        out += f', data="{json.dumps(data, separators=(",", ":"))}"'
+    return out + "\n"
+
+
+class FakeProxyApp:
+    """proxy-app (com.proxyapp.mobile) behind FakeAdb's `shell`: its AdbReceiver's
+    commands over `am broadcast` (status, list, add, connect, disconnect, remove, log),
+    with the receiver's reply shapes and selection rules (AdbReceiver.kt,
+    ProfileRepository.kt: `selected` falls back to the first profile), plus the
+    `pm path` / `dumpsys package` / `pm install` that setup uses.
+
+    `profiles` is [{id, name, ...}]; `selected_id` and `state`/`active_id` are the VPN.
+    `consent=True` makes the next connect ask for VPN permission (once accepted, the
+    test calls `accept()`). `installed` is the versionCode on the phone (None: absent)."""
+
+    def __init__(self, profiles=(), selected_id=None, active_id=None, installed=1, consent=False,
+                 apps=("com.android.chrome",)):
+        self.profiles = [dict(p) for p in profiles]
+        self.selected_id, self.active_id = selected_id, active_id
+        self.installed, self.consent, self.apps = installed, consent, set(apps)
+        self.broadcasts, self.installs, self.connects = [], 0, []
+        self.connect_state = "connected"         # what a connect ends in ("connecting": slow, "error")
+        self.log = [{"time": "10:00:01", "proto": "tcp", "app": "com.android.chrome", "target": "example.com:80",
+                     "dst": "127.0.0.1:8080", "status": "ok", "up": 120, "down": 1400}]
+        self._n = 0
+
+    # -- state as the app computes it
+    def selected(self):
+        return (next((p for p in self.profiles if p["id"] == self.selected_id), None)
+                or (self.profiles[0] if self.profiles else None))
+
+    def _find(self, q):
+        hit = [p for p in self.profiles if p["id"] == q] or \
+              [p for p in self.profiles if p["name"].lower() == q.lower()]
+        if len(hit) != 1:
+            raise ValueError(f'no profile matches "{q}"')
+        return hit[0]
+
+    def profile_json(self, p):
+        return {"id": p["id"], "name": p["name"], "type": p.get("type", "http"), "host": p.get("host", "h"),
+                "port": p.get("port", 1), "auth": bool(p.get("user")), "tag": "",
+                "apps": {"only": "only_selected", "all": "all", "except": "except_selected"}[p.get("mode", "all")],
+                "mode": p.get("mode", "all"), "packages": sorted(p.get("packages", [])),
+                "dns": p.get("dns", "auto"), "blockQuic": p.get("blockQuic", False)}
+
+    def status(self):
+        active = next((p for p in self.profiles if p["id"] == self.active_id), None)
+        st = {"state": "off" if active is None else self.connect_state}
+        prof = active or self.selected()
+        if active is not None:
+            st["profile"] = active["name"]
+            if self.connect_state == "error":
+                st["error"] = 'dial "h:1": refused'
+        else:
+            st["profile"] = st["selected"] = prof and prof["name"]
+        st.update(mode=prof and prof.get("mode", "all"), apps=sorted(prof.get("packages", [])) if prof else [],
+                  blockQuic=prof and prof.get("blockQuic", False), dnsPolicy=prof and prof.get("dns", "auto"))
+        return st
+
+    # -- the receiver
+    def receive(self, extras, flags):
+        cmd = extras.get("cmd", "status")
+        if cmd == "status":
+            return 0, self.status()
+        if cmd == "list":
+            sel = self.selected()
+            return 0, [dict(self.profile_json(p), selected=p is sel, active=p["id"] == self.active_id)
+                       for p in self.profiles]
+        if cmd == "add":
+            import urllib.parse
+            u = urllib.parse.urlsplit(extras["url"])
+            existing = next((p for p in self.profiles if p["name"].lower() == extras["name"].lower()), None)
+            if existing is None:
+                self._n += 1
+                existing = {"id": f"id-new-{self._n}"}
+                self.profiles.append(existing)
+                self.selected_id = self.selected_id or existing["id"]
+            existing.update(name=extras["name"], type=u.scheme, host=u.hostname, port=u.port, user=u.username,
+                            password=u.password, mode=extras.get("mode", "all"),
+                            packages=extras["apps"].split(","), dns=extras.get("dns", "auto"),
+                            blockQuic=flags.get("blockquic", False))
+            if flags.get("select"):
+                self.selected_id = existing["id"]
+            return 0, {"saved": self.profile_json(existing), "updated": existing["id"] != f"id-new-{self._n}"}
+        if cmd == "connect":
+            try:
+                p = self._find(extras["profile"]) if "profile" in extras else self.selected()
+            except ValueError as e:
+                return 1, {"error": str(e)}
+            self.selected_id = p["id"]
+            self.connects.append(p["name"])
+            if self.consent:
+                self.pending = p["id"]
+                return 1, {"error": "VPN permission not granted yet: accept the consent dialog, then check status",
+                           "consent": "requested"}
+            self.active_id = p["id"]
+            if self.connect_state == "error":
+                return 1, {"error": 'dial "h:1": refused'}
+            if self.connect_state == "error-later":       # connect answers, then the tunnel fails
+                self.connect_state = "error"
+                return 0, dict(self.status(), state="connecting")
+            return 0, self.status()
+        if cmd == "disconnect":
+            self.active_id = None
+            return 0, self.status()
+        if cmd == "remove":
+            p = self._find(extras["profile"])
+            if self.active_id == p["id"]:
+                self.active_id = None
+            self.profiles.remove(p)
+            if self.selected_id == p["id"]:
+                self.selected_id = None
+            return 0, {"removed": p["name"]}
+        if cmd == "log":
+            entries = [e for e in self.log if not flags.get("failed") or e["status"] != "ok"]
+            return 0, entries[:int(extras.get("limit", 50))]
+        return 1, {"error": f'unknown command "{cmd}"'}
+
+    def accept(self):
+        """The user tapped OK: ToggleActivity connects the selected profile."""
+        self.consent = False
+        self.active_id = self.pending
+
+    def snapshot(self):
+        """The user-visible state (what `proxy off` must restore)."""
+        return ([dict(p) for p in self.profiles], self.selected()["id"] if self.selected() else None,
+                self.active_id)
+
+    # -- FakeAdb's shell callable
+    def __call__(self, line):
+        import shlex
+        words = shlex.split(line)
+        if words[:2] == ["am", "broadcast"]:
+            self.broadcasts.append(line)
+            if self.installed is None:
+                return b"Broadcasting: Intent { }\nBroadcast completed: result=0\n", b"", 0
+            extras, flags, i = {}, {}, 2
+            while i < len(words):
+                if words[i] in ("--es", "--ez", "--ei"):
+                    key, val = words[i + 1], words[i + 2]
+                    if words[i] == "--ez":
+                        flags[key] = val == "true"
+                    else:
+                        extras[key] = val
+                    i += 3
+                else:
+                    i += 2 if words[i] in ("-a", "-n") else 1
+            code, data = self.receive(extras, flags)
+            return broadcast_reply(code, data).encode(), b"", 0
+        if words[:2] == ["pm", "path"]:
+            ok = (words[2] == "com.proxyapp.mobile" and self.installed is not None) or words[2] in self.apps
+            return (f"package:/data/app/{words[2]}-1/base.apk\n".encode() if ok else b""), b"", 0 if ok else 1
+        if words[:2] == ["dumpsys", "package"]:
+            return (f"Packages:\n  Package [{words[2]}]\n    versionCode={self.installed} minSdk=26\n".encode()
+                    if self.installed is not None else b""), b"", 0
+        if words[:2] == ["pm", "install"]:
+            self.installs += 1
+            self.installed = self.bundled
+            self.active_id = None                 # replacing the app kills its running VPN
+            return b"Success\n", b"", 0
+        if words[0] == "rm":
+            return b"", b"", 0
+        raise AssertionError(f"unexpected device command: {line}")
+
+    bundled = 1

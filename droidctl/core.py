@@ -70,6 +70,7 @@ ERROR_KINDS = {
     "secure-window": "the window is FLAG_SECURE, so it cannot be captured",
     "signing": "the iPhone runner can't be signed or provisioned (no Apple sign-in, an expired one, no team, a free team's 3-app or certificate limit)",
     "not-trusted": "the iPhone doesn't trust the developer certificate yet (Settings > General > VPN & Device Management)",
+    "proxy": "proxy-app (the per-app VPN behind `droidctl proxy`) refused or did not answer; data.reason: no-receiver, rejected, consent, connect-failed, bad-reply",
     "profile-expired": "the iPhone runner's provisioning profile has expired and no new one could be issued (run: droidctl login)",
     # resolving and acting
     "stale-ref": "the ref no longer resolves (gone, shifted or occupied); re-run snapshot",

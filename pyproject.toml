@@ -37,9 +37,10 @@ droidctl = "droidctl.client:entry"
 packages = ["droidctl", "droidctl.assets", "droidctl.ios", "droidctl.ios.apple"]
 
 [tool.setuptools.package-data]
-# the agent APK (`make apk`) and the prebuilt iOS runner (`make runner`), both committed, ship inside the wheel
+# the agent APK (`make apk`), the prebuilt iOS runner (`make runner`) and proxy-app's APK with its
+# manifest (`droidctl proxy`), all committed, ship inside the wheel
 droidctl = ["SKILL.md"]
-"droidctl.assets" = ["*.apk", "*.zip"]
+"droidctl.assets" = ["*.apk", "*.zip", "*.json"]
 "droidctl.ios.apple" = ["*.pem"]
 # the iOS runner's Xcode project: built on the user's Mac with their signing team (`droidctl setup`)
 "droidctl.ios" = ["xcode/DroidctlRunner.xcodeproj/project.pbxproj",

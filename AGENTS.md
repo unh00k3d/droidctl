@@ -270,6 +270,38 @@ droidctl launch com.example --stop               # force-stop first; --clear wip
 droidctl stop-app com.example | apps --filter bank | install app.apk | open-url https://example.com
 ```
 
+## Proxy one app's traffic: `proxy`
+
+```bash
+droidctl proxy on --app com.android.chrome       # Chrome only -> $DROIDCTL_PROXY_URL (default http://phone:pt@127.0.0.1:8080)
+droidctl proxy on --app com.example --to socks5://127.0.0.1:1080 --dns proxy
+droidctl proxy status | proxy log --limit 20 --failed
+droidctl proxy off                               # disconnect, put the user's own proxy-app state back
+droidctl proxy setup                             # install the bundled proxy-app (on does it when needed)
+```
+
+- droidctl bundles **proxy-app** (`com.proxyapp.mobile`), a per-app VPN, and drives it over
+  `am broadcast`. `setup` installs it only when it is missing or older (never the same version
+  again: reinstalling kills a running VPN); an upgrade that stops the user's running profile
+  connects it again.
+- `on` routes **only `--app`** to the proxy (mode `only`, QUIC blocked so apps fall back to TCP)
+  through droidctl's own profile `droidctl-pt`, connects and waits for `connected`. `--dns
+  direct` (the default) keeps DNS off the proxy; `auto`/`proxy` send it through. The proxy's user
+  and password must be letters and digits. Results show the URL with the password as `***`.
+- **The phone's owner may use proxy-app for their own work.** `on` records which of their
+  profiles was selected and whether it was connected (once; a second `on` keeps the first
+  record), and `off` puts exactly that back: it reconnects their profile if it was on. Their
+  profiles are never edited. If they switched to their own profile meanwhile, `off` leaves it.
+  proxy-app has no select-only command, so a profile of theirs that was selected but off is
+  re-selected by connecting and disconnecting it (`off` says so in a `warning`).
+- No VPN permission yet: `on` taps OK on the system's "Connection request" dialog itself (only
+  that dialog), then waits for `connected`.
+- `status` and `log` pass proxy-app's JSON through (`status.state`: `off`, `connecting`,
+  `connected`, `error`; log entries `{time, proto, app, target, dst, status, up, down, error?}`;
+  `app` is "Unknown app" before Android 10). Errors: `proxy` (`data.reason` `no-receiver`,
+  `rejected`, `consent`, `connect-failed`), `timeout` (`data.status`), `not-installed` (with
+  `--no-auto-setup`).
+
 ## Prefer `run` for multi-step tasks
 
 ```bash
@@ -330,6 +362,7 @@ file with the same generated tables); `droidctl skill print` prints it.
 | `secure-window` | the window is FLAG_SECURE, so it cannot be captured |
 | `signing` | the iPhone runner can't be signed or provisioned (no Apple sign-in, an expired one, no team, a free team's 3-app or certificate limit) |
 | `not-trusted` | the iPhone doesn't trust the developer certificate yet (Settings > General > VPN & Device Management) |
+| `proxy` | proxy-app (the per-app VPN behind `droidctl proxy`) refused or did not answer; data.reason: no-receiver, rejected, consent, connect-failed, bad-reply |
 | `profile-expired` | the iPhone runner's provisioning profile has expired and no new one could be issued (run: droidctl login) |
 | `stale-ref` | the ref no longer resolves (gone, shifted or occupied); re-run snapshot |
 | `ambiguous` | the locator matched more than one element |
@@ -396,6 +429,7 @@ Regenerate with: `python -c 'from droidctl.cli import _command_table; print(_com
 | `install` | `<apk> --grant` | install an APK (adb install -r; iOS: a .app or .ipa) |
 | `open-url` | `<url> --settle MS --expect-change` | open a URL or deep link (ACTION_VIEW) and settle |
 | `run` | `[file] --step CMD --keep-going` | run many steps in one process and one device session |
+| `proxy` | `<{setup,on,off,status,log}> --app PKG --to URL --dns {auto,proxy,direct} --timeout S --limit N --failed` | route one app's traffic to a proxy with the bundled proxy-app (a per-app VPN): setup installs it, on/off switch it and restore the user's own profile, status/log pass its JSON through |
 | `daemon` | `<{start,stop,restart,status,logs}> --foreground --lines N` | the background daemon: start, stop, restart, status, logs |
 | `serve` | `--stdio` | bridge the daemon's JSON-RPC over stdin/stdout (not MCP: see `mcp`) |
 | `mcp` | `--install {claude,codex,cursor,all} --dry-run --force` | run the MCP server on stdio, or --install it into an agent's config |

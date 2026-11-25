@@ -1371,6 +1371,10 @@ def build_parser():
     from droidctl import commands
     commands.add_parsers(sub, jsonopt, devopt)
 
+    # proxy-app: route one app's traffic to a proxy (proxy.py)
+    from droidctl import proxy
+    proxy.add_parsers(sub, jsonopt, devopt)
+
     # daemon / serve / mcp (implemented in daemon.py and mcp.py)
     from droidctl import daemon
     daemon.add_parsers(sub, jsonopt)

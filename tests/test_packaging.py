@@ -35,9 +35,17 @@ def test_the_bundled_apk_has_the_expected_version_code():
 
 def test_the_wheel_config_ships_the_apk_and_skill():
     text = (ROOT / "pyproject.toml").read_text()
-    assert '"droidctl.assets" = ["*.apk", "*.zip"]' in text and 'droidctl = ["SKILL.md"]' in text
+    assert '"droidctl.assets" = ["*.apk", "*.zip", "*.json"]' in text and 'droidctl = ["SKILL.md"]' in text
     manifest = (ROOT / "MANIFEST.in").read_text()
-    assert "droidctl/assets/*.apk" in manifest and "droidctl/assets/*.zip" in manifest
+    assert all(f"droidctl/assets/*.{ext}" in manifest for ext in ("apk", "zip", "json"))
+
+
+def test_proxy_app_is_bundled_with_a_matching_manifest():
+    """`droidctl proxy setup` installs this APK; the code checks its sha256 against the manifest."""
+    from droidctl import proxy
+    man = proxy.bundled()
+    assert pathlib.Path(proxy.APK_PATH).is_file() and man["package"] == "com.proxyapp.mobile"
+    proxy._verify_apk(man)
 
 
 def test_the_ios_runner_is_bundled_and_built_from_the_current_sources():
